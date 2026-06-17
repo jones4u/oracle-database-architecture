@@ -530,12 +530,17 @@
     }
 
     .trainer-workspace.architecture-expanded {
-      grid-template-columns: minmax(0, 1fr) 0;
-      gap: 0;
+      grid-template-columns: minmax(0, 1.22fr) minmax(330px, 420px);
+      gap: 12px;
     }
 
     .trainer-workspace.side-panel-locked {
-      grid-template-columns: minmax(0, 1fr) 36px;
+      grid-template-columns: minmax(0, 1fr) 28px;
+      gap: 8px;
+    }
+
+    .trainer-workspace.architecture-expanded.side-panel-locked {
+      grid-template-columns: minmax(0, 1fr) 28px;
       gap: 8px;
     }
 
@@ -564,17 +569,15 @@
     }
 
     .trainer-workspace.architecture-expanded .side-panel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 22;
-      width: min(420px, 86vw);
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      width: auto;
       min-width: 0;
-      overflow: hidden;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(100%);
+      overflow: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
     }
 
     .trainer-workspace.architecture-expanded .diagram-panel {
@@ -626,14 +629,14 @@
 
     .side-panel-locker {
       position: absolute;
-      left: -20px;
+      left: -14px;
       top: 50%;
       z-index: 12;
-      width: 34px;
-      height: 88px;
+      width: 24px;
+      height: 62px;
       min-height: 0;
       padding: 0;
-      border-radius: 14px 0 0 14px;
+      border-radius: 10px 0 0 10px;
       display: grid;
       place-items: center;
       color: #dffbff;
@@ -651,14 +654,14 @@
 
     .side-panel-locker .locker-icon {
       display: inline-block;
-      font-size: 1.1rem;
+      font-size: .88rem;
       line-height: 1;
       transition: transform var(--fast);
     }
 
     .trainer-workspace.side-panel-locked .side-panel-locker {
-      left: -6px;
-      border-radius: 14px 0 0 14px;
+      left: -4px;
+      border-radius: 10px 0 0 10px;
       background: linear-gradient(180deg, rgba(255,209,102,.24), rgba(99,236,255,.12));
     }
 
@@ -667,7 +670,7 @@
     }
 
     .trainer-workspace.architecture-expanded .side-panel-locker {
-      display: none;
+      display: grid;
     }
 
     .diagram-panel {
@@ -1323,6 +1326,19 @@
       background: rgba(255, 209, 102, 0.07);
     }
 
+    .info-block.end-workflow {
+      border-color: rgba(255, 209, 102, 0.46);
+      border-left-color: #7ff6ff;
+      background:
+        linear-gradient(135deg, rgba(255, 209, 102, 0.17), rgba(99, 236, 255, 0.11)),
+        rgba(255,255,255,0.035);
+      box-shadow: 0 0 24px rgba(255, 209, 102, 0.12);
+    }
+
+    .info-block.end-workflow h3 {
+      color: #ffe59d;
+    }
+
     .info-block h3 {
       color: #f7fbff;
       font-size: .86rem;
@@ -1339,6 +1355,32 @@
 
     .info-block p {
       white-space: pre-line;
+    }
+
+    .abbreviation-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .abbreviation-row {
+      display: grid;
+      grid-template-columns: minmax(62px, .35fr) 1fr;
+      gap: 10px;
+      align-items: start;
+      color: #dbe7f6;
+      line-height: 1.35;
+      font-size: .9rem;
+    }
+
+    .abbr-key {
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: .02em;
+      white-space: nowrap;
+    }
+
+    .abbr-value {
+      color: #dbe7f6;
     }
 
     .student-summary {
@@ -1867,6 +1909,8 @@
     body.page-light-mode .student-summary,
     body.page-light-mode .workflow-focus-toggle,
     body.page-light-mode .workflow-focus-body,
+    body.page-light-mode .abbreviation-row,
+    body.page-light-mode .abbr-value,
     body.page-light-mode .step-path,
     body.page-light-mode .path-node,
     body.page-light-mode .component-chip,
@@ -1888,6 +1932,14 @@
 
     body.page-light-mode .panel-kicker {
       color: #8a5a00;
+    }
+
+    body.page-light-mode .abbr-key {
+      color: #8a5a00;
+    }
+
+    body.page-light-mode .info-block.end-workflow h3 {
+      color: #6f4b00;
     }
 
     body.page-light-mode .path-arrow {
@@ -1966,20 +2018,40 @@
 
     body.architecture-light-mode .svg-wrap {
       background:
-        radial-gradient(circle at 48% 42%, rgba(99,236,255,.14), transparent 34rem),
-        linear-gradient(180deg, rgba(238, 247, 255, .18), rgba(255, 255, 255, .05));
-      border-color: rgba(99, 236, 255, .28);
-      box-shadow: inset 0 0 44px rgba(99, 236, 255, .09);
+        radial-gradient(circle at 28% 30%, rgba(255,209,102,.18), transparent 25rem),
+        radial-gradient(circle at 55% 42%, rgba(99,236,255,.24), transparent 37rem),
+        linear-gradient(180deg, rgba(238, 247, 255, .26), rgba(255, 255, 255, .08));
+      border-color: rgba(99, 236, 255, .46);
+      box-shadow:
+        inset 0 0 74px rgba(99, 236, 255, .18),
+        0 0 34px rgba(99, 236, 255, .16);
     }
 
     body.architecture-light-mode .architecture-svg {
       background:
-        radial-gradient(circle at 44% 28%, rgba(255, 209, 102, .16), transparent 25rem),
-        radial-gradient(circle at 62% 62%, rgba(99, 236, 255, .18), transparent 31rem),
-        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.025));
-      filter: brightness(1.18) saturate(1.10);
-      border-color: rgba(99, 236, 255, .34);
-      box-shadow: 0 0 36px rgba(99, 236, 255, .13);
+        radial-gradient(circle at 42% 30%, rgba(255, 209, 102, .24), transparent 27rem),
+        radial-gradient(circle at 62% 62%, rgba(99, 236, 255, .30), transparent 33rem),
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+      filter: brightness(1.30) saturate(1.20) contrast(1.05);
+      border-color: rgba(99, 236, 255, .56);
+      box-shadow:
+        0 0 48px rgba(99, 236, 255, .24),
+        0 0 92px rgba(255, 209, 102, .10);
+    }
+
+    body.architecture-light-mode .architecture-svg .instance-frame,
+    body.architecture-light-mode .architecture-svg .sga-frame,
+    body.architecture-light-mode .architecture-svg .memory-shape,
+    body.architecture-light-mode .architecture-svg .process-shape,
+    body.architecture-light-mode .architecture-svg .storage-shape,
+    body.architecture-light-mode .architecture-svg .network-shape {
+      filter: drop-shadow(0 0 8px rgba(99,236,255,.38)) drop-shadow(0 0 12px rgba(255,209,102,.16));
+    }
+
+    body.architecture-light-mode .component.active rect,
+    body.architecture-light-mode .component.active path,
+    body.architecture-light-mode .component.active ellipse {
+      filter: url(#strongGlow) drop-shadow(0 0 10px rgba(255,242,122,.82)) drop-shadow(0 0 18px rgba(99,236,255,.52));
     }
 
     body.page-light-mode.architecture-light-mode .svg-wrap {
@@ -2531,7 +2603,10 @@
         direction: 1,
         speed: 1,
         timer: null,
+        workflowIntroMode: false,
         workflowFocusCollapsed: false,
+        workflowAbbreviationsCollapsed: false,
+        componentAbbreviationsCollapsed: false,
         autoScroll: true,
         loop: false,
         workflowCategory: "all",
@@ -2612,6 +2687,80 @@
         "redo-log-buffer": { zone: "redo", title: "Redo Log Buffer", detail: "Change records wait here before LGWR writes them to online redo logs." },
         "lgwr": { zone: "redo", title: "LGWR", detail: "LGWR flushes redo from memory to online redo logs for commit durability." }
       };
+
+      const abbreviationGlossary = {
+        "sql": { term: "SQL", full: "Structured Query Language" },
+        "plsql": { term: "PL/SQL", full: "Procedural Language extension to SQL" },
+        "sga": { term: "SGA", full: "System Global Area" },
+        "pga": { term: "PGA", full: "Program Global Area" },
+        "uga": { term: "UGA", full: "User Global Area" },
+        "lru-list": { term: "LRU", full: "Least Recently Used" },
+        "i-o": { term: "I/O", full: "Input/Output" },
+        "cpu": { term: "CPU", full: "Central Processing Unit" },
+        "cbo": { term: "CBO", full: "Cost-Based Optimizer" },
+        "ddl": { term: "DDL", full: "Data Definition Language" },
+        "dml": { term: "DML", full: "Data Manipulation Language" },
+        "dbwn": { term: "DBWn", full: "Database Writer process" },
+        "lgwr": { term: "LGWR", full: "Log Writer process" },
+        "ckpt": { term: "CKPT", full: "Checkpoint process" },
+        "arcn": { term: "ARCn", full: "Archiver process" },
+        "rvwr": { term: "RVWR", full: "Recovery Writer process" },
+        "rman": { term: "RMAN", full: "Recovery Manager" },
+        "mml": { term: "MML", full: "Media Management Library" },
+        "osb": { term: "OSB", full: "Oracle Secure Backup" },
+        "pmon": { term: "PMON", full: "Process Monitor process" },
+        "smon": { term: "SMON", full: "System Monitor process" },
+        "reco": { term: "RECO", full: "Recoverer process" },
+        "mmon": { term: "MMON", full: "Manageability Monitor process" },
+        "mmnl": { term: "MMNL", full: "Manageability Monitor Light process" },
+        "mman": { term: "MMAN", full: "Memory Manager process" },
+        "dbrm": { term: "DBRM", full: "Database Resource Manager process" },
+        "diag": { term: "DIAG", full: "Diagnosability process" },
+        "diag0": { term: "DIAG0", full: "Diagnosability helper process" },
+        "vktm": { term: "VKTM", full: "Virtual Keeper of Time process" },
+        "smco": { term: "SMCO", full: "Space Management Coordinator process" },
+        "qmnc": { term: "QMNC", full: "Queue Monitor Coordinator process" },
+        "cjq0": { term: "CJQ0", full: "Job Queue Coordinator process" },
+        "gen0": { term: "GEN0", full: "Generic task execution process" },
+        "psp0": { term: "PSP0", full: "Process Spawner process" }
+      };
+
+      const textAbbreviationMatchers = [
+        ["plsql", /\bPL\/SQL\b/i],
+        ["sql", /\bSQL\b/i],
+        ["sga", /\bSGA\b/i],
+        ["pga", /\bPGA\b/i],
+        ["uga", /\bUGA\b/i],
+        ["lru-list", /\bLRU\b/i],
+        ["i-o", /\bI\/O\b/i],
+        ["cpu", /\bCPU\b/i],
+        ["cbo", /\bCBO\b|\bCost-Based Optimizer\b/i],
+        ["ddl", /\bDDL\b/i],
+        ["dml", /\bDML\b/i],
+        ["dbwn", /\bDBWn\b|\bDBWR\b/i],
+        ["lgwr", /\bLGWR\b/i],
+        ["ckpt", /\bCKPT\b/i],
+        ["arcn", /\bARCn\b/i],
+        ["rvwr", /\bRVWR\b/i],
+        ["rman", /\bRMAN\b/i],
+        ["mml", /\bMML\b/i],
+        ["osb", /\bOSB\b|\bOracle Secure Backup\b/i],
+        ["pmon", /\bPMON\b/i],
+        ["smon", /\bSMON\b/i],
+        ["reco", /\bRECO\b/i],
+        ["mmon", /\bMMON\b/i],
+        ["mmnl", /\bMMNL\b/i],
+        ["mman", /\bMMAN\b/i],
+        ["dbrm", /\bDBRM\b/i],
+        ["diag0", /\bDIAG0\b/i],
+        ["diag", /\bDIAG\b/i],
+        ["vktm", /\bVKTM\b/i],
+        ["smco", /\bSMCO\b/i],
+        ["qmnc", /\bQMNC\b/i],
+        ["cjq0", /\bCJQ0\b/i],
+        ["gen0", /\bGEN0\b/i],
+        ["psp0", /\bPSP0\b/i]
+      ];
 
       const componentMetadata = {
         "instance": c("instance", "Oracle Instance", "Instance", "The running memory and process layer of Oracle Database.", "An instance is the combination of SGA memory and Oracle background processes started for a database.", "The instance is where SQL is parsed, cached, executed, coordinated, and made durable before or while files are updated.", "SQL work happens in server processes that use SGA structures and background processes attached to this instance.", "Teach the instance as the live engine. The database files can exist on disk, but users need an instance to do work.", "New DBAs often call the instance and database the same thing. The instance is running memory and processes; the database is persistent files.", "A running operations floor attached to a file vault.", "Point to the instance boundary first: this is the live engine Oracle starts before users can work.", ["sga", "pga", "dbwn", "lgwr", "ckpt", "database"]),
@@ -3159,10 +3308,23 @@
           if (event.target.id === "referencesModal") closeReferences();
         });
         $("#explanationPanel").addEventListener("click", (event) => {
-          const button = event.target.closest("[data-toggle-workflow-focus]");
-          if (!button) return;
-          state.workflowFocusCollapsed = !state.workflowFocusCollapsed;
-          updateExplanationPanel();
+          const focusButton = event.target.closest("[data-toggle-workflow-focus]");
+          if (focusButton) {
+            state.workflowFocusCollapsed = !state.workflowFocusCollapsed;
+            updateExplanationPanel();
+            return;
+          }
+          const abbreviationsButton = event.target.closest("[data-toggle-workflow-abbreviations]");
+          if (abbreviationsButton) {
+            state.workflowAbbreviationsCollapsed = !state.workflowAbbreviationsCollapsed;
+            updateExplanationPanel();
+            return;
+          }
+          const componentAbbreviationsButton = event.target.closest("[data-toggle-component-abbreviations]");
+          if (componentAbbreviationsButton) {
+            state.componentAbbreviationsCollapsed = !state.componentAbbreviationsCollapsed;
+            updateExplanationPanel();
+          }
         });
         $("#playButton").addEventListener("click", playFlow);
         $("#pauseButton").addEventListener("click", pauseFlow);
@@ -3317,7 +3479,9 @@
         state.activeFlowId = flowId;
         state.currentStepIndex = 0;
         state.selectedComponentId = null;
+        state.workflowIntroMode = true;
         state.workflowFocusCollapsed = false;
+        state.workflowAbbreviationsCollapsed = false;
         syncWorkflowViewMode();
         buildTimeline(flowId);
         updateTimelineUI();
@@ -3347,7 +3511,9 @@
         state.activeFlowId = flowId;
         state.currentStepIndex = Math.max(0, Math.min(stepIndex, flow.steps.length - 1));
         state.selectedComponentId = null;
-        if (!state.playing) state.workflowFocusCollapsed = state.currentStepIndex > 0;
+        state.workflowIntroMode = false;
+        state.workflowFocusCollapsed = true;
+        state.workflowAbbreviationsCollapsed = true;
         syncWorkflowViewMode();
         updateWorkflowCardState();
         buildTimeline(flowId);
@@ -3599,12 +3765,15 @@
           .join(" ");
       }
 
-      function goToStep(index) {
+      function goToStep(index, options = {}) {
         const flow = flows[state.activeFlowId];
         if (!flow) return;
         state.currentStepIndex = Math.max(0, Math.min(index, flow.steps.length - 1));
         state.selectedComponentId = null;
-        state.workflowFocusCollapsed = state.currentStepIndex > 0;
+        state.workflowIntroMode = false;
+        const expandDrawers = options.expandIntroDrawers && state.currentStepIndex === 0;
+        state.workflowFocusCollapsed = !expandDrawers;
+        state.workflowAbbreviationsCollapsed = !expandDrawers;
         syncLayoutMode();
         updateTimelineUI();
         updateCurrentOperationCard();
@@ -3617,6 +3786,10 @@
         const flow = flows[state.activeFlowId];
         if (!flow) {
           selectAdjacentComponent(1);
+          return;
+        }
+        if (state.workflowIntroMode) {
+          goToStep(0);
           return;
         }
         if (state.currentStepIndex < flow.steps.length - 1) {
@@ -3636,8 +3809,10 @@
           selectAdjacentComponent(-1);
           return;
         }
+        if (state.workflowIntroMode) return;
         if (state.currentStepIndex > 0) {
-          goToStep(state.currentStepIndex - 1);
+          const targetIndex = state.currentStepIndex - 1;
+          goToStep(targetIndex, { expandIntroDrawers: targetIndex === 0 });
         } else if (state.architectureExpanded && state.playing && activateAdjacentFlow(-1)) {
           return;
         } else if (state.loop) {
@@ -3664,9 +3839,12 @@
 
       function playFlow() {
         if (!state.activeFlowId) selectFlow(defaultWorkflowId());
+        if (state.workflowIntroMode) goToStep(state.currentStepIndex);
         state.playing = true;
         state.direction = 1;
-        state.workflowFocusCollapsed = state.currentStepIndex > 0;
+        state.workflowIntroMode = false;
+        state.workflowFocusCollapsed = true;
+        state.workflowAbbreviationsCollapsed = true;
         document.body.classList.remove("trainer-paused");
         updateExplanationPanel();
         schedulePlayback();
@@ -3694,7 +3872,10 @@
         pauseFlow();
         state.currentStepIndex = 0;
         state.selectedComponentId = null;
+        state.workflowIntroMode = false;
         state.workflowFocusCollapsed = false;
+        state.workflowAbbreviationsCollapsed = false;
+        state.componentAbbreviationsCollapsed = false;
         syncLayoutMode();
         if (state.activeFlowId) {
           goToStep(0);
@@ -3713,7 +3894,10 @@
         state.activeFlowId = null;
         state.currentStepIndex = 0;
         state.selectedComponentId = null;
+        state.workflowIntroMode = false;
         state.workflowFocusCollapsed = false;
+        state.workflowAbbreviationsCollapsed = false;
+        state.componentAbbreviationsCollapsed = false;
         state.focusMode = false;
         state.architectureExpanded = false;
         state.panelLocked = false;
@@ -3784,6 +3968,12 @@
           return;
         }
         const flow = flows[state.activeFlowId];
+        if (state.workflowIntroMode) {
+          const guideInfo = workflowTeachingGuides[state.activeFlowId] || {};
+          card.querySelector("h2").textContent = `${flow.title} - Workflow intro`;
+          card.querySelector("p").textContent = guideInfo.studentExplanation || flow.summary || flow.teachingPurpose || "Review the workflow overview, then press Play or Start Demo to begin Step 1.";
+          return;
+        }
         const item = flow.steps[state.currentStepIndex];
         card.querySelector("h2").textContent = `${flow.title} - ${state.currentStepIndex + 1}. ${item.title}`;
         card.querySelector("p").textContent = item.explanation;
@@ -3791,6 +3981,10 @@
 
       function updateDiagramHighlights() {
         const flow = flows[state.activeFlowId];
+        if (flow && state.workflowIntroMode) {
+          clearHighlights();
+          return;
+        }
         if (!flow) {
           if (state.selectedComponentId) {
             highlightComponentSet([state.selectedComponentId], componentMetadata[state.selectedComponentId].relatedComponents || []);
@@ -4194,6 +4388,7 @@
         if (!meta) return;
         pauseFlow();
         state.selectedComponentId = componentId;
+        state.componentAbbreviationsCollapsed = false;
         syncLayoutMode();
         highlightComponentSet([componentId], meta.relatedComponents || []);
         updateExplanationPanel();
@@ -4218,10 +4413,15 @@
         }
         if (state.activeFlowId) {
           const flow = flows[state.activeFlowId];
+          if (state.workflowIntroMode) {
+            panel.innerHTML = workflowOverviewTemplate(state.activeFlowId, flow);
+            return;
+          }
           const item = flow.steps[state.currentStepIndex];
           const activeIds = Array.from(new Set(item.componentIds));
           const notes = flow.trainerNotes || {};
           const guideInfo = workflowTeachingGuides[state.activeFlowId] || {};
+          const finalStep = state.currentStepIndex === flow.steps.length - 1;
           panel.innerHTML = `
             <div class="panel-kicker">Workflow guide</div>
             <h2>${escapeHtml(item.title)}</h2>
@@ -4231,8 +4431,10 @@
               <span class="tag">Step ${state.currentStepIndex + 1} of ${flow.steps.length}</span>
               <span class="tag">${escapeHtml(item.operation)}</span>
             </div>
+            ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
             ${workflowFocusDrawerTemplate(flow, guideInfo)}
             ${block("At this step", currentStepTeaching(flow, item, notes, guideInfo), "primary")}
+            ${finalStep ? block("End of Workflow", `${flow.title} has reached its final step. Use Reset to replay this workflow or choose another workflow from the list.`, "end-workflow") : ""}
             ${stepPathTemplate(item)}
             <div class="info-grid">
               ${flow.exampleSql ? block("Example SQL / command", flow.exampleSql, "primary") : ""}
@@ -4265,6 +4467,7 @@
           <h2>${escapeHtml(meta.title)}</h2>
           <div class="meta-row"><span class="tag">${escapeHtml(meta.category)}</span><span class="tag">${escapeHtml(meta.id)}</span></div>
           <div class="student-summary">${escapeHtml(meta.shortDescription)}</div>
+          ${componentAbbreviationsDrawerTemplate(meta)}
           <div class="info-grid">
             ${block("Definition and Use", `${meta.whatItIs} ${meta.whyItMatters}`, "primary")}
             ${operationMemoryPlacement[meta.id] ? htmlBlock("Memory placement", memoryPlacementTemplate([meta.id])) : ""}
@@ -4291,6 +4494,8 @@
             <span class="tag">${escapeHtml(flowId)}</span>
           </div>
           <div class="student-summary">${escapeHtml(guideInfo.studentExplanation || notes.simple || flow.summary || flow.teachingPurpose || "")}</div>
+          ${workflowFocusDrawerTemplate(flow, guideInfo)}
+          ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
           <div class="info-grid">
             ${flow.exampleSql ? block("Example SQL / command", flow.exampleSql) : ""}
             ${block("What this workflow teaches", guideInfo.focus || flow.teachingPurpose || flow.summary, "primary")}
@@ -4301,6 +4506,99 @@
             ${block("Common mix-up", notes.misconception || "Do not treat every highlighted component as the only component Oracle uses internally.")}
             ${block("Check your understanding", notes.question || "Which component is on the critical path for this operation?")}
             ${htmlBlock("Components touched", `<p>${escapeHtml(touched)}</p>`)}
+          </div>`;
+      }
+
+      function addTextAbbreviations(targetSet, ...values) {
+        values
+          .filter((value) => value !== undefined && value !== null)
+          .map((value) => String(value))
+          .forEach((text) => {
+            textAbbreviationMatchers.forEach(([key, pattern]) => {
+              if (pattern.test(text)) targetSet.add(key);
+            });
+          });
+      }
+
+      function addComponentAbbreviation(targetSet, id) {
+        if (!id) return;
+        if (abbreviationGlossary[id]) targetSet.add(id);
+        const meta = componentMetadata[id];
+        if (meta) addTextAbbreviations(targetSet, meta.title, meta.shortDescription, meta.whatItIs, meta.whyItMatters, meta.whatHappensDuringSql);
+      }
+
+      function componentAbbreviationKeys(meta) {
+        const keys = new Set();
+        addComponentAbbreviation(keys, meta.id);
+        addTextAbbreviations(keys, meta.title, meta.category, meta.shortDescription, meta.whatItIs, meta.whyItMatters, meta.whatHappensDuringSql, meta.commonConfusion, meta.trainerScript);
+        (meta.relatedComponents || []).forEach((id) => addComponentAbbreviation(keys, id));
+        return orderedAbbreviationKeys(keys);
+      }
+
+      function workflowAbbreviationKeys(flow, guideInfo = {}) {
+        const keys = new Set();
+        const notes = flow.trainerNotes || {};
+        addTextAbbreviations(keys, flow.title, flow.category, flow.bestFor, flow.summary, flow.teachingPurpose, flow.exampleSql, guideInfo.focus, guideInfo.studentExplanation, guideInfo.watch, guideInfo.keyTakeaway, notes.simple, notes.precision, notes.misconception, notes.question);
+        (flow.steps || []).forEach((item) => {
+          addTextAbbreviations(keys, item.id, item.title, item.operation, item.explanation, item.trainerScript, item.source, item.target);
+          addComponentAbbreviation(keys, item.source);
+          addComponentAbbreviation(keys, item.target);
+          (item.componentIds || []).forEach((id) => addComponentAbbreviation(keys, id));
+        });
+        return orderedAbbreviationKeys(keys);
+      }
+
+      function orderedAbbreviationKeys(keys) {
+        return Object.keys(abbreviationGlossary).filter((key) => keys.has(key));
+      }
+
+      function abbreviationListTemplate(keys) {
+        const entries = [];
+        const seenTerms = new Set();
+        keys.forEach((key) => {
+          const entry = abbreviationGlossary[key];
+          if (!entry || seenTerms.has(entry.term)) return;
+          seenTerms.add(entry.term);
+          entries.push(entry);
+        });
+        if (!entries.length) return "";
+        return `<div class="abbreviation-list">${entries.map((entry) => `
+          <div class="abbreviation-row">
+            <span class="abbr-key">${escapeHtml(entry.term)}</span>
+            <span class="abbr-value">${escapeHtml(entry.full)}</span>
+          </div>`).join("")}</div>`;
+      }
+
+      function abbreviationBlock(keys, title) {
+        const html = abbreviationListTemplate(keys);
+        return html ? htmlBlock(title, html, "primary") : "";
+      }
+
+      function workflowAbbreviationsDrawerTemplate(flow, guideInfo = {}) {
+        const html = abbreviationListTemplate(workflowAbbreviationKeys(flow, guideInfo));
+        if (!html) return "";
+        const collapsed = state.workflowAbbreviationsCollapsed;
+        return `
+          <div class="workflow-focus-drawer abbreviation-drawer ${collapsed ? "collapsed" : ""}">
+            <button class="workflow-focus-toggle" type="button" data-toggle-workflow-abbreviations aria-expanded="${String(!collapsed)}">
+              <strong>Full forms used in this workflow</strong>
+              <span class="drawer-icon" aria-hidden="true">${collapsed ? "&#9662;" : "&#9652;"}</span>
+            </button>
+            <div class="workflow-focus-body">${html}</div>
+          </div>`;
+      }
+
+      function componentAbbreviationsDrawerTemplate(meta) {
+        const html = abbreviationListTemplate(componentAbbreviationKeys(meta));
+        if (!html) return "";
+        const collapsed = state.componentAbbreviationsCollapsed;
+        return `
+          <div class="workflow-focus-drawer abbreviation-drawer component-abbreviation-drawer ${collapsed ? "collapsed" : ""}">
+            <button class="workflow-focus-toggle" type="button" data-toggle-component-abbreviations aria-expanded="${String(!collapsed)}">
+              <strong>Full forms used here</strong>
+              <span class="drawer-icon" aria-hidden="true">${collapsed ? "&#9662;" : "&#9652;"}</span>
+            </button>
+            <div class="workflow-focus-body">${html}</div>
           </div>`;
       }
 
@@ -4567,7 +4865,7 @@
         const workspace = $(".trainer-workspace");
         const button = $("#panelLockerButton");
         if (!workspace || !button) return;
-        const locked = state.panelLocked && !state.architectureExpanded;
+        const locked = state.panelLocked;
         workspace.classList.toggle("side-panel-locked", locked);
         button.classList.toggle("active", state.panelLocked);
         button.setAttribute("aria-pressed", String(state.panelLocked));
@@ -4589,14 +4887,13 @@
         const sidePanel = $("#sidePanel");
         button.classList.toggle("active", state.architectureExpanded);
         button.setAttribute("aria-pressed", String(state.architectureExpanded));
-        restoreButton.hidden = !state.architectureExpanded;
-        if (state.architectureExpanded) sidePanel.setAttribute("aria-hidden", "true");
-        else sidePanel.removeAttribute("aria-hidden");
+        restoreButton.hidden = true;
+        sidePanel.removeAttribute("aria-hidden");
         workspace.classList.toggle("architecture-expanded", state.architectureExpanded);
         syncPanelLockerState();
         syncArchitectureFraming();
         if (state.architectureExpanded) $("#diagramPanel").scrollIntoView({ block: "start", behavior: "smooth" });
-        setStatus(state.architectureExpanded ? "Full Architecture view on: explanation panel parked on the right." : "Full Architecture view off: explanation panel restored.");
+        setStatus(state.architectureExpanded ? "Full Architecture view on: architecture enlarged with the panel still available." : "Full Architecture view off.");
       }
 
       async function toggleArchitectureFullscreen() {
