@@ -265,13 +265,29 @@
     }
 
     .app-shell.workflow-active {
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto auto auto;
+      align-content: start;
       gap: 7px;
       padding-bottom: 16px;
     }
 
     .app-shell.workflow-active .workflow-explorer {
       display: none;
+    }
+
+    .app-shell.architecture-view-active {
+      grid-template-rows: auto auto auto auto;
+      align-content: start;
+      gap: 4px;
+      padding-bottom: 12px;
+    }
+
+    .app-shell.architecture-view-active .workflow-explorer {
+      display: none;
+    }
+
+    .app-shell.architecture-view-active .trainer-workspace {
+      scroll-margin-top: 0;
     }
 
     .app-shell.workflow-active .trainer-workspace {
@@ -370,6 +386,19 @@
     .app-shell.component-active .timeline-controls {
       justify-content: flex-start;
       gap: 4px;
+    }
+
+    .app-shell.architecture-view-active,
+    .app-shell.architecture-view-active.component-active,
+    .app-shell.architecture-view-active.workflow-active {
+      grid-template-rows: auto auto auto auto;
+      align-content: start;
+      gap: 4px;
+      padding-bottom: 12px;
+    }
+
+    .app-shell.architecture-view-active .workflow-explorer {
+      display: none !important;
     }
 
     .workflow-explorer-head {
@@ -3530,13 +3559,16 @@
       function syncLayoutMode() {
         const workflowActive = Boolean(state.activeFlowId);
         const componentActive = Boolean(state.selectedComponentId && !state.activeFlowId);
+        const architectureViewActive = Boolean(state.architectureExpanded);
         const appShell = $(".app-shell");
         const explorer = $(".workflow-explorer");
         appShell?.classList.toggle("workflow-active", workflowActive);
         appShell?.classList.toggle("component-active", componentActive);
+        appShell?.classList.toggle("architecture-view-active", architectureViewActive);
         if (explorer) {
-          explorer.hidden = workflowActive;
-          explorer.setAttribute("aria-hidden", String(workflowActive));
+          const explorerHidden = workflowActive || architectureViewActive;
+          explorer.hidden = explorerHidden;
+          explorer.setAttribute("aria-hidden", String(explorerHidden));
         }
       }
 
@@ -4890,6 +4922,7 @@
         restoreButton.hidden = true;
         sidePanel.removeAttribute("aria-hidden");
         workspace.classList.toggle("architecture-expanded", state.architectureExpanded);
+        syncLayoutMode();
         syncPanelLockerState();
         syncArchitectureFraming();
         if (state.architectureExpanded) $("#diagramPanel").scrollIntoView({ block: "start", behavior: "smooth" });
