@@ -135,11 +135,17 @@
     .app-shell {
       position: relative;
       z-index: 1;
+      --adaptive-workflow-svg-height: clamp(540px, calc(100dvh - 254px), 700px);
+      --adaptive-workflow-panel-height: clamp(590px, calc(100dvh - 218px), 735px);
+      --adaptive-normal-svg-height: clamp(610px, calc(100dvh - 84px), 1010px);
+      --adaptive-normal-panel-height: clamp(640px, calc(100dvh - 24px), 1050px);
+      --adaptive-architecture-svg-height: clamp(720px, calc(100dvh - 70px), 980px);
       min-height: 100vh;
       padding: 14px 20px 16px;
       display: grid;
       gap: 8px;
       grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      align-content: start;
     }
 
     .app-shell:not(.workflow-active) {
@@ -166,7 +172,7 @@
 
     h1 {
       margin-bottom: 6px;
-      font-size: clamp(1.55rem, 2.2vw, 2.55rem);
+      font-size: clamp(1.42rem, 1.9vw, 2.24rem);
       line-height: 1.05;
       font-weight: 750;
     }
@@ -296,23 +302,23 @@
     }
 
     .app-shell.workflow-active .side-panel {
-      height: clamp(560px, calc(100vh - 190px), 760px);
-      max-height: clamp(560px, calc(100vh - 190px), 760px);
+      height: var(--adaptive-workflow-panel-height);
+      max-height: var(--adaptive-workflow-panel-height);
       align-self: start;
     }
 
     .app-shell.workflow-active .svg-wrap {
-      height: clamp(500px, calc(100vh - 255px), 690px);
+      height: var(--adaptive-workflow-svg-height);
     }
 
     .app-shell:not(.workflow-active) .side-panel {
-      height: clamp(640px, calc(100vh - 24px), 1050px);
+      height: var(--adaptive-normal-panel-height);
       max-height: none;
       align-self: stretch;
     }
 
     .app-shell:not(.workflow-active) .svg-wrap {
-      height: clamp(610px, calc(100vh - 84px), 1010px);
+      height: var(--adaptive-normal-svg-height);
     }
 
     .app-shell:not(.workflow-active) .timeline-panel {
@@ -354,7 +360,8 @@
     }
 
     .app-shell.component-active {
-      grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto auto auto auto;
+      align-content: start;
       gap: 5px;
     }
 
@@ -364,13 +371,13 @@
     }
 
     .app-shell.component-active .side-panel {
-      height: clamp(680px, calc(100vh - 24px), 1050px);
+      height: max(680px, var(--adaptive-normal-panel-height));
       max-height: none;
       align-self: start;
     }
 
     .app-shell.component-active .svg-wrap {
-      height: clamp(610px, calc(100vh - 84px), 1010px);
+      height: var(--adaptive-normal-svg-height);
     }
 
     .app-shell.component-active .timeline-panel {
@@ -399,6 +406,48 @@
 
     .app-shell.architecture-view-active .workflow-explorer {
       display: none !important;
+    }
+
+    .app-shell.workflow-active,
+    .app-shell.component-active,
+    .app-shell.architecture-view-active {
+      align-content: start !important;
+    }
+
+    .app-shell.workflow-active {
+      grid-template-rows: auto auto auto auto !important;
+    }
+
+    .app-shell.component-active:not(.workflow-active) {
+      grid-template-rows: auto auto auto auto auto !important;
+    }
+
+    .app-shell.workflow-active .trainer-workspace,
+    .app-shell.workflow-active .timeline-panel,
+    .app-shell.architecture-view-active .trainer-workspace,
+    .app-shell.architecture-view-active .timeline-panel {
+      align-self: start;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    @supports not (height: 100dvh) {
+      .app-shell {
+        --adaptive-workflow-svg-height: clamp(540px, calc(100vh - 254px), 700px);
+        --adaptive-workflow-panel-height: clamp(590px, calc(100vh - 218px), 735px);
+        --adaptive-normal-svg-height: clamp(610px, calc(100vh - 84px), 1010px);
+        --adaptive-normal-panel-height: clamp(640px, calc(100vh - 24px), 1050px);
+        --adaptive-architecture-svg-height: clamp(720px, calc(100vh - 70px), 980px);
+      }
+
+      .app-shell.workflow-active .side-panel {
+        height: var(--adaptive-workflow-panel-height);
+        max-height: var(--adaptive-workflow-panel-height);
+      }
+
+      .app-shell.workflow-active .svg-wrap {
+        height: var(--adaptive-workflow-svg-height);
+      }
     }
 
     .workflow-explorer-head {
@@ -616,7 +665,7 @@
 
     .trainer-workspace.architecture-expanded .svg-wrap {
       min-height: 0;
-      height: clamp(720px, calc(100vh - 70px), 980px);
+      height: var(--adaptive-architecture-svg-height);
       overflow: hidden;
       display: grid;
       place-items: center;
@@ -849,7 +898,7 @@
 
     .svg-wrap {
       min-height: 0;
-      height: clamp(555px, calc(100vh - 255px), 725px);
+      height: var(--adaptive-workflow-svg-height);
       overflow: hidden;
       padding: 1px 5px;
       display: grid;
@@ -2652,6 +2701,7 @@
       const DEVELOPER_CREDIT = "Designed by Cyril Jones S - CSS - 2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
+      let layoutFrame = 0;
       const flowCueTimers = new Set();
       const FLOW_DRAW_MS = 780;
 
@@ -3247,6 +3297,7 @@
         bindControls();
         bindPanelScrollCapture();
         bindWorkspaceScrollSettle();
+        bindAdaptiveLayout();
         bindKeyboardShortcuts();
         bindSearch();
         populateWorkflowFilters();
@@ -3259,6 +3310,7 @@
         syncWorkflowViewMode();
         syncArchitectureFraming();
         syncPanelLockerState();
+        scheduleAdaptiveLayout();
       }
 
       function protectDeveloperCredit() {
@@ -3380,6 +3432,50 @@
         });
       }
 
+      function bindAdaptiveLayout() {
+        scheduleAdaptiveLayout();
+        window.addEventListener("resize", scheduleAdaptiveLayout, { passive: true });
+        window.addEventListener("orientationchange", scheduleAdaptiveLayout, { passive: true });
+        window.visualViewport?.addEventListener("resize", scheduleAdaptiveLayout, { passive: true });
+        window.visualViewport?.addEventListener("scroll", scheduleAdaptiveLayout, { passive: true });
+        document.fonts?.ready?.then(scheduleAdaptiveLayout).catch(() => {});
+      }
+
+      function scheduleAdaptiveLayout() {
+        cancelAnimationFrame(layoutFrame);
+        layoutFrame = requestAnimationFrame(syncAdaptiveLayout);
+      }
+
+      function syncAdaptiveLayout() {
+        const shell = $(".app-shell");
+        const workspace = $(".trainer-workspace");
+        const svgWrap = $(".svg-wrap");
+        const sidePanel = $("#sidePanel");
+        const toolbar = $(".diagram-toolbar");
+        if (!shell || !workspace || !svgWrap || !sidePanel) return;
+
+        const viewportHeight = Math.max(620, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 900);
+        const svgWidth = Math.max(980, svgWrap.getBoundingClientRect().width || workspace.getBoundingClientRect().width || 1200);
+        const naturalSvgHeight = svgWidth / 1.76;
+        const toolbarHeight = Math.max(42, toolbar?.getBoundingClientRect().height || 52);
+
+        const normalSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.9), 650, 1040);
+        const architectureSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.96), 760, 1100);
+        const workflowSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.78), 600, 760);
+        const workflowPanelHeight = workflowSvgHeight + toolbarHeight + 8;
+        const normalPanelHeight = normalSvgHeight + toolbarHeight + 8;
+
+        shell.style.setProperty("--adaptive-workflow-svg-height", `${Math.round(workflowSvgHeight)}px`);
+        shell.style.setProperty("--adaptive-workflow-panel-height", `${Math.round(workflowPanelHeight)}px`);
+        shell.style.setProperty("--adaptive-normal-svg-height", `${Math.round(normalSvgHeight)}px`);
+        shell.style.setProperty("--adaptive-normal-panel-height", `${Math.round(normalPanelHeight)}px`);
+        shell.style.setProperty("--adaptive-architecture-svg-height", `${Math.round(architectureSvgHeight)}px`);
+      }
+
+      function clampNumber(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
       function bindPanelScrollCapture() {
         const panel = $("#explanationPanel");
         if (!panel) return;
@@ -3411,6 +3507,7 @@
               behavior: reducedMotion ? "auto" : "smooth"
             });
             window.setTimeout(() => { settling = false; }, reducedMotion ? 80 : 420);
+            window.setTimeout(scheduleAdaptiveLayout, reducedMotion ? 90 : 440);
           }, 80);
         }, { passive: true });
       }
@@ -3570,6 +3667,7 @@
           explorer.hidden = explorerHidden;
           explorer.setAttribute("aria-hidden", String(explorerHidden));
         }
+        scheduleAdaptiveLayout();
       }
 
       function scrollPlayViewIntoPosition() {
