@@ -3673,9 +3673,20 @@
       function scrollPlayViewIntoPosition() {
         const workspace = $(".trainer-workspace");
         if (!workspace) return;
-        requestAnimationFrame(() => {
-          const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          workspace.scrollIntoView({ block: "start", behavior: reducedMotion ? "auto" : "smooth" });
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const passes = [0, 90, 260, 520];
+        passes.forEach((delay, index) => {
+          window.setTimeout(() => {
+            scheduleAdaptiveLayout();
+            requestAnimationFrame(() => {
+              const rect = workspace.getBoundingClientRect();
+              const targetTop = Math.max(0, window.scrollY + rect.top - 2);
+              window.scrollTo({
+                top: targetTop,
+                behavior: index === 0 && !reducedMotion ? "smooth" : "auto"
+              });
+            });
+          }, delay);
         });
       }
 
