@@ -4562,12 +4562,6 @@
           panel.innerHTML = `
             <div class="panel-kicker">Workflow guide</div>
             <h2>${escapeHtml(item.title)}</h2>
-            <div class="meta-row">
-              <span class="tag">${escapeHtml(flow.title)}</span>
-              ${flow.difficulty ? `<span class="tag">${escapeHtml(flow.difficulty)}</span>` : ""}
-              <span class="tag">Step ${state.currentStepIndex + 1} of ${flow.steps.length}</span>
-              <span class="tag">${escapeHtml(item.operation)}</span>
-            </div>
             ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
             ${workflowFocusDrawerTemplate(flow, guideInfo)}
             ${block("At this step", currentStepTeaching(flow, item, notes, guideInfo), "primary")}
@@ -4624,12 +4618,6 @@
         return `
           <div class="panel-kicker">Workflow overview</div>
           <h2>${escapeHtml(flow.title)}</h2>
-          <div class="meta-row">
-            <span class="tag">${escapeHtml(flow.category || "Workflow")}</span>
-            <span class="tag">${escapeHtml(flow.difficulty || "Basic")}</span>
-            <span class="tag">${escapeHtml(flow.bestFor || "DBA training")}</span>
-            <span class="tag">${escapeHtml(flowId)}</span>
-          </div>
           <div class="student-summary">${escapeHtml(guideInfo.studentExplanation || notes.simple || flow.summary || flow.teachingPurpose || "")}</div>
           ${workflowFocusDrawerTemplate(flow, guideInfo)}
           ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
