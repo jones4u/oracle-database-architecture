@@ -172,7 +172,7 @@
 
     h1 {
       margin-bottom: 6px;
-      font-size: clamp(1.42rem, 1.9vw, 2.24rem);
+      font-size: clamp(1.25rem, 1.55vw, 1.9rem);
       line-height: 1.05;
       font-weight: 750;
     }
@@ -3673,18 +3673,14 @@
       function scrollPlayViewIntoPosition() {
         const workspace = $(".trainer-workspace");
         if (!workspace) return;
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const passes = [0, 90, 260, 520];
-        passes.forEach((delay, index) => {
+        const passes = [0, 35, 90, 180, 360, 650];
+        passes.forEach((delay) => {
           window.setTimeout(() => {
             scheduleAdaptiveLayout();
             requestAnimationFrame(() => {
               const rect = workspace.getBoundingClientRect();
-              const targetTop = Math.max(0, window.scrollY + rect.top - 2);
-              window.scrollTo({
-                top: targetTop,
-                behavior: index === 0 && !reducedMotion ? "smooth" : "auto"
-              });
+              const targetTop = Math.max(0, Math.round(window.scrollY + rect.top - 2));
+              window.scrollTo({ top: targetTop, behavior: "auto" });
             });
           }, delay);
         });
