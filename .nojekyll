@@ -1,0 +1,2 @@
+Disable Jekyll processing for static trainer deployment.
+Static GitHub Pages deployment marker. This prevents GitHub Pages from applying Jekyll processing when branch-based Pages publishing is used.
