@@ -500,7 +500,7 @@
     .workflow-card-grid {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: minmax(260px, 320px);
+      grid-auto-columns: minmax(292px, 360px);
       gap: 10px;
       overflow-x: auto;
       padding-bottom: 0;
@@ -568,14 +568,15 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 74px;
+      min-width: 82px;
       min-height: 28px;
       color: #eaf5ff;
       font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0;
-      line-height: 1;
-      white-space: nowrap;
+      line-height: 1.12;
+      white-space: normal;
+      text-align: center;
       padding: 0.18rem 0.5rem;
       border: 1px solid rgba(99,236,255,.26);
       border-radius: 999px;
@@ -585,17 +586,20 @@
     .workflow-card .meta-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) max-content;
-      align-items: center;
+      align-items: start;
       gap: 8px;
       margin: 0;
     }
 
     .workflow-card .tag {
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      min-height: 28px;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
       justify-content: center;
+      text-align: center;
+      line-height: 1.12;
     }
 
     .trainer-workspace {
@@ -3650,8 +3654,8 @@
         return `
           <article class="workflow-card" data-workflow-card="${escapeHtml(flowId)}">
             <div class="meta-row">
-              <span class="tag">${escapeHtml(flow.category || "Workflow")}</span>
-              <span class="difficulty">${escapeHtml(flow.difficulty || "Basic")}</span>
+              <span class="tag" title="${escapeHtml(flow.category || "Workflow")}">${escapeHtml(flow.category || "Workflow")}</span>
+              <span class="difficulty" title="${escapeHtml(flow.difficulty || "Basic")}">${escapeHtml(flow.difficulty || "Basic")}</span>
             </div>
             <h3>${escapeHtml(flow.title)}</h3>
             <p><strong>Best for:</strong> ${escapeHtml(flow.bestFor || "DBA training")}</p>
