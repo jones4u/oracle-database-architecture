@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Offline Oracle Database 11g architecture and SQL execution trainer">
-  <meta name="author" content="Cyril Jones S - CSS - 2026">
-  <meta name="copyright" content="Designed by Cyril Jones S - 2026">
+  <meta name="author" content="Cyril Jones S">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v76 | Updated : 22-Aug-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -139,7 +139,6 @@
       --adaptive-workflow-panel-height: clamp(590px, calc(100dvh - 218px), 735px);
       --adaptive-normal-svg-height: clamp(610px, calc(100dvh - 84px), 1010px);
       --adaptive-normal-panel-height: clamp(640px, calc(100dvh - 24px), 1050px);
-      --adaptive-architecture-svg-height: clamp(720px, calc(100dvh - 70px), 980px);
       min-height: 100vh;
       padding: 14px 20px 16px;
       display: grid;
@@ -281,21 +280,6 @@
       display: none;
     }
 
-    .app-shell.architecture-view-active {
-      grid-template-rows: auto auto auto auto;
-      align-content: start;
-      gap: 4px;
-      padding-bottom: 12px;
-    }
-
-    .app-shell.architecture-view-active .workflow-explorer {
-      display: none;
-    }
-
-    .app-shell.architecture-view-active .trainer-workspace {
-      scroll-margin-top: 0;
-    }
-
     .app-shell.workflow-active .trainer-workspace {
       min-height: 0;
       align-items: start;
@@ -395,22 +379,8 @@
       gap: 4px;
     }
 
-    .app-shell.architecture-view-active,
-    .app-shell.architecture-view-active.component-active,
-    .app-shell.architecture-view-active.workflow-active {
-      grid-template-rows: auto auto auto auto;
-      align-content: start;
-      gap: 4px;
-      padding-bottom: 12px;
-    }
-
-    .app-shell.architecture-view-active .workflow-explorer {
-      display: none !important;
-    }
-
     .app-shell.workflow-active,
-    .app-shell.component-active,
-    .app-shell.architecture-view-active {
+    .app-shell.component-active {
       align-content: start !important;
     }
 
@@ -423,9 +393,7 @@
     }
 
     .app-shell.workflow-active .trainer-workspace,
-    .app-shell.workflow-active .timeline-panel,
-    .app-shell.architecture-view-active .trainer-workspace,
-    .app-shell.architecture-view-active .timeline-panel {
+    .app-shell.workflow-active .timeline-panel {
       align-self: start;
       margin-top: 0 !important;
       margin-bottom: 0 !important;
@@ -437,7 +405,6 @@
         --adaptive-workflow-panel-height: clamp(590px, calc(100vh - 218px), 735px);
         --adaptive-normal-svg-height: clamp(610px, calc(100vh - 84px), 1010px);
         --adaptive-normal-panel-height: clamp(640px, calc(100vh - 24px), 1050px);
-        --adaptive-architecture-svg-height: clamp(720px, calc(100vh - 70px), 980px);
       }
 
       .app-shell.workflow-active .side-panel {
@@ -530,6 +497,26 @@
       line-height: 1.2;
     }
 
+    .failure-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      justify-self: start;
+      box-sizing: border-box;
+      min-height: 24px;
+      border: 1px solid rgba(255, 122, 122, .54);
+      border-radius: 999px;
+      color: #ffb3b3;
+      background: rgba(154, 34, 49, .22);
+      padding: .28rem .58rem .25rem;
+      font-size: .67rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
     .workflow-card p {
       margin: 0;
       color: #c9d4e2;
@@ -611,17 +598,7 @@
       transition: grid-template-columns var(--slow), gap var(--slow);
     }
 
-    .trainer-workspace.architecture-expanded {
-      grid-template-columns: minmax(0, 1.22fr) minmax(330px, 420px);
-      gap: 12px;
-    }
-
     .trainer-workspace.side-panel-locked {
-      grid-template-columns: minmax(0, 1fr) 28px;
-      gap: 8px;
-    }
-
-    .trainer-workspace.architecture-expanded.side-panel-locked {
       grid-template-columns: minmax(0, 1fr) 28px;
       gap: 8px;
     }
@@ -647,65 +624,6 @@
     }
 
     .trainer-workspace.side-panel-locked .explanation-panel {
-      display: none;
-    }
-
-    .trainer-workspace.architecture-expanded .side-panel {
-      position: relative;
-      inset: auto;
-      z-index: auto;
-      width: auto;
-      min-width: 0;
-      overflow: visible;
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-
-    .trainer-workspace.architecture-expanded .diagram-panel {
-      min-height: 0;
-      padding-inline: clamp(6px, 0.7vw, 12px);
-    }
-
-    .trainer-workspace.architecture-expanded .svg-wrap {
-      min-height: 0;
-      height: var(--adaptive-architecture-svg-height);
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      padding: clamp(6px, 0.7vw, 12px);
-      border: 1px solid rgba(99, 236, 255, .18);
-      border-radius: 14px;
-      background:
-        linear-gradient(90deg, rgba(99,236,255,.04), transparent 14%, transparent 86%, rgba(255,209,102,.04)),
-        radial-gradient(circle at 50% 50%, rgba(99,236,255,.08), transparent 42rem);
-    }
-
-    .trainer-workspace.architecture-expanded .architecture-svg {
-      min-width: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .panel-restore-button {
-      position: fixed;
-      right: 0;
-      top: 50%;
-      z-index: 25;
-      width: 30px;
-      height: 86px;
-      min-height: 0;
-      padding: 0;
-      border-radius: 12px 0 0 12px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(180deg, rgba(99,236,255,0.20), rgba(241,66,61,0.18));
-      border-color: rgba(99, 236, 255, 0.62);
-      box-shadow: 0 0 26px rgba(99, 236, 255, 0.24);
-      font-size: 1.25rem;
-    }
-
-    .panel-restore-button[hidden] {
       display: none;
     }
 
@@ -749,10 +667,6 @@
 
     .trainer-workspace.side-panel-locked .side-panel-locker .locker-icon {
       transform: rotate(180deg);
-    }
-
-    .trainer-workspace.architecture-expanded .side-panel-locker {
-      display: grid;
     }
 
     .diagram-panel {
@@ -1485,6 +1399,91 @@
       color: #f7fbff;
     }
 
+    .failure-rca-grid {
+      display: grid;
+      gap: 9px;
+    }
+
+    .failure-rca-item {
+      border: 1px solid rgba(255, 122, 122, .20);
+      border-radius: 7px;
+      padding: 10px;
+      background: rgba(52, 13, 22, .24);
+    }
+
+    .failure-rca-item h4 {
+      margin: 0 0 5px;
+      color: #ffb3b3;
+      font-size: .82rem;
+    }
+
+    .failure-rca-item p {
+      margin: 0;
+      color: #d9e2ec;
+      font-size: .84rem;
+      line-height: 1.48;
+      white-space: pre-line;
+    }
+
+    .oracle-error-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .oracle-error-list li {
+      display: grid;
+      grid-template-columns: minmax(108px, max-content) 1fr;
+      gap: 5px 9px;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255, 122, 122, .15);
+      padding: 0 0 7px;
+    }
+
+    .oracle-error-list li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .oracle-error-code {
+      color: #ffd166;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: .78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .oracle-error-message {
+      color: #f1f5f9;
+      font-size: .82rem;
+      line-height: 1.42;
+    }
+
+    .oracle-error-context {
+      grid-column: 2;
+      color: #aebccc;
+      font-size: .75rem;
+      line-height: 1.4;
+    }
+
+    .oracle-error-source-note {
+      margin-top: 8px !important;
+      color: #aebccc !important;
+      font-size: .74rem !important;
+    }
+
+    @media (max-width: 520px) {
+      .oracle-error-list li {
+        grid-template-columns: 1fr;
+      }
+
+      .oracle-error-context {
+        grid-column: 1;
+      }
+    }
+
     .license-note {
       margin-top: 8px;
       border-top: 1px solid rgba(255, 209, 102, 0.20);
@@ -2051,6 +2050,11 @@
     body.page-light-mode .diagnostic-event,
     body.page-light-mode .diagnostic-event p,
     body.page-light-mode .diagnostic-event strong,
+    body.page-light-mode .failure-rca-item,
+    body.page-light-mode .failure-rca-item p,
+    body.page-light-mode .oracle-error-message,
+    body.page-light-mode .oracle-error-context,
+    body.page-light-mode .oracle-error-source-note,
     body.page-light-mode .step-path,
     body.page-light-mode .path-node,
     body.page-light-mode .component-chip,
@@ -2068,6 +2072,17 @@
     body.page-light-mode .tag,
     body.page-light-mode .status-pill {
       color: #26374c;
+    }
+
+    body.page-light-mode .failure-label,
+    body.page-light-mode .failure-rca-item h4,
+    body.page-light-mode .oracle-error-code {
+      color: #8f2432;
+    }
+
+    body.page-light-mode .failure-rca-item {
+      border-color: rgba(143, 36, 50, .22);
+      background: rgba(255, 238, 240, .82);
     }
 
     body.page-light-mode .diagnostic-event {
@@ -2179,14 +2194,6 @@
         grid-template-columns: 1fr;
       }
 
-      .trainer-workspace.architecture-expanded {
-        grid-template-columns: 1fr;
-      }
-
-      .trainer-workspace.architecture-expanded .side-panel {
-        display: grid;
-      }
-
       .side-panel {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto;
@@ -2274,7 +2281,7 @@
         <p class="subtitle">Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designed by Cyril Jones S - 2026" aria-label="Designed by Cyril Jones S - 2026"></p>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v76 | Updated : 22-Aug-2026" aria-label="Designer : Cyril Jones S | Version : v76 | Updated : 22-Aug-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2285,7 +2292,6 @@
     <nav class="button-bar glass" aria-label="Trainer controls">
       <button id="resetButton" type="button">Reset</button>
       <button id="focusModeButton" type="button" aria-pressed="false">Focus Mode</button>
-      <button id="architectureViewButton" type="button" aria-pressed="false">Full Architecture</button>
       <button id="pageLightButton" type="button" aria-pressed="false">Light Page</button>
       <button id="printButton" type="button">Print / Save PDF</button>
       <button id="referencesButton" type="button">References</button>
@@ -2333,6 +2339,7 @@
           </div>
           <div class="diagram-toolbar-actions">
             <div id="statusPill" class="status-pill" aria-live="polite">Ready: select a flow or click a component.</div>
+            <button id="architectureResetButton" class="icon-control" type="button" aria-label="Reset trainer and return to Workflow Explorer" title="Reset and return to Workflow Explorer">&#x21BA;</button>
             <button id="architectureFullscreenButton" class="icon-control" type="button" aria-pressed="false" aria-label="Open architecture fullscreen" title="Open architecture fullscreen">&#x26F6;</button>
           </div>
         </div>
@@ -2669,8 +2676,6 @@
       </aside>
     </main>
 
-    <button id="restorePanelButton" class="panel-restore-button" type="button" aria-label="Show explanation panel" aria-controls="sidePanel" title="Show explanation panel" hidden>&#9664;</button>
-
     <section class="timeline-panel glass" aria-label="Cinematic operation timeline">
       <div class="timeline-controls">
         <button id="playButton" class="transport-button" type="button" aria-label="Play flow" title="Play flow">▶</button>
@@ -2701,7 +2706,7 @@
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designed by Cyril Jones S - 2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v76 | Updated : 22-Aug-2026.
   </div>
 
   <div id="referencesModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="referencesTitle">
@@ -2716,6 +2721,10 @@
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/memory.htm">Oracle 11g Concepts: memory architecture</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/process.htm">Oracle 11g Concepts: process architecture</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/physical.htm">Oracle 11g Concepts: physical storage structures</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/network.112/e41945/net_arch.htm">Oracle 11g Net Services: listener and connection architecture</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/datainte.htm">Oracle 11g Concepts: data integrity and constraint behavior</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e17766.pdf">Oracle 11g Database Error Messages</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/backup.112/e10642.pdf">Oracle 11g Backup and Recovery User's Guide</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40402/bgprocesses.htm">Oracle 11g Reference: background processes</a></li>
         <li><a href="https://docs.oracle.com/html/E10642_06/title.htm">Oracle 11g Backup and Recovery User's Guide</a></li>
         <li><a href="https://docs.oracle.com/cd/E25054_01/server.1111/e25789/intro.htm#i62345">Oracle 11g Concepts: architecture introduction</a></li>
@@ -2739,7 +2748,6 @@
         selectedComponentId: null,
         focusMode: false,
         pageLightMode: false,
-        architectureExpanded: false,
         architectureFullscreen: false,
         panelLocked: false,
         playing: false,
@@ -2763,7 +2771,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designed by Cyril Jones S - 2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v76 | Updated : 22-Aug-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;
@@ -3112,6 +3120,18 @@
         return { title, category, difficulty, bestFor, teachingPurpose, exampleSql, summary, trainerNotes: notes, steps };
       }
 
+      function failureWorkflow(title, category, difficulty, bestFor, teachingPurpose, exampleSql, summary, notes, steps) {
+        return { ...workflow(title, category, difficulty, bestFor, teachingPurpose, exampleSql, summary, notes, steps), scenarioType: "failure" };
+      }
+
+      function oracleError(code, message, context = "") {
+        return { code, message, context };
+      }
+
+      function failureScenario(symptom, likelyCauses, evidence, correctiveAction, guardrail, oracleErrors = []) {
+        return { symptom, likelyCauses, evidence, correctiveAction, guardrail, oracleErrors };
+      }
+
       function notes(simple, precision, analogy, misconception, question, performance = "") {
         return { simple, precision, analogy, misconception, question, performance };
       }
@@ -3121,15 +3141,15 @@
       }
 
       const operationGroups = [
-        { id: "connection-session", title: "Connection & Session", workflows: ["user-login", "dedicated-server-session", "session-cleanup"] },
-        { id: "sql-query-execution", title: "SQL Query Execution", workflows: ["select-first-execution", "select-soft-parse", "select-hard-parse", "select-cache-hit", "select-cache-miss", "sort-temp-spill"] },
-        { id: "dml-transaction-commit", title: "DML / Transaction / Commit", workflows: ["insert-commit", "update-commit", "commit-durability"] },
-        { id: "ddl-metadata-change", title: "DDL / Metadata Change", workflows: ["create-table-ddl", "alter-table-ddl"] },
-        { id: "undo-rollback-read-consistency", title: "Undo / Rollback / Read Consistency", workflows: ["rollback-flow", "read-consistency"] },
-        { id: "redo-checkpoint-archiving", title: "Redo / Checkpoint / Archiving", workflows: ["dbwn-dirty-write", "checkpoint-flow", "redo-log-switch"] },
-        { id: "startup-shutdown-recovery", title: "Startup / Shutdown / Recovery", workflows: ["instance-startup", "shutdown-immediate", "crash-recovery"] },
-        { id: "rman-backup-restore-recovery", title: "RMAN Backup / Restore / Recovery", workflows: ["rman-full-backup", "rman-restore-recover"] },
-        { id: "flashback", title: "Flashback", workflows: ["flashback-database"] },
+        { id: "connection-session", title: "Connection & Session", workflows: ["user-login", "dedicated-server-session", "session-cleanup", "connection-failure-rca"] },
+        { id: "sql-query-execution", title: "SQL Query Execution", workflows: ["select-first-execution", "select-soft-parse", "select-hard-parse", "select-cache-hit", "select-cache-miss", "sort-temp-spill", "sql-parse-failure-rca"] },
+        { id: "dml-transaction-commit", title: "DML / Transaction / Commit", workflows: ["insert-commit", "update-commit", "commit-durability", "dml-statement-failure-rca"] },
+        { id: "ddl-metadata-change", title: "DDL / Metadata Change", workflows: ["create-table-ddl", "alter-table-ddl", "ddl-lock-failure-rca"] },
+        { id: "undo-rollback-read-consistency", title: "Undo / Rollback / Read Consistency", workflows: ["rollback-flow", "read-consistency", "snapshot-too-old-rca"] },
+        { id: "redo-checkpoint-archiving", title: "Redo / Checkpoint / Archiving", workflows: ["dbwn-dirty-write", "checkpoint-flow", "redo-log-switch", "archive-destination-failure-rca"] },
+        { id: "startup-shutdown-recovery", title: "Startup / Shutdown / Recovery", workflows: ["instance-startup", "shutdown-immediate", "crash-recovery", "startup-file-failure-rca"] },
+        { id: "rman-backup-restore-recovery", title: "RMAN Backup / Restore / Recovery", workflows: ["rman-full-backup", "rman-restore-recover", "rman-backup-failure-rca"] },
+        { id: "flashback", title: "Flashback", workflows: ["flashback-database", "flashback-unavailable-rca"] },
         { id: "monitoring-diagnostics-performance", title: "Monitoring / Diagnostics / Performance", workflows: [
           "session-monitoring",
           "known-sql-slowness",
@@ -3143,7 +3163,8 @@
           "buffer-contention",
           "shared-pool-parse-pressure",
           "free-buffer-pressure",
-          "archive-log-switch-pressure"
+          "archive-log-switch-pressure",
+          "performance-incident-rca"
         ] }
       ];
 
@@ -3625,6 +3646,241 @@
         ])
       });
 
+      const workflowFailureScenarios = {
+        "connection-failure-rca": failureScenario(
+          "The client cannot establish a usable database session. Typical messages include ORA-12514 for an unknown service or ORA-01017 for invalid credentials.",
+          "Wrong connect descriptor or service name; service not registered with the listener; listener or instance unavailable; invalid credential; account not authorized.",
+          "Test network reachability, run LSNRCTL SERVICES, compare the requested SERVICE_NAME with registered services, then inspect the database authentication error and account state.",
+          "Correct the failing layer only: repair the connect descriptor or registration for a listener-stage failure, or correct credentials and authorization for an authentication-stage failure.",
+          "Do not reset passwords for an ORA-12514 routing failure, and do not restart the listener for an ORA-01017 authentication failure.",
+          [
+            oracleError("ORA-12514", "TNS:listener does not currently know of service requested in connect descriptor.", "The requested service is not registered with or statically configured for the listener."),
+            oracleError("ORA-12541", "TNS:no listener.", "No listener is reachable at the requested network address."),
+            oracleError("ORA-01017", "invalid username/password; logon denied.", "The listener path succeeded, but database authentication rejected the credentials."),
+            oracleError("ORA-28000", "the account is locked.", "The credentials may be correct, but the database account is locked.")
+          ]
+        ),
+        "sql-parse-failure-rca": failureScenario(
+          "The SQL call returns a parse error before row-source execution starts. The exact message identifies whether grammar, an identifier, object resolution, or privileges failed.",
+          "Invalid SQL grammar; misspelled or missing object or column; unresolved synonym; missing object privilege; object changed between parse attempts.",
+          "Read the complete error and position, reproduce with the same schema and session settings, verify object and column names, then check direct privileges and current metadata.",
+          "Correct the SQL text for syntax errors. Correct object resolution or grants for semantic and authorization errors, then parse again.",
+          "Do not tune the optimizer, Buffer Cache, or storage for a statement that never completed parsing.",
+          [
+            oracleError("ORA-00900", "invalid SQL statement.", "Oracle does not recognize the submitted SQL as a valid statement."),
+            oracleError("ORA-00904", "\"<identifier>\": invalid identifier.", "A referenced column or identifier is not valid in this statement context."),
+            oracleError("ORA-00942", "table or view does not exist.", "Object resolution failed or the object is not visible to the current user."),
+            oracleError("ORA-01031", "insufficient privileges.", "The user lacks a privilege required for the requested operation.")
+          ]
+        ),
+        "dml-statement-failure-rca": failureScenario(
+          "An INSERT or UPDATE fails with an immediate integrity error such as duplicate key or missing parent key.",
+          "Unique, primary-key, foreign-key, NOT NULL, or check constraint violation; application sent an invalid value; concurrent work changed the expected key state.",
+          "Capture the full ORA error and constraint name, inspect the constraint definition and offending key values, and confirm whether the constraint is immediate or deferred.",
+          "Correct the data or application ordering and retry the statement. Decide explicitly whether earlier successful work in the same transaction should be committed or rolled back.",
+          "For an immediate constraint, Oracle normally rolls back only the failed statement. Deferred constraints can fail at COMMIT and have different transaction impact.",
+          [
+            oracleError("ORA-00001", "unique constraint (<owner>.<constraint>) violated.", "A unique or primary-key value duplicates an existing key."),
+            oracleError("ORA-01400", "cannot insert NULL into (<column>).", "A required NOT NULL column received a null value."),
+            oracleError("ORA-02290", "check constraint (<owner>.<constraint>) violated.", "A value failed a CHECK constraint condition."),
+            oracleError("ORA-02291", "integrity constraint (<owner>.<constraint>) violated - parent key not found.", "A foreign-key value has no matching parent key."),
+            oracleError("ORA-02292", "integrity constraint (<owner>.<constraint>) violated - child record found.", "A parent row cannot be deleted while matching child rows remain.")
+          ]
+        ),
+        "ddl-lock-failure-rca": failureScenario(
+          "DDL returns ORA-00054 because another session holds an incompatible lock and NOWAIT was used or DDL_LOCK_TIMEOUT expired.",
+          "An open transaction or long-running operation holds the object lock; maintenance overlaps application work; the configured DDL wait period is too short for the workload.",
+          "Identify the locked object, waiting session, blocking session, SQL, transaction age, and application owner before deciding whether to wait or intervene.",
+          "Let the owning transaction complete, schedule the DDL in a safe window, or use a measured DDL_LOCK_TIMEOUT when waiting is acceptable.",
+          "Oracle commits the caller's earlier transaction before DDL. If the DDL then fails, that pre-DDL commit is not undone; do not kill a blocker without application approval.",
+          [
+            oracleError("ORA-00054", "resource busy and acquire with NOWAIT specified or timeout expired.", "The requested lock remained unavailable under NOWAIT or until DDL_LOCK_TIMEOUT expired.")
+          ]
+        ),
+        "snapshot-too-old-rca": failureScenario(
+          "A long or delayed query fails with ORA-01555 because the older block version required for consistent read can no longer be reconstructed.",
+          "Required committed undo was overwritten by newer transactions; undo capacity is too small for the workload and query duration; the query or fetch lasts unusually long.",
+          "Compare query duration with V$UNDOSTAT tuned retention and MAXQUERYLEN, inspect undo generation and tablespace pressure, and identify the SQL and objects involved.",
+          "Reduce unnecessary query duration, tune the access path, and size or autoextend the undo tablespace for measured generation and retention needs. Use retention guarantee only after weighing DML space risk.",
+          "UNDO_RETENTION is not an unconditional guarantee when space is constrained. Increasing it without sufficient undo capacity may not preserve the required records.",
+          [
+            oracleError("ORA-01555", "snapshot too old: rollback segment number <number> with name \"<name>\" too small.", "The undo needed to reconstruct a read-consistent block version is no longer available.")
+          ]
+        ),
+        "archive-destination-failure-rca": failureScenario(
+          "ARCn cannot archive a filled online redo log. ORA-00257 can restrict normal connections, and continued log reuse pressure can stop transactions.",
+          "Archive destination or Fast Recovery Area is full; a mandatory destination is unavailable; permission, path, network, or storage errors prevent archive writes.",
+          "Read the alert log and ARCn trace, inspect archive destination status and errors, verify free space and permissions, and confirm which online redo group is waiting for archival.",
+          "Restore destination availability or safely free managed space according to the backup and retention policy, then confirm that archiving and log switches resume.",
+          "Do not delete archived logs blindly. Preserve recovery requirements and verify backup status before removing recovery files.",
+          [
+            oracleError("ORA-00257", "archiver error. Connect internal only, until freed.", "Oracle 11g reports this when the archiver cannot archive redo; inspect the alert log for the underlying destination error."),
+            oracleError("ORA-19809", "limit exceeded for recovery files.", "The Fast Recovery Area limit has been exceeded and space cannot be reclaimed automatically.")
+          ]
+        ),
+        "startup-file-failure-rca": failureScenario(
+          "Startup reaches NOMOUNT but cannot MOUNT or OPEN the database because required control or data files cannot be identified or accessed.",
+          "Wrong CONTROL_FILES setting; control file missing or inconsistent; data file missing, renamed, offline at the storage layer, inaccessible, or needing media recovery.",
+          "Use the exact startup stage and error stack. Check the alert log, parameter values, control-file paths, data-file paths, storage visibility, permissions, and recovery requirement.",
+          "Repair or restore the specific file layer, recover when required, and retry the failed stage. Use multiplexed control files and tested backups to reduce exposure.",
+          "Do not recreate a control file or force OPEN merely to bypass the message. A control-file failure at MOUNT and a data-file failure at OPEN require different actions.",
+          [
+            oracleError("ORA-00205", "error in identifying control file, check alert log for more info.", "A configured control file could not be identified or opened during MOUNT."),
+            oracleError("ORA-01157", "cannot identify/lock data file <number> - see DBWR trace file.", "Oracle cannot find or lock an online data file required to OPEN the database."),
+            oracleError("ORA-01110", "data file <number>: '<file-name>'.", "Companion message that names the affected data file."),
+            oracleError("ORA-01113", "file <number> needs media recovery.", "The data-file checkpoint is not sufficiently current and recovery is required.")
+          ]
+        ),
+        "rman-backup-failure-rca": failureScenario(
+          "RMAN reports RMAN-03009 with accompanying ORA or operating-system errors and the affected backup command or channel fails.",
+          "Destination full or unwritable; media manager or channel failure; missing or inaccessible input file; block corruption; archived log unavailable in every usable location.",
+          "Read the entire RMAN error stack from the bottom upward, identify the failed channel and file, verify source availability, destination space and permissions, media manager logs, and repository status.",
+          "Correct the underlying source, destination, or channel problem, rerun the failed backup, and validate recoverability with RESTORE VALIDATE or an appropriate recovery test.",
+          "RMAN-03009 is a wrapper, not the root cause. A completed backup command is not enough assurance until the backup is validated and recovery is tested.",
+          [
+            oracleError("RMAN-03009", "failure of <command> command on <channel> channel at <time>.", "This identifies the failed RMAN command or channel; read the accompanying messages for the cause."),
+            oracleError("ORA-19504", "failed to create file \"<file-name>\".", "The backup destination file could not be created; inspect accompanying operating-system errors and permissions."),
+            oracleError("ORA-19502", "write error on file \"<file-name>\", block number <number> (block size=<bytes>).", "A write to the backup output failed."),
+            oracleError("ORA-19505", "failed to identify file \"<file-name>\".", "An expected input or backup file cannot be identified."),
+            oracleError("ORA-19511", "non RMAN, but media manager or vendor specific failure, error text: <vendor-message>.", "The media management layer returned the actual tape or vendor failure."),
+            oracleError("ORA-19809", "limit exceeded for recovery files.", "The Fast Recovery Area limit has been exceeded.")
+          ]
+        ),
+        "flashback-unavailable-rca": failureScenario(
+          "FLASHBACK DATABASE cannot reach the requested SCN or time, or the feature is not available for the requested operation.",
+          "Flashback Database was not enabled before the incident; the target is older than the retained flashback window; Fast Recovery Area pressure removed older flashback logs; required redo is unavailable.",
+          "Check V$DATABASE.FLASHBACK_ON, the database state, V$FLASHBACK_DATABASE_LOG, restore points, Fast Recovery Area usage, and availability of required archived and online redo.",
+          "Choose a reachable target or guaranteed restore point. If the flashback window is insufficient, use RMAN restore and database point-in-time recovery when backups and redo permit it.",
+          "DB_FLASHBACK_RETENTION_TARGET is a target, not a guarantee. Flashback Database does not repair missing or damaged data files and does not replace tested backups.",
+          [
+            oracleError("ORA-38726", "Flashback database logging is not on.", "FLASHBACK DATABASE was requested before Flashback Database logging had been enabled."),
+            oracleError("ORA-38729", "Not enough flashback database log data to do FLASHBACK.", "The retained flashback logs do not cover the requested target."),
+            oracleError("ORA-38754", "FLASHBACK DATABASE not started; required redo log is not available.", "A redo log needed for the recovery phase of FLASHBACK DATABASE cannot be found or accessed."),
+            oracleError("ORA-38757", "Database must be mounted and not open to FLASHBACK.", "FLASHBACK DATABASE was attempted in the wrong database state.")
+          ]
+        ),
+        "performance-incident-rca": failureScenario(
+          "Users report a slowdown, timeout, or spike, but the architecture branch responsible is not yet proven. A performance incident often has no ORA error at all.",
+          "CPU saturation; single-block or multiblock I/O; commit latency; lock or buffer contention; TEMP spill; hard-parse pressure; archive or checkpoint pressure; application or network delay.",
+          "Fix the exact time window, compare DB CPU with non-idle waits, identify affected sessions and SQL, map waits to objects and files, and compare with a normal baseline.",
+          "Correct the measured bottleneck at the narrowest responsible layer, then repeat the same workload and compare response time, throughput, errors, and resource use.",
+          "A top wait, high CPU metric, or expensive SQL is a symptom until it is correlated with the same users, SQL, objects, and incident interval.",
+          [
+            oracleError("No universal ORA code", "A slowdown can complete successfully and still be a serious performance incident.", "Use response time, DB time, wait events, sessions, and SQL evidence when no error is returned."),
+            oracleError("ORA-01013", "user requested cancel of current operation.", "The client or user cancelled work; this does not by itself identify why the operation was slow."),
+            oracleError("ORA-00060", "deadlock detected while waiting for resource.", "Oracle detected a transaction deadlock; inspect the trace file for the involved resources and SQL."),
+            oracleError("ORA-12170", "TNS:Connect timeout occurred.", "An Oracle Net connection timed out; diagnose the network and connection path rather than assuming SQL execution was slow.")
+          ]
+        )
+      };
+
+      Object.assign(workflowTeachingGuides, {
+        "connection-failure-rca": guide("Connection failure decision path", "This RCA workflow separates network and listener routing from database authentication. The same client symptom can stop before a server process exists or after handoff when credentials are checked.", "Identify the layer that rejected the request before changing configuration.", "Watch User Process, Listener, Server Process, Shared Pool, and Data Dictionary Cache."),
+        "sql-parse-failure-rca": guide("Parse failure decision path", "A statement can fail during private syntax analysis or later during semantic and authorization checks. Neither branch reaches optimization, row-source execution, or data access.", "The error stage determines whether to fix SQL grammar, object resolution, or privileges.", "Watch Private SQL Area, Syntax Check, Semantic Check, Data Dictionary Cache, and the absence of Optimizer and Row Source Execution."),
+        "dml-statement-failure-rca": guide("Failed DML statement rollback", "This workflow shows an immediate constraint failure. Oracle uses its implicit statement savepoint to reverse work done by the failed statement while earlier successful statements remain part of the open transaction.", "A failed statement is not automatically a full transaction rollback.", "Watch Server Process, Buffer Cache, Undo, Undo Tablespace, Data Files, and the error returned to the user."),
+        "ddl-lock-failure-rca": guide("DDL lock failure", "DDL first commits earlier work, then requests locks needed for the metadata change. If an incompatible lock remains until NOWAIT or DDL_LOCK_TIMEOUT expires, the DDL operation fails without changing the object.", "The pre-DDL commit remains even when the DDL operation fails.", "Watch Implicit Commit, Redo, Library Cache, Data Dictionary Cache, and Server Process."),
+        "snapshot-too-old-rca": guide("Consistent-read undo failure", "A query needs an older committed block image, but the undo records required to build that image have already been reused. Oracle cannot return a correct partial answer, so the statement fails.", "ORA-01555 is a retention-versus-query-duration problem, not proof that the current data block is corrupt.", "Watch Buffer Cache, Undo, Undo Tablespace, Data Files, Server Process, and User Process."),
+        "archive-destination-failure-rca": guide("Archive destination failure", "ARCn must preserve a filled online redo log before that group can be safely reused in ARCHIVELOG mode. A full or failed destination can therefore grow from an archive error into transaction stoppage.", "Restore the archive path without discarding required recovery history.", "Watch Redo Log Buffer, LGWR, Online Redo Logs, ARCn, and Archived Redo Logs."),
+        "startup-file-failure-rca": guide("Startup stage failure", "The instance can start in NOMOUNT and still fail later. Control-file access is required to MOUNT; data-file and online-redo access is required to OPEN.", "Use the failed startup stage to isolate the file layer before selecting a recovery action.", "Watch Oracle Instance, SGA, Background Processes, Control Files, Data Files, and Online Redo Logs."),
+        "rman-backup-failure-rca": guide("RMAN backup failure", "An RMAN backup can fail while reading database input, allocating a channel, or writing backup output. RMAN-03009 identifies the failed command or channel, while accompanying messages identify the cause.", "Read the complete error stack and validate the corrected backup.", "Watch RMAN, Large Pool, Control Files, Data Files, Archived Redo Logs, Disk Backup, MML, and Tape Backup."),
+        "flashback-unavailable-rca": guide("Flashback availability failure", "Flashback Database can rewind only within the flashback data and redo that remain available. Configuration, target age, recovery-area pressure, and database state determine whether the requested target is reachable.", "A retention target is not a guaranteed flashback window.", "Watch Database, Control Files, Flashback Logs, RVWR, Data Files, Archived Redo Logs, and RMAN fallback."),
+        "performance-incident-rca": guide("Evidence-driven incident RCA", "This workflow starts with a user-visible slowdown and narrows it through time-window, database-time, session, SQL, wait, object, and file evidence before any correction is made.", "Map the measured symptom to one architecture branch and verify the result after correction.", "Watch Server Process, Shared Pool, Execution Plan, Buffer Cache, Data Files, PGA, TEMP, Redo, and background processes as the evidence directs.")
+      });
+
+      Object.assign(workflowDiagnostics, {
+        "performance-incident-rca": {
+          events: ["db-file-sequential-read", "db-file-scattered-read", "log-file-sync", "enq-tx-row-lock", "buffer-busy-waits", "direct-path-read-temp", "shared-pool-contention"],
+          summary: "Treat waits and DB CPU as measured branches for the same incident interval. Correlate the dominant time with sessions, SQL, objects, files, and user impact before naming a root cause.",
+          licenseAware: true
+        }
+      });
+
+      Object.assign(flows, {
+        "connection-failure-rca": failureWorkflow("Connection Failure / Listener or Authentication RCA", "Connection & Session", "Intermediate", "DBA / Support", "Separates listener, service registration, and credential failures.", "sqlplus hr/wrong_password@orcl", "The DBA finds the first layer that rejects the connection and corrects that layer only.", notes("Connection errors must be isolated by layer.", "The listener routes requests; database authentication occurs after a service handler is reached.", "Trace a parcel to the desk where it was rejected.", "A listener error and a password error are not the same failure.", "Did the request reach a registered service and a database server process?"), [
+          step("connfail-01", "Client requests service", "Connect", "user-process", "listener", ["user-process", "listener"], ["arrow-user-listener"], "The client sends a connect descriptor and requested service to the listener endpoint.", "Confirm host, port, protocol, and requested service before changing the database."),
+          step("connfail-02", "Listener checks service", "Service Resolution", "listener", "listener", ["listener", "pmon", "instance"], [], "The listener can route only to a service and handler it knows through static configuration or service registration.", "ORA-12514 points to service knowledge or registration, not a database password."),
+          step("connfail-03", "Known service gets handler", "Handoff", "listener", "server-process", ["listener", "server-process"], ["arrow-listener-server"], "If the service is known, the listener selects a service handler and the connection reaches a server process.", "This step occurs only after listener-stage checks pass.", "forward", "server-spawn"),
+          step("connfail-04", "Database checks identity", "Authentication", "server-process", "data-dictionary-cache", ["server-process", "shared-pool", "data-dictionary-cache"], ["arrow-server-shared-pool", "arrow-library-dictionary"], "Database authentication and authorization are checked after the request reaches the database service path.", "ORA-01017 belongs to credentials or authorization, not listener routing."),
+          step("connfail-05", "Failure returns to client", "Reject", "server-process", "user-process", ["server-process", "user-process"], ["arrow-server-user"], "The failing layer returns an Oracle Net or database error and no usable session is established.", "Preserve the complete error because its layer guides the RCA."),
+          step("connfail-06", "DBA verifies corrected layer", "Verify", "user-process", "server-process", ["user-process", "listener", "server-process", "pga"], ["arrow-user-listener", "arrow-listener-server"], "After correction, the request reaches a server process and private session state can be established.", "Verify both connection and authentication instead of stopping after a listener-only test.")
+        ]),
+        "sql-parse-failure-rca": failureWorkflow("SQL Parse Failure / Syntax, Object, or Privilege RCA", "SQL Query Execution", "Intermediate", "Developer / DBA", "Shows where failed SQL stops before execution.", "SELECT employee_id FROM employes WHERE department_id = 50;", "The statement is rejected at syntax or semantic validation, so no execution plan runs and no table blocks are fetched.", notes("Parse failure happens before row execution.", "Syntax analysis is private parser work; object and privilege checks require shared dictionary metadata.", "A work order is rejected before production starts.", "A parse error is not a slow execution plan.", "Did the statement fail on grammar, object meaning, or authorization?"), [
+          step("parsefail-01", "Private cursor receives text", "Parse Start", "server-process", "private-sql-area", ["server-process", "pga", "private-sql-area", "sql-statement"], ["arrow-server-pga", "arrow-server-sql-statement"], "The server process places the SQL text and private cursor state in its PGA.", "Parsing starts in private session context."),
+          step("parsefail-02", "Syntax is checked", "Syntax", "sql-statement", "syntax-check", ["sql-statement", "syntax-check", "private-sql-area", "pga"], ["arrow-sql-syntax"], "Oracle checks SQL grammar and structure before it needs object metadata.", "A grammar error stops here and does not become optimizer or data-file work."),
+          step("parsefail-03", "Syntax error stops call", "Syntax Failure", "server-process", "user-process", ["syntax-check", "server-process", "user-process"], ["arrow-server-user"], "If grammar is invalid, the server process returns the parse error to the client.", "Correct the SQL text and parse again; shared-cache or storage tuning is irrelevant to this branch."),
+          step("parsefail-04", "Meaning and privileges are checked", "Semantic Check", "syntax-check", "data-dictionary-cache", ["syntax-check", "semantic-check", "shared-pool", "data-dictionary-cache", "server-process"], ["arrow-syntax-semantic", "arrow-semantic-shared-pool", "arrow-library-dictionary"], "If grammar passes, Oracle resolves objects and columns and checks required authorization through dictionary metadata.", "Object, synonym, column, and privilege failures occur on this later branch."),
+          step("parsefail-05", "Semantic error stops call", "Semantic Failure", "server-process", "user-process", ["data-dictionary-cache", "server-process", "user-process"], ["arrow-server-user"], "If an object cannot be resolved or the user lacks authorization, the server process returns an error and does not execute row sources.", "Reproduce in the same schema and session environment before changing metadata or grants."),
+          step("parsefail-06", "No execution path begins", "Stop Boundary", "hard-parse", "row-source-execution", ["hard-parse", "optimizer", "execution-plan", "row-source-execution", "database-buffer-cache", "data-files"], [], "The failed statement never reaches a successful hard parse, optimizer plan, row-source execution, or table-block read.", "The unhighlighted success path defines the boundary of this failure.")
+        ]),
+        "dml-statement-failure-rca": failureWorkflow("DML Statement Failure / Constraint and Statement Rollback", "DML / Transaction / Commit", "Intermediate", "Developer / DBA", "Explains immediate constraint failure and statement-level rollback.", "INSERT INTO employees(employee_id, last_name) VALUES (100, 'Jones');", "An immediate constraint violation rolls back the failed statement to its implicit savepoint while earlier transaction work remains pending.", notes("Oracle protects statement atomicity with an implicit savepoint.", "Immediate and deferred constraints have different failure timing.", "Reject one invalid form without discarding earlier valid forms.", "A failed DML statement does not always roll back the whole transaction.", "Which work remains pending after the failed statement?"), [
+          step("dmlfail-01", "DML starts current-buffer work", "Execute", "server-process", "database-buffer-cache", ["server-process", "database-buffer-cache", "users-tablespace", "data-files"], ["arrow-server-buffer-cache"], "The server process begins the DML statement against current buffers.", "Oracle marks an internal statement boundary before execution."),
+          step("dmlfail-02", "Undo protects the statement", "Undo", "database-buffer-cache", "undo-tablespace", ["database-buffer-cache", "undo", "undo-tablespace", "data-files"], ["arrow-buffer-undo", "arrow-undo-tablespace", "arrow-undo-tbs-datafiles"], "Undo records protect changes made by this statement so they can be reversed if it fails.", "Statement atomicity depends on this rollback information."),
+          step("dmlfail-03", "Constraint is enforced", "Constraint Check", "server-process", "data-dictionary-cache", ["database-buffer-cache", "data-dictionary-cache", "shared-pool", "server-process"], ["arrow-server-shared-pool", "arrow-library-dictionary"], "The server process enforces the applicable immediate constraint using its metadata and the required table or index data.", "The named constraint and offending key identify the business rule that failed."),
+          step("dmlfail-04", "Failed statement is reversed", "Statement Rollback", "undo", "database-buffer-cache", ["undo", "undo-tablespace", "database-buffer-cache", "data-files"], ["arrow-buffer-undo"], "Oracle rolls back work performed by the failed statement to its implicit savepoint.", "For this immediate-constraint case, earlier successful statements in the transaction are not automatically undone.", "backward"),
+          step("dmlfail-05", "Transaction remains open", "Transaction State", "database-buffer-cache", "server-process", ["database-buffer-cache", "undo", "server-process", "pga"], [], "The application must decide whether to correct and retry, commit valid earlier work, or roll back the full transaction.", "Do not assume the error ended the transaction."),
+          step("dmlfail-06", "Constraint error returns", "Error Response", "server-process", "user-process", ["server-process", "user-process"], ["arrow-server-user"], "Oracle returns the constraint error to the client without committing the failed statement.", "Capture the constraint name and transaction context for RCA.")
+        ]),
+        "ddl-lock-failure-rca": failureWorkflow("DDL Failure / Object Lock and Timeout RCA", "DDL / Metadata Change", "Advanced", "DBA / Release", "Shows a blocked DDL and the surviving pre-DDL commit.", "ALTER SESSION SET ddl_lock_timeout = 30;\nALTER TABLE employees ADD status VARCHAR2(20);", "DDL commits earlier caller work, then can fail with ORA-00054 if it cannot obtain the required object lock.", notes("DDL has transaction effects before metadata execution.", "A blocked metadata change and the earlier transaction commit are separate outcomes.", "Close the old ledger before requesting an exclusive blueprint change.", "Failed DDL does not restore pre-DDL uncommitted work.", "What was committed before the DDL lock request?"), [
+          step("ddlfail-01", "Earlier work is committed", "Pre-DDL Commit", "database-buffer-cache", "online-redo-logs", ["implicit-commit", "database-buffer-cache", "redo-log-buffer", "lgwr", "online-redo-logs"], ["arrow-buffer-redo", "arrow-redo-lgwr", "arrow-lgwr-online-redo"], "Before executing DDL, Oracle commits the caller's current transaction.", "If the DDL later fails, this pre-DDL commit remains durable."),
+          step("ddlfail-02", "DDL requests object locks", "Lock Request", "server-process", "data-dictionary-cache", ["server-process", "library-cache", "data-dictionary-cache", "shared-pool", "recursive-sql"], ["arrow-server-shared-pool", "arrow-library-dictionary"], "Oracle requests the dictionary and library-cache locks needed to change the object definition.", "An incompatible lock held by another session can block this request."),
+          step("ddlfail-03", "Timeout expires", "ORA-00054", "data-dictionary-cache", "server-process", ["data-dictionary-cache", "library-cache", "server-process"], [], "NOWAIT or an expired DDL_LOCK_TIMEOUT causes ORA-00054 when the required resource remains held.", "The DDL operation stops without applying the requested metadata change."),
+          step("ddlfail-04", "DDL error returns", "Failure Response", "server-process", "user-process", ["server-process", "user-process", "implicit-commit"], ["arrow-server-user"], "Oracle reports the DDL failure to the client, while the earlier pre-DDL commit is not reversed.", "Application owners must understand this transaction boundary."),
+          step("ddlfail-05", "DBA finds lock owner", "RCA", "user-process", "server-process", ["user-process", "server-process", "pga", "sga", "data-dictionary-cache"], [], "The DBA identifies the waiting DDL, blocking session, object, open transaction, SQL, and transaction age.", "Resolve the owner and business transaction, not merely the visible waiting session."),
+          step("ddlfail-06", "DDL is retried safely", "Verify", "server-process", "data-dictionary-cache", ["server-process", "data-dictionary-cache", "library-cache", "recursive-sql"], ["arrow-server-shared-pool", "arrow-library-dictionary"], "After the lock is released or a safe maintenance window is chosen, the DDL can be retried and its metadata result verified.", "Successful DDL performs its normal post-DDL commit.")
+        ]),
+        "snapshot-too-old-rca": failureWorkflow("ORA-01555 Snapshot Too Old / Undo RCA", "Undo / Rollback / Read Consistency", "Advanced", "DBA / Developer", "Shows why missing historical undo stops a consistent read.", "Long-running SELECT fails with ORA-01555", "A query needs an older block image, but the required undo was overwritten before the query could use it.", notes("Consistent reads depend on retained undo.", "Undo availability must cover the query duration and concurrent undo generation.", "A reader requests an older revision after that revision was recycled.", "ORA-01555 does not mean the current data file is corrupt.", "Was the required undo retained for the full query and fetch duration?"), [
+          step("ora1555-01", "Query fixes read point", "Query SCN", "server-process", "database-buffer-cache", ["server-process", "database-buffer-cache", "row-source-execution"], ["arrow-server-buffer-cache"], "The SELECT must return data consistent with its statement read point.", "Every block must be reconstructed to the appropriate committed version."),
+          step("ora1555-02", "Current block is too new", "Consistent Read", "database-buffer-cache", "undo", ["database-buffer-cache", "undo", "server-process"], ["arrow-buffer-undo"], "A cached block contains changes newer than the query's read point, so Oracle follows undo information.", "The current block can be healthy while an older version is still required."),
+          step("ora1555-03", "Oracle searches retained undo", "Undo Lookup", "undo", "undo-tablespace", ["undo", "undo-tablespace", "data-files"], ["arrow-undo-tablespace", "arrow-undo-tbs-datafiles"], "The server process needs undo blocks stored through the UNDO tablespace and its data files.", "The required chain must still exist."),
+          step("ora1555-04", "Required undo was reused", "Undo Missing", "undo-tablespace", "server-process", ["undo-tablespace", "undo", "server-process", "data-files"], [], "Newer transactions have overwritten or reused the undo records required by this reader.", "Oracle cannot invent a correct historical image after the required undo is gone."),
+          step("ora1555-05", "Query fails safely", "ORA-01555", "server-process", "user-process", ["server-process", "user-process", "undo-tablespace"], ["arrow-server-user"], "Oracle returns ORA-01555 rather than mixing block versions or returning an incomplete consistent result.", "The query statement fails; the current database data is not rolled back."),
+          step("ora1555-06", "DBA sizes from evidence", "RCA", "undo-tablespace", "data-files", ["undo-tablespace", "data-files", "server-process", "row-source-execution"], ["arrow-undo-tbs-datafiles"], "The DBA compares query duration, tuned undo retention, undo generation, tablespace capacity, and SQL efficiency.", "Correct both avoidable query duration and measured undo-capacity pressure, then rerun the same workload.")
+        ]),
+        "archive-destination-failure-rca": failureWorkflow("Archive Destination Full / ORA-00257 RCA", "Redo / Checkpoint / Archiving", "Advanced", "DBA / Operations", "Shows why archive failure can stop transaction processing.", "ORA-00257: archiver error. Connect internal only, until freed.", "ARCn cannot preserve a filled redo group, so the group cannot be reused and LGWR eventually has nowhere safe to switch.", notes("Archiving protects redo history before reuse.", "A full or failed mandatory archive destination can become a transaction outage.", "The journal copier cannot clear the next book for reuse.", "Deleting archive logs without recovery-policy checks can create a recovery gap.", "Which archive destination failed, and is the required redo safely backed up?"), [
+          step("archfail-01", "LGWR fills online redo", "Redo Write", "redo-log-buffer", "online-redo-logs", ["redo-log-buffer", "lgwr", "online-redo-logs"], ["arrow-redo-lgwr", "arrow-lgwr-online-redo"], "Normal transactions continue generating redo until an online redo group fills.", "LGWR must eventually switch to another reusable group."),
+          step("archfail-02", "Filled group needs archive", "Log Switch", "online-redo-logs", "arcn", ["online-redo-logs", "arcn"], ["arrow-online-redo-arcn"], "In ARCHIVELOG mode, ARCn must archive the filled group before it can be safely reused.", "The archive path is now on the redo-reuse path."),
+          step("archfail-03", "Archive write fails", "Archive Failure", "arcn", "archived-redo-logs", ["arcn", "archived-redo-logs", "duplexed-archived-logs"], ["arrow-arcn-archive"], "The archive destination is full, unavailable, or reports another write error.", "The alert log and destination status identify the exact failed target."),
+          step("archfail-04", "Redo group stays unavailable", "Reuse Blocked", "online-redo-logs", "arcn", ["archived-redo-logs", "online-redo-logs", "arcn", "lgwr"], ["arrow-online-redo-arcn"], "Because ARCn did not complete the archive copy, Oracle cannot safely reuse the required online redo group.", "Repeated switches consume the remaining reusable groups."),
+          step("archfail-05", "Transactions are restricted", "ORA-00257", "lgwr", "server-process", ["lgwr", "server-process", "user-process", "online-redo-logs"], [], "If the condition persists, Oracle restricts normal connections and transactions can stop because LGWR cannot progress safely.", "This is protection against losing required redo history."),
+          step("archfail-06", "DBA repairs destination", "RCA", "archived-redo-logs", "arcn", ["archived-redo-logs", "duplexed-archived-logs", "arcn", "online-redo-logs"], ["arrow-online-redo-arcn", "arrow-arcn-archive"], "The DBA restores space or destination availability according to backup and retention requirements.", "Preserve recovery continuity; do not remove files blindly."),
+          step("archfail-07", "Archiving resumes", "Verify", "arcn", "archived-redo-logs", ["arcn", "archived-redo-logs", "online-redo-logs", "lgwr"], ["arrow-arcn-archive"], "ARCn completes archival, the online group becomes reusable, and normal log switches and transaction processing resume.", "Verify destination status, sequence continuity, and alert-log recovery.")
+        ]),
+        "startup-file-failure-rca": failureWorkflow("Startup Failure / Control or Data File RCA", "Startup / Shutdown / Recovery", "Advanced", "DBA / Recovery", "Uses the failed startup stage to distinguish control-file and data-file faults.", "STARTUP;", "NOMOUNT can succeed while MOUNT or OPEN fails because the next stage requires a different physical file set.", notes("Startup is staged diagnosis.", "Control files are required to mount; data files and redo are required to open.", "Open the building plan before opening every storage room.", "Forcing OPEN can turn a recoverable file problem into data loss.", "Did startup fail at NOMOUNT, MOUNT, or OPEN?"), [
+          step("startfail-01", "Instance reaches NOMOUNT", "NOMOUNT", "instance", "sga", ["instance", "sga", "pmon", "smon", "dbwn", "lgwr", "ckpt"], [], "Oracle allocates the SGA and starts background processes without yet opening the database files.", "A successful NOMOUNT proves the instance layer started, not that the database files are usable."),
+          step("startfail-02", "MOUNT needs control files", "MOUNT", "instance", "control-files", ["instance", "control-files", "ckpt"], [], "Oracle must identify and read the configured control files to associate the instance with the database.", "The control file supplies the database file map and checkpoint metadata."),
+          step("startfail-03", "Control-file error stops MOUNT", "ORA-00205", "control-files", "instance", ["control-files", "instance"], [], "A missing, wrong, inaccessible, or inconsistent configured control file can stop the MOUNT stage.", "Check every configured multiplexed control-file path and the alert log before recovery action."),
+          step("startfail-04", "OPEN checks database files", "OPEN", "control-files", "data-files", ["control-files", "data-files", "online-redo-logs", "database"], [], "If MOUNT succeeds, Oracle next verifies and opens the data files and online redo logs recorded in the control file.", "This is a different file layer from MOUNT."),
+          step("startfail-05", "Data-file error stops OPEN", "ORA-01157", "data-files", "instance", ["data-files", "users-tablespace", "undo-tablespace", "instance"], [], "A missing or inaccessible data file, or one requiring recovery, can stop OPEN even though the control file was read successfully.", "Use the accompanying error to identify the file and required action."),
+          step("startfail-06", "DBA repairs exact layer", "RCA", "rman", "data-files", ["control-files", "data-files", "online-redo-logs", "rman", "disk-backup", "archived-redo-logs"], ["arrow-rman-datafiles"], "The DBA corrects paths or storage access, or uses RMAN to restore and recover the affected file from tested backups and redo.", "Select recovery from the failed file and stage, not from a generic startup checklist."),
+          step("startfail-07", "Startup stages are retested", "Verify", "instance", "database", ["instance", "database", "control-files", "data-files", "online-redo-logs"], [], "Oracle is retested through NOMOUNT, MOUNT, and OPEN, and the alert log is checked for remaining file or recovery errors.", "A successful OPEN confirms the database file set is usable and consistent.")
+        ]),
+        "rman-backup-failure-rca": failureWorkflow("RMAN Backup Failure / Destination or Input RCA", "RMAN Backup / Restore / Recovery", "Advanced", "Backup DBA / Operations", "Separates RMAN wrapper messages from source, channel, and destination causes.", "BACKUP DATABASE PLUS ARCHIVELOG;", "The DBA follows the complete RMAN stack to the file or channel that actually failed, corrects it, and validates the replacement backup.", notes("RMAN error stacks are layered.", "RMAN-03009 reports the failed command or channel; accompanying errors identify the cause.", "Read the shipping failure report down to the broken dock or missing package.", "A green scheduler status is not the same as tested recoverability.", "Which source, channel, or destination produced the first actionable error?"), [
+          step("rmanfail-01", "RMAN reads repository metadata", "Metadata", "rman", "control-files", ["rman", "control-files"], ["arrow-rman-control"], "RMAN reads control-file or recovery-catalog metadata to plan the backup.", "Repository knowledge does not guarantee that every source and destination is currently accessible."),
+          step("rmanfail-02", "Channel is allocated", "Channel", "rman", "large-pool", ["rman", "large-pool", "large-pool-response-queue", "large-pool-request-queue"], [], "RMAN allocates disk or media-management channels; larger I/O buffers may use the Large Pool when configured.", "Channel-specific errors identify the failing backup path."),
+          step("rmanfail-03", "RMAN reads input files", "Backup Read", "rman", "data-files", ["rman", "data-files", "control-files", "archived-redo-logs"], ["arrow-rman-datafiles"], "RMAN reads database files and, when requested, required archived redo according to the command.", "Missing input, read errors, and corruption appear in the accompanying error stack."),
+          step("rmanfail-04", "RMAN writes backup output", "Backup Write", "rman", "disk-backup", ["rman", "disk-backup", "mml", "tape-backup"], ["arrow-rman-disk"], "The channel writes backup pieces to disk or through a media management layer.", "Destination space, permissions, media-manager status, and storage errors matter here."),
+          step("rmanfail-05", "Command or channel fails", "RMAN-03009", "disk-backup", "rman", ["disk-backup", "rman", "data-files", "archived-redo-logs", "mml"], ["arrow-disk-rman"], "RMAN-03009 identifies the failed command or channel, while nearby ORA and operating-system messages identify the actionable cause.", "Read the complete stack rather than treating RMAN-03009 as the root cause."),
+          step("rmanfail-06", "DBA corrects root cause", "RCA", "rman", "disk-backup", ["rman", "disk-backup", "data-files", "archived-redo-logs", "mml", "tape-backup"], ["arrow-rman-disk", "arrow-mml-tape"], "The DBA restores source availability or destination capacity and reruns the failed operation.", "A failed output should not be counted toward recoverability until RMAN records a successful replacement."),
+          step("rmanfail-07", "Backup is validated", "Validate", "disk-backup", "rman", ["disk-backup", "rman", "control-files", "data-files"], ["arrow-disk-rman"], "RESTORE VALIDATE or an appropriate recovery test confirms that required backup pieces can be read and used.", "Validation and periodic recovery tests close the backup RCA.")
+        ]),
+        "flashback-unavailable-rca": failureWorkflow("Flashback Database Unavailable / Retention RCA", "Flashback", "Advanced", "DBA / Recovery", "Shows why a requested flashback target may be unreachable.", "FLASHBACK DATABASE TO TIMESTAMP (SYSDATE - 2);", "Oracle checks configuration and retained flashback/redo before rewind; an unreachable target requires a closer target or RMAN recovery.", notes("Flashback availability is prepared before the incident.", "The configured target is constrained by retained flashback data, redo, and recovery-area space.", "A rewind point exists only while its recording remains available.", "Flashback Database is not media recovery.", "Is the requested SCN inside the actual flashback window?"), [
+          step("flashfail-01", "DBA requests rewind target", "Flashback Request", "user-process", "database", ["user-process", "database", "control-files"], [], "The DBA specifies a target time, SCN, or restore point while preparing the database for Flashback Database.", "The requested target must be reachable in the current database incarnation."),
+          step("flashfail-02", "Oracle checks configuration", "Prerequisite Check", "database", "flashback-logs", ["database", "flashback-logs", "rvwr", "control-files"], [], "Oracle checks whether Flashback Database was enabled and whether the database state and control metadata support the request.", "Enabling flashback after an incident cannot create missing historical flashback logs."),
+          step("flashfail-03", "Oracle checks retained window", "Window Check", "flashback-logs", "data-files", ["flashback-logs", "data-files", "archived-redo-logs", "online-redo-logs"], [], "The target must be covered by retained flashback data and the redo required to reach the precise point.", "Fast Recovery Area pressure can shorten the actual window below the configured retention target."),
+          step("flashfail-04", "Requested target is unavailable", "Flashback Failure", "flashback-logs", "database", ["flashback-logs", "database", "control-files"], [], "If the required flashback data or redo is unavailable, Oracle rejects the requested target.", "Query the actual flashback window and inspect the exact error before choosing another method."),
+          step("flashfail-05", "DBA chooses recovery path", "RCA", "disk-backup", "data-files", ["database", "rman", "disk-backup", "archived-redo-logs", "data-files"], ["arrow-disk-rman", "arrow-rman-datafiles"], "The DBA chooses a reachable flashback target or follows the RMAN restore path from backup to data files before applying the redo required for point-in-time recovery.", "Flashback cannot repair a missing data file; media failure requires restore and recovery."),
+          step("flashfail-06", "Recovery readiness is improved", "Prevent", "rvwr", "flashback-logs", ["rvwr", "flashback-logs", "disk-backup", "rman"], ["arrow-rvwr-flashback"], "The DBA sizes and monitors the recovery area, sets realistic retention, creates guaranteed restore points only when justified, and keeps tested backups.", "Verify the actual window instead of assuming the target parameter is guaranteed.")
+        ]),
+        "performance-incident-rca": failureWorkflow("Performance Incident RCA / Symptom to Cause", "Monitoring / Diagnostics / Performance", "Advanced", "Performance DBA / Operations", "Provides a repeatable evidence path for any slowdown or spike.", "Define the incident window, then correlate DB CPU, non-idle waits, sessions, SQL, objects, and files.", "A user-visible slowdown is narrowed to one measured architecture branch before correction and verification.", notes("Performance RCA is a correlation exercise.", "The same symptom can come from CPU, I/O, locking, parsing, TEMP, redo, or background pressure.", "Follow measured delay through the operations floor.", "The top wait or top SQL alone is not automatically the root cause.", "Which evidence ties the symptom to the same time, session, SQL, and object?"), [
+          step("perfrca-01", "Incident window is fixed", "Scope", "user-process", "server-process", ["user-process", "server-process", "pga"], ["arrow-user-listener", "arrow-listener-server"], "The DBA records exact start and end times, affected users, service, module, and business action.", "Without a precise interval, cumulative metrics can hide or dilute the incident."),
+          step("perfrca-02", "Database time is separated", "Measure", "server-process", "sga", ["server-process", "sga", "pga"], ["arrow-server-shared-pool", "arrow-server-buffer-cache"], "The DBA separates database CPU from non-idle wait time for the same interval.", "This first split distinguishes processing pressure from time spent waiting on a resource."),
+          step("perfrca-03", "Sessions and SQL are identified", "Attribute", "server-process", "sql-statement", ["server-process", "sql-statement", "shared-pool", "library-cache", "execution-plan"], ["arrow-server-sql-statement", "arrow-server-shared-pool"], "Sessions, SQL IDs, executions, plans, modules, and objects are correlated with the measured database time.", "Attribution prevents system-wide averages from being blamed on the wrong workload."),
+          step("perfrca-04", "Wait maps to architecture", "Map Cause", "row-source-execution", "database", ["row-source-execution", "database-buffer-cache", "data-files", "pga", "temp-tablespace", "temporary-files", "redo-log-buffer", "lgwr", "online-redo-logs", "undo"], ["arrow-server-buffer-cache", "arrow-buffer-datafiles", "arrow-sort-temp-tbs", "arrow-redo-lgwr"], "The dominant wait and SQL operation are mapped to the relevant I/O, TEMP, redo, lock, parse, or buffer path.", "Use the exact event and responsible component; do not treat all waits as storage."),
+          step("perfrca-05", "One cause is corrected", "Correct", "database", "server-process", ["database", "server-process", "execution-plan", "database-buffer-cache", "data-files", "pga", "lgwr"], [], "The narrowest proven cause is corrected in SQL, application behavior, memory policy, file I/O, redo path, or workload scheduling.", "Change one evidenced cause at a time and preserve a rollback plan."),
+          step("perfrca-06", "Same workload is verified", "Verify", "server-process", "user-process", ["server-process", "user-process", "sga", "pga"], ["arrow-server-user"], "The same action and interval are retested, comparing response time, throughput, errors, DB CPU, and waits with the baseline.", "RCA closes only when the user symptom and measured bottleneck improve without regression.")
+        ])
+      });
+
       function init() {
         protectDeveloperCredit();
         bindComponentHandlers();
@@ -3701,18 +3957,15 @@
 
       function bindControls() {
         $("#resetButton").addEventListener("click", clearTrainer);
+        $("#architectureResetButton").addEventListener("click", resetAndReturnToExplorer);
         $("#timelineResetButton").addEventListener("click", resetFlow);
         $("#focusModeButton").addEventListener("click", toggleFocusMode);
-        $("#architectureViewButton").addEventListener("click", toggleArchitectureView);
         $("#pageLightButton").addEventListener("click", togglePageLightMode);
         $("#architectureFullscreenButton").addEventListener("click", toggleArchitectureFullscreen);
         $("#panelLockerButton").addEventListener("click", togglePanelLocker);
         $("#architectureScrollCue")?.addEventListener("click", () => {
           scrollPlayViewIntoPosition();
           setStatus("Dynamic architecture diagram in view.");
-        });
-        $("#restorePanelButton").addEventListener("click", () => {
-          if (state.architectureExpanded) toggleArchitectureView();
         });
         $("#printButton").addEventListener("click", () => window.print());
         $("#referencesButton").addEventListener("click", () => openReferences());
@@ -3794,7 +4047,6 @@
         const toolbarHeight = Math.max(42, toolbar?.getBoundingClientRect().height || 52);
 
         const normalSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.9), 650, 1040);
-        const architectureSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.96), 760, 1100);
         const workflowSvgHeight = clampNumber(Math.min(naturalSvgHeight, viewportHeight * 0.78), 600, 760);
         const workflowPanelHeight = workflowSvgHeight + toolbarHeight + 8;
         const normalPanelHeight = normalSvgHeight + toolbarHeight + 8;
@@ -3803,7 +4055,6 @@
         shell.style.setProperty("--adaptive-workflow-panel-height", `${Math.round(workflowPanelHeight)}px`);
         shell.style.setProperty("--adaptive-normal-svg-height", `${Math.round(normalSvgHeight)}px`);
         shell.style.setProperty("--adaptive-normal-panel-height", `${Math.round(normalPanelHeight)}px`);
-        shell.style.setProperty("--adaptive-architecture-svg-height", `${Math.round(architectureSvgHeight)}px`);
       }
 
       function clampNumber(value, min, max) {
@@ -3879,6 +4130,11 @@
             workflowTeachingGuides[flowId]?.keyTakeaway,
             workflowTeachingGuides[flowId]?.watch,
             workflowDiagnostics[flowId]?.summary,
+            ...Object.entries(workflowFailureScenarios[flowId] || {})
+              .filter(([key]) => key !== "oracleErrors")
+              .map(([, value]) => value),
+            ...(workflowFailureScenarios[flowId]?.oracleErrors || [])
+              .flatMap((error) => [error.code, error.message, error.context]),
             ...(workflowDiagnostics[flowId]?.events || []).flatMap((eventId) => {
               const event = waitEventMetadata[eventId] || {};
               return [event.name, event.waitClass, event.meaning, event.checks, event.caution];
@@ -3918,6 +4174,7 @@
               <span class="tag" title="${escapeHtml(flow.category || "Workflow")}">${escapeHtml(flow.category || "Workflow")}</span>
               <span class="difficulty" title="${escapeHtml(flow.difficulty || "Basic")}">${escapeHtml(flow.difficulty || "Basic")}</span>
             </div>
+            ${flow.scenarioType === "failure" ? '<span class="failure-label">Failure / RCA</span>' : ""}
             <h3>${escapeHtml(flow.title)}</h3>
             <p><strong>Best for:</strong> ${escapeHtml(flow.bestFor || "DBA training")}</p>
             <p>${escapeHtml(guideInfo.studentExplanation || flow.teachingPurpose || flow.summary || "")}</p>
@@ -3925,8 +4182,8 @@
             <code>${escapeHtml(flow.exampleSql || "No command required")}</code>
             <p><strong>Touches:</strong> ${escapeHtml(components)}</p>
             <div class="workflow-card-actions">
-              <button type="button" data-start-workflow="${escapeHtml(flowId)}">Start Demo</button>
-              <button type="button" data-explain-workflow="${escapeHtml(flowId)}">Explain</button>
+              <button type="button" data-start-workflow="${escapeHtml(flowId)}">Auto Demo</button>
+              <button type="button" data-explain-workflow="${escapeHtml(flowId)}">Manual Demo</button>
             </div>
           </article>`;
       }
@@ -3995,14 +4252,12 @@
       function syncLayoutMode() {
         const workflowActive = Boolean(state.activeFlowId);
         const componentActive = Boolean(state.selectedComponentId && !state.activeFlowId);
-        const architectureViewActive = Boolean(state.architectureExpanded);
         const appShell = $(".app-shell");
         const explorer = $(".workflow-explorer");
         appShell?.classList.toggle("workflow-active", workflowActive);
         appShell?.classList.toggle("component-active", componentActive);
-        appShell?.classList.toggle("architecture-view-active", architectureViewActive);
         if (explorer) {
-          const explorerHidden = workflowActive || architectureViewActive;
+          const explorerHidden = workflowActive;
           explorer.hidden = explorerHidden;
           explorer.setAttribute("aria-hidden", String(explorerHidden));
         }
@@ -4283,8 +4538,6 @@
         }
         if (state.currentStepIndex < flow.steps.length - 1) {
           goToStep(state.currentStepIndex + 1);
-        } else if (state.architectureExpanded && state.playing && activateAdjacentFlow(1)) {
-          return;
         } else if (state.loop) {
           goToStep(0);
         } else {
@@ -4302,28 +4555,11 @@
         if (state.currentStepIndex > 0) {
           const targetIndex = state.currentStepIndex - 1;
           goToStep(targetIndex, { expandIntroDrawers: targetIndex === 0 });
-        } else if (state.architectureExpanded && state.playing && activateAdjacentFlow(-1)) {
-          return;
         } else if (state.loop) {
           goToStep(flow.steps.length - 1);
         } else {
           pauseFlow();
         }
-      }
-
-      function activateAdjacentFlow(direction) {
-        const flowIds = getVisibleWorkflowIds();
-        const currentIndex = flowIds.indexOf(state.activeFlowId);
-        if (currentIndex < 0) return false;
-        const nextIndex = currentIndex + direction;
-        if (nextIndex < 0 || nextIndex >= flowIds.length) {
-          if (!state.loop) return false;
-          const loopIndex = direction > 0 ? 0 : flowIds.length - 1;
-          const loopFlow = flows[flowIds[loopIndex]];
-          return activateFlow(flowIds[loopIndex], direction > 0 ? 0 : loopFlow.steps.length - 1, false);
-        }
-        const nextFlow = flows[flowIds[nextIndex]];
-        return activateFlow(flowIds[nextIndex], direction > 0 ? 0 : nextFlow.steps.length - 1, false);
       }
 
       function playFlow() {
@@ -4390,7 +4626,6 @@
         state.componentAbbreviationsCollapsed = false;
         state.focusMode = false;
         state.pageLightMode = false;
-        state.architectureExpanded = false;
         state.panelLocked = false;
         state.direction = 1;
         state.speed = 1;
@@ -4416,13 +4651,10 @@
         syncWorkflowViewMode();
         $("#focusModeButton").classList.remove("active");
         $("#focusModeButton").setAttribute("aria-pressed", "false");
-        $("#architectureViewButton").classList.remove("active");
-        $("#architectureViewButton").setAttribute("aria-pressed", "false");
         $("#pageLightButton").classList.remove("active");
         $("#pageLightButton").setAttribute("aria-pressed", "false");
-        $("#restorePanelButton").hidden = true;
         $("#sidePanel").removeAttribute("aria-hidden");
-        $(".trainer-workspace").classList.remove("architecture-expanded", "side-panel-locked");
+        $(".trainer-workspace").classList.remove("side-panel-locked");
         $(".workflow-explorer")?.scrollTo({ left: 0, top: 0 });
         clearSearch(false);
         renderWorkflowExplorer();
@@ -4441,6 +4673,19 @@
         updateSpeakerNotes();
         updateWorkflowCardState();
         setStatus("Reset complete. Select a flow or component.");
+      }
+
+      async function resetAndReturnToExplorer() {
+        await clearTrainer();
+        const explorer = $(".workflow-explorer");
+        if (!explorer) return;
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        requestAnimationFrame(() => {
+          explorer.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+          window.setTimeout(() => {
+            $("#workflowCategoryFilter")?.focus({ preventScroll: true });
+          }, reducedMotion ? 0 : 420);
+        });
       }
 
       function setPlaybackSpeed(speed) {
@@ -4487,7 +4732,7 @@
         if (state.workflowIntroMode) {
           const guideInfo = workflowTeachingGuides[state.activeFlowId] || {};
           card.querySelector("h2").textContent = `${flow.title} - Workflow intro`;
-          card.querySelector("p").textContent = guideInfo.studentExplanation || flow.summary || flow.teachingPurpose || "Review the workflow overview, then press Play or Start Demo to begin Step 1.";
+          card.querySelector("p").textContent = guideInfo.studentExplanation || flow.summary || flow.teachingPurpose || "Review the workflow overview, then press Play or Auto Demo to begin Step 1.";
           return;
         }
         const item = flow.steps[state.currentStepIndex];
@@ -4944,6 +5189,7 @@
             ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
             ${workflowFocusDrawerTemplate(flow, guideInfo)}
             ${block("At this step", currentStepTeaching(flow, item, notes, guideInfo), "primary")}
+            ${workflowFailureTemplate(state.activeFlowId)}
             ${workflowDiagnosticTemplate(state.activeFlowId)}
             ${finalStep ? block("End of Workflow", `${flow.title} has reached its final step. Use Reset to replay this workflow or choose another workflow from the list.`, "end-workflow") : ""}
             ${stepPathTemplate(item)}
@@ -5002,6 +5248,7 @@
           ${workflowFocusDrawerTemplate(flow, guideInfo)}
           ${workflowAbbreviationsDrawerTemplate(flow, guideInfo)}
           <div class="info-grid">
+            ${workflowFailureTemplate(flowId)}
             ${workflowDiagnosticTemplate(flowId)}
             ${flow.exampleSql ? block("Example SQL / command", flow.exampleSql) : ""}
             ${block("What this workflow teaches", guideInfo.focus || flow.teachingPurpose || flow.summary, "primary")}
@@ -5044,7 +5291,10 @@
       function workflowAbbreviationKeys(flow, guideInfo = {}) {
         const keys = new Set();
         const notes = flow.trainerNotes || {};
+        const failureScenarioInfo = workflowFailureScenarios[state.activeFlowId] || {};
         addTextAbbreviations(keys, flow.title, flow.category, flow.bestFor, flow.summary, flow.teachingPurpose, flow.exampleSql, guideInfo.focus, guideInfo.studentExplanation, guideInfo.watch, guideInfo.keyTakeaway, notes.simple, notes.precision, notes.misconception, notes.question);
+        addTextAbbreviations(keys, ...Object.entries(failureScenarioInfo).filter(([key]) => key !== "oracleErrors").map(([, value]) => value));
+        (failureScenarioInfo.oracleErrors || []).forEach((error) => addTextAbbreviations(keys, error.code, error.message, error.context));
         (flow.steps || []).forEach((item) => {
           addTextAbbreviations(keys, item.id, item.title, item.operation, item.explanation, item.trainerScript, item.source, item.target);
           addComponentAbbreviation(keys, item.source);
@@ -5169,6 +5419,32 @@
           ? `<div class="license-note"><strong>License boundary:</strong> AWR, ADDM, and ASH are Oracle Diagnostics Pack features. Use them only when appropriately licensed. Current dynamic views such as V$SESSION, V$SYSTEM_EVENT, and V$SQLSTATS remain the classroom starting point shown here.</div>`
           : "";
         return htmlBlock("Performance diagnostic lens", `<p>${escapeHtml(diagnostic.summary || "Correlate wait time with the responsible session, SQL, object, and interval.")}</p>${eventHtml}${licenseNote}`, "diagnostic-lens");
+      }
+
+      function workflowFailureTemplate(flowId) {
+        const scenario = workflowFailureScenarios[flowId];
+        if (!scenario) return "";
+        const errorList = `<ul class="oracle-error-list">${(scenario.oracleErrors || []).map((error) => `
+          <li>
+            <code class="oracle-error-code">${escapeHtml(error.code)}</code>
+            <span class="oracle-error-message">${escapeHtml(error.message)}</span>
+            ${error.context ? `<span class="oracle-error-context">${escapeHtml(error.context)}</span>` : ""}
+          </li>`).join("")}</ul>
+          <p class="oracle-error-source-note">Oracle Database 11g message wording is shown above. Text in angle brackets is the value Oracle substitutes at runtime.</p>`;
+        const rows = [
+          ["Verified Oracle error messages", errorList, true],
+          ["Visible symptom", scenario.symptom],
+          ["Likely root causes", scenario.likelyCauses],
+          ["Evidence to collect", scenario.evidence],
+          ["Safe corrective action", scenario.correctiveAction],
+          ["Guardrail", scenario.guardrail]
+        ];
+        const html = `<div class="failure-rca-grid">${rows.map(([title, value, allowHtml = false]) => `
+          <section class="failure-rca-item">
+            <h4>${escapeHtml(title)}</h4>
+            ${allowHtml ? value : `<p>${escapeHtml(value || "")}</p>`}
+          </section>`).join("")}</div>`;
+        return htmlBlock("Failure scenario and RCA", html, "failure-lens");
       }
 
       function currentFrameSummary(flow, item) {
@@ -5409,24 +5685,6 @@
         setStatus(state.panelLocked ? "Explanation panel locked in. Architecture space expanded." : "Explanation panel restored.");
       }
 
-      function toggleArchitectureView() {
-        state.architectureExpanded = !state.architectureExpanded;
-        const button = $("#architectureViewButton");
-        const restoreButton = $("#restorePanelButton");
-        const workspace = $(".trainer-workspace");
-        const sidePanel = $("#sidePanel");
-        button.classList.toggle("active", state.architectureExpanded);
-        button.setAttribute("aria-pressed", String(state.architectureExpanded));
-        restoreButton.hidden = true;
-        sidePanel.removeAttribute("aria-hidden");
-        workspace.classList.toggle("architecture-expanded", state.architectureExpanded);
-        syncLayoutMode();
-        syncPanelLockerState();
-        syncArchitectureFraming();
-        if (state.architectureExpanded) $("#diagramPanel").scrollIntoView({ block: "start", behavior: "smooth" });
-        setStatus(state.architectureExpanded ? "Full Architecture view on: architecture enlarged with the panel still available." : "Full Architecture view off.");
-      }
-
       async function toggleArchitectureFullscreen() {
         if (state.architectureFullscreen) {
           await exitArchitectureFullscreen();
@@ -5526,6 +5784,28 @@
       }
 
       function validateFlowDefinitions() {
+        Object.entries(workflowFailureScenarios).forEach(([flowId, scenario]) => {
+          if (!flows[flowId]) console.warn(`Failure/RCA metadata references missing workflow: ${flowId}`);
+          ["symptom", "likelyCauses", "evidence", "correctiveAction", "guardrail"].forEach((field) => {
+            if (!scenario[field]) console.warn(`Failure/RCA metadata missing ${field}: ${flowId}`);
+          });
+          if (!Array.isArray(scenario.oracleErrors) || !scenario.oracleErrors.length) {
+            console.warn(`Failure/RCA metadata missing verified Oracle errors: ${flowId}`);
+          } else {
+            scenario.oracleErrors.forEach((error, index) => {
+              ["code", "message"].forEach((field) => {
+                if (!error[field]) console.warn(`Failure/RCA Oracle error ${index + 1} missing ${field}: ${flowId}`);
+              });
+            });
+          }
+        });
+        operationGroups.forEach((group) => {
+          group.workflows.forEach((flowId) => {
+            if (!flows[flowId]) console.warn(`${group.id} references missing workflow: ${flowId}`);
+          });
+          const failures = group.workflows.filter((flowId) => flows[flowId]?.scenarioType === "failure");
+          if (!failures.length) console.warn(`Workflow category lacks a dedicated failure/RCA scenario: ${group.id}`);
+        });
         Object.entries(waitEventMetadata).forEach(([eventId, event]) => {
           ["name", "waitClass", "meaning", "checks", "caution"].forEach((field) => {
             if (!event[field]) console.warn(`Wait-event metadata missing ${field}: ${eventId}`);
@@ -5544,6 +5824,9 @@
           }
         });
         Object.entries(flows).forEach(([flowId, flow]) => {
+          if (flow.scenarioType === "failure" && !workflowFailureScenarios[flowId]) {
+            console.warn(`Failure workflow missing RCA metadata: ${flowId}`);
+          }
           if (workflowIdsForCategory("all").includes(flowId)) {
             const guideInfo = workflowTeachingGuides[flowId];
             if (!guideInfo) console.warn(`Visible workflow missing student guide: ${flowId}`);
