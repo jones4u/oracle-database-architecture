@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v1 | Updated : 25-Nov-2026">
+<title>Oracle Enterprise Manager · Oracle 11g Architecture</title>
+<style>
+:root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#63ecff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 "Segoe UI",Arial,sans-serif}a{color:var(--accent)}button,a,summary{touch-action:manipulation}button,summary{cursor:pointer}button{font:inherit}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:3px}header,main,footer{max-width:1180px;margin:auto;padding:0 clamp(16px,3vw,38px)}header{padding-top:22px}nav{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;padding-bottom:14px;border-bottom:1px solid var(--line)}nav a{display:inline-block;text-decoration:none;border-radius:6px;padding:5px 9px;color:var(--muted);font-size:.92rem}nav a:first-child{color:var(--text);font-weight:650}nav a[aria-current]{background:var(--accent);color:#10151b;font-weight:650}nav a:hover,.menu a:hover{background:#263442;color:#fff}h1,h2,h3,p{margin:0}h1{font-size:clamp(1.9rem,4vw,3rem);line-height:1.12;margin:25px 0 8px;letter-spacing:-.027em}h2{font-size:1.22rem}h3{font-size:1.12rem}.sub{font-size:1.08rem}.scope,.muted,footer{color:var(--muted)}.scope{font-size:.92rem;margin-top:3px}.layout{display:grid;grid-template-columns:minmax(210px,275px) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:start;margin:25px auto}.menu a{display:block;color:var(--text);text-decoration:none;line-height:1.35;padding:11px 12px;border:1px solid var(--line);border-radius:7px;margin-top:8px}.menu small{display:block;color:var(--muted);margin-bottom:3px}.menu a[aria-current]{border-color:var(--accent);background:#222c34}.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(14px,2.2vw,24px)}.setup{margin:6px 0 14px;color:var(--muted)}.map{list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 15px}.map li{padding:8px 9px;background:#10151b;border:1px solid var(--line);border-radius:6px;line-height:1.32}.map strong,.map small{display:block}.map small{margin-top:3px;color:var(--muted)}.map .active{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}.map .active strong,.state{color:var(--accent)}.state{font-size:.87rem;font-weight:650}.frame{border-top:1px solid var(--line);padding-top:13px;min-height:109px}.frame p{margin-top:4px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tools button{padding:6px 13px;color:var(--text);background:#28323e;border:1px solid var(--line);border-radius:6px}button.primary{background:var(--accent);color:#111820;font-weight:650}.tools button:disabled{opacity:.48;cursor:default}.check{border-top:1px solid var(--line);margin:17px 0 0;padding-top:13px}.check p{margin:4px 0}.check summary{color:var(--accent);font-weight:600}.refs{margin:17px 0 0}.refs ul{margin:5px 0 0;padding-left:20px}.refs a{font-size:.92rem}footer{padding-bottom:24px;font-size:.88rem}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:6px;background:#162532;padding:7px;z-index:9}[hidden]{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.menu h2{grid-column:1/-1}.menu a{margin:0;font-size:.93rem}.map{grid-template-columns:repeat(2,minmax(0,1fr))}.frame{min-height:0}}@media(max-width:390px){.map{grid-template-columns:1fr 1fr}.menu a{padding:8px}.tools button{padding:6px 11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">11g Architecture home</a>
+<a href="./rac.html">RAC</a>
+<a href="./dataguard.html">Data Guard</a>
+<a href="./rac-dataguard.html">RAC + Data Guard</a>
+<a href="./goldengate.html">GoldenGate</a>
+<a href="./oem.html" aria-current="page">Enterprise Manager</a></nav><h1>Oracle Enterprise Manager</h1><p class="sub">Trace an observation from an Oracle 11g database to the administrator who acts on it.</p><p class="scope">Enterprise Manager Cloud Control 12c (12.1) · Oracle Database 11g target · Central monitoring · Trainer v1</p></header>
+<main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#first-sample" data-lesson="first-sample"><small>Basic</small>Discover a database and see its first sample</a>
+<a href="#threshold-incident" data-lesson="threshold-incident"><small>Intermediate</small>Follow a threshold breach to its owner</a>
+<a href="#patch-blackout" data-lesson="patch-blackout"><small>Advanced</small>Track a patch window with a blackout</a>
+<a href="#stale-evidence" data-lesson="stale-evidence"><small>Ultra-advanced</small>Separate stale telemetry from a database outage</a>
+<a href="#oem-startup" data-lesson="oem-startup"><small>Basic</small>Start Cloud Control and verify fresh monitoring</a>
+<a href="#oem-graceful-shutdown" data-lesson="oem-graceful-shutdown"><small>Intermediate</small>Gracefully stop the Cloud Control stack</a>
+<a href="#oem-patching" data-lesson="oem-patching"><small>Advanced</small>Patch the OMS and its repository-side artifacts</a></aside><section id="demo" class="box" aria-label="Manual demo" tabindex="-1"><h2 id="flow-title"></h2><p class="setup" id="setup"></p><h3>Architecture</h3><p class="muted">The agent collects from the target and uploads to the OMS. The OMS writes to the repository and retrieves the data that the console displays.</p><ul class="map" id="architecture" aria-label="Components highlighted in the current step"><li data-node="database"><strong>11g target</strong><small>Database instance or host being monitored</small></li>
+<li data-node="agent"><strong>Management Agent</strong><small>Collects data using the target plug-in</small></li>
+<li data-node="oms"><strong>Management Service</strong><small>Receives uploads and serves the console</small></li>
+<li data-node="repo"><strong>Management Repository</strong><small>Stores management, metric and incident data</small></li>
+<li data-node="console"><strong>Cloud Control console</strong><small>Displays target evidence to the operator</small></li>
+<li data-node="rules"><strong>Incident rules</strong><small>Route configured events and notifications</small></li></ul><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools"><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related 11g Architecture home workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"first-sample":[["user-login","Target discovery illustrates a management agent connecting with monitoring credentials."],["session-monitoring","Establish which database target, credentials, collection interval and timestamp produced a metric sample."]],"stale-evidence":[["connection-failure-rca","Check target reachability independently of an agent or OMS connectivity failure."],["shutdown-abort","Verify whether the target actually went down before interpreting a gap in telemetry as a crash."],["crash-recovery","Use independent evidence to distinguish actual failure from stale monitoring data."],["startup-file-failure-rca","Validate the target independently when startup and the monitoring view disagree."],["known-sql-slowness","Verify collection freshness and target reachability before interpreting a missing or outdated sample."],["spike-window-diagnosis","Verify collection freshness and target reachability before interpreting a missing or outdated sample."],["redo-commit-latency","Check comparable sample times before using target metrics to investigate a latency spike."]],"threshold-incident":[["archive-destination-failure-rca","If the target exposes a relevant threshold, track the observed incident separately from repairing the destination."],["archive-log-switch-pressure","Investigate an observed storage threshold and close the incident after confirming the underlying cause."],["performance-incident-rca","Trace a monitored condition through event creation, ownership and verification."]],"oem-startup":[["instance-startup","Distinguish startup of the monitoring stack from startup of a monitored database."]],"oem-graceful-shutdown":[["shutdown-normal","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."],["shutdown-transactional","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."],["shutdown-immediate","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."]],"oem-patching":[["patch-quarterly-psu-spu","Track component compatibility and post-maintenance health across the management stack."],["patch-one-off","Scope the interim correction to the intended database target or management component."],["patch-set-upgrade","Check management stack, agent and plug-in compatibility before monitoring the upgraded target."]],"patch-blackout":[["patch-windows-bundle","Use a bounded monitoring blackout for the Windows target maintenance window."],["patch-rollback","End the blackout only after the service and fresh target samples confirm the recovery."],["patch-upgrade-mode-rca","Keep maintenance evidence and independently confirm the database’s open state before ending the monitoring blackout."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main>
+<footer><p>Related 11g Architecture lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=session-monitoring">Observe database sessions</a></p><a href="./index.html">Return to 11g Architecture home</a></footer>
+<script type="application/json" id="lesson-data">{
+  "flows": [
+    [
+      "first-sample",
+      "Basic",
+      "Discover a database and see its first sample",
+      "An 11g database is running on a host with a Cloud Control Management Agent and the required database plug-in. Monitoring credentials are available.",
+      [
+        [
+          "agent",
+          "Discover the target",
+          "The discovery process identifies the database as a candidate. The administrator checks its identity and monitoring details."
+        ],
+        [
+          "console",
+          "Promote it for monitoring",
+          "The administrator promotes the discovered database to a managed target with the appropriate monitoring settings."
+        ],
+        [
+          "database",
+          "Collect the first observation",
+          "At the scheduled interval, the agent uses the target plug-in and credentials to collect a database metric."
+        ],
+        [
+          "oms",
+          "Upload the result",
+          "The agent sends its collected data to the Oracle Management Service (OMS)."
+        ],
+        [
+          "repo",
+          "Store the metric",
+          "The OMS stores the management data in the Management Repository."
+        ],
+        [
+          "console",
+          "Verify the measurement",
+          "Open the target metric, check its timestamp and compare it with the sample expected from the database."
+        ]
+      ],
+      "Why might a discovered database have no normal metric history yet?",
+      "Discovery identifies a candidate. Promotion, working credentials and an operational collection and upload path are needed for normal monitoring.",
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      "threshold-incident",
+      "Intermediate",
+      "Follow a threshold breach to its owner",
+      "A training tablespace has a configured warning threshold of 80 percent used and critical threshold of 90 percent used. One occurrence triggers the event in this example. A rule is configured to create and notify on critical incidents.",
+      [
+        [
+          "database",
+          "Collect rising utilization",
+          "The database returns samples of 74, 84 and 92 percent used on successive intervals."
+        ],
+        [
+          "agent",
+          "Evaluate the configured metric",
+          "The samples cross the configured warning and then critical thresholds. Follow the metric event generated by monitoring."
+        ],
+        [
+          "oms",
+          "Process the incoming event",
+          "The monitoring system receives the event with its target, metric, severity and observation time."
+        ],
+        [
+          "rules",
+          "Apply the incident rule",
+          "The matching rule creates the incident and routes a notification to the designated team. Other rule configurations can produce different actions."
+        ],
+        [
+          "console",
+          "Verify recovery",
+          "The DBA resolves the space issue. A later healthy sample clears this metric event. Inspect both event history and incident status."
+        ]
+      ],
+      "Does every metric sample or every event automatically create an incident?",
+      "No. Collection produces observations, threshold evaluation can produce an event, and incident rules determine the configured response.",
+      [
+        0,
+        2
+      ]
+    ],
+    [
+      "patch-blackout",
+      "Advanced",
+      "Track a patch window with a blackout",
+      "A planned database patch requires a service interruption. The administrator can schedule a time-bounded blackout for the affected targets.",
+      [
+        [
+          "console",
+          "Define the window",
+          "Select the affected database and any other intended targets. Record the reason, start time and expected end."
+        ],
+        [
+          "agent",
+          "Confirm the blackout is active",
+          "Verify the selected targets show the blackout before maintenance. Their monitoring data collection is suspended for this interval."
+        ],
+        [
+          "database",
+          "Perform the maintenance",
+          "The DBA follows the patch README and validates the database separately. The blackout changes how Cloud Control monitors the target."
+        ],
+        [
+          "console",
+          "End the blackout",
+          "When the work finishes, end the blackout or verify its scheduled expiry. Ensure unexpected targets were not included."
+        ],
+        [
+          "repo",
+          "Verify a fresh collection",
+          "Confirm a new availability or metric timestamp after the window and compare it with a direct database check."
+        ]
+      ],
+      "Does a gap in metric history during a scheduled blackout prove that the database was down?",
+      "The blackout explains suspended collection. Use the maintenance record and independent availability checks to establish the database state.",
+      [
+        3,
+        2
+      ]
+    ],
+    [
+      "stale-evidence",
+      "Ultra-advanced",
+      "Separate stale telemetry from a database outage",
+      "The console shows an old measurement for several targets on one host. Other hosts are uploading current data. The latest sample preceded the reported problem.",
+      [
+        [
+          "console",
+          "Compare timestamps",
+          "Separate the last observed database state from the time of the current report. Compare timestamps for several targets on this host and on another host."
+        ],
+        [
+          "database",
+          "Check availability independently",
+          "In the simulation an authorized direct client can connect and run a simple query. This establishes database availability at the time of the test."
+        ],
+        [
+          "agent",
+          "Inspect the shared collection path",
+          "The host agent is running. Its logs and upload status show a backlog and repeated failures to contact the OMS."
+        ],
+        [
+          "oms",
+          "Locate and restore the upload path",
+          "Other agents can reach the OMS. After the affected host’s connection is restored, its uploads resume."
+        ],
+        [
+          "repo",
+          "Check that new evidence arrived",
+          "Wait for an observation taken after recovery, then verify its time and value in the console. The earlier gap remains part of the timeline."
+        ]
+      ],
+      "What supports a monitoring-path failure in this case?",
+      "A live database query succeeded, several targets shared stale timestamps, and agent uploads failed while other hosts were healthy. A fresh post-recovery sample closes the loop.",
+      [
+        0,
+        2
+      ]
+    ],
+    [
+      "oem-startup",
+      "Basic",
+      "Start Cloud Control and verify fresh monitoring",
+      "A planned restart covers a single OMS, its repository database and listener, and one Management Agent. The independently managed 11g application database remains available.",
+      [
+        [
+          "repo",
+          "Make the repository reachable",
+          "Bring up the repository database and its listener as required. Verify that the repository service is reachable from the OMS host."
+        ],
+        [
+          "oms",
+          "Start the management service",
+          "From the OMS home start the configured Oracle Management Service stack. Check OMS status and the console and agent-upload endpoints."
+        ],
+        [
+          "agent",
+          "Start the Management Agent",
+          "Run the agent's startup and status checks from its own home. Confirm it can collect from the 11g target and upload to the OMS."
+        ],
+        [
+          "console",
+          "Verify a post-start observation",
+          "Log in, select the intended target and locate a metric with a collection timestamp after restart. Compare it with a contemporaneous direct database observation before returning monitoring to service."
+        ]
+      ],
+      "The console opens and shows yesterday's value. Has monitoring recovered?",
+      "Verify a new successful agent collection and upload followed by a matching, post-start timestamp in the console. A working console alone proves only part of the monitoring path.",
+      [
+        0,
+        4
+      ]
+    ],
+    [
+      "oem-graceful-shutdown",
+      "Intermediate",
+      "Gracefully stop the Cloud Control stack",
+      "A scheduled full outage includes one OMS, its local Management Agent and the dedicated repository host. The application database monitored by this agent remains online.",
+      [
+        [
+          "console",
+          "Declare the observation window",
+          "Schedule the appropriate maintenance blackout while the console is available, review active jobs and stop new administrative work. Record a final metric timestamp and an independent way to reach the application database."
+        ],
+        [
+          "oms",
+          "Stop the complete OMS stack",
+          "Use the documented orderly full-stack shutdown for this OMS installation. Check the resulting management and middleware component status."
+        ],
+        [
+          "agent",
+          "Stop the in-scope agent",
+          "Use the agent home to stop the local Management Agent normally. Remote agents outside this outage can buffer collections within their configured limits."
+        ],
+        [
+          "repo",
+          "Close the dedicated repository if in scope",
+          "After the management services stop, close the repository database cleanly and stop its listener if it is dedicated to this maintenance. Verify component status and record the monitoring gap."
+        ],
+        [
+          "database",
+          "Confirm the application state independently",
+          "Use an independent connection to the application database to establish its actual availability during the monitoring outage. Record the result separately from the status of Cloud Control."
+        ]
+      ],
+      "The monitoring console is unavailable during the planned shutdown. What evidence decides whether the application database is down?",
+      "A direct connection and representative query against the application database. The console and its repository were explicitly shut down, so their availability cannot establish the target's state.",
+      [
+        0,
+        3,
+        4
+      ]
+    ],
+    [
+      "oem-patching",
+      "Advanced",
+      "Patch the OMS and its repository-side artifacts",
+      "This example uses a single Cloud Control 12.1.0.4 OMS and an applicable Enterprise Manager system patch that contains binary and repository actions. Each target database and Management Agent has its own patch level.",
+      [
+        [
+          "oms",
+          "Identify the management-system change",
+          "Match the patch README to the exact OMS release, OS, installed plug-ins and topology. Identify the required patch tool version and the repository artifacts included in this system patch."
+        ],
+        [
+          "repo",
+          "Verify backups and readiness",
+          "Verify matching recoverable backups of the repository, OMS and configuration. Confirm repository connectivity, run the release-specific prerequisite or analysis checks and review the patch plan before the outage."
+        ],
+        [
+          "console",
+          "Coordinate the maintenance window",
+          "Record baseline target timestamps. Schedule appropriate blackouts, complete or defer management jobs and record a direct check of the managed 11g database."
+        ],
+        [
+          "oms",
+          "Apply the supported patch plan",
+          "Use the README's single-OMS procedure and required service states. The 12.1.0.4 method can use OPatchauto for applicable system patches. Keep the binary and repository deployment logs together."
+        ],
+        [
+          "repo",
+          "Check deployment on both sides",
+          "Verify the expected subpatch inventory for the OMS homes and successful deployment of repository changes. A binary-only inventory check cannot establish the repository outcome."
+        ],
+        [
+          "agent",
+          "Validate a new upload and close the window",
+          "Verify OMS endpoints, a fresh successful agent upload and a console metric collected after the patch. End the appropriate blackout and verify monitoring resumes. Resolve or roll back failures using the documented system-patch procedure."
+        ]
+      ],
+      "The updated OMS inventory is correct but repository deployment reported an error. Should the patch window close?",
+      "Keep the window open. Resolve the documented repository deployment failure and verify both repository results and a fresh end-to-end target observation before closing the maintenance.",
+      [
+        0,
+        3,
+        4,
+        5
+      ]
+    ]
+  ],
+  "sources": [
+    [
+      "Cloud Control components",
+      "https://docs.oracle.com/cd/E24628_01/doc.121/e25353/overview.htm"
+    ],
+    [
+      "Discovery and promotion",
+      "https://docs.oracle.com/cd/E24628_01/doc.121/e24473/discovery.htm"
+    ],
+    [
+      "Enterprise monitoring and incidents",
+      "https://docs.oracle.com/cd/E24628_01/doc.121/e24473/monitor_overview.htm"
+    ],
+    [
+      "Using maintenance blackouts",
+      "https://docs.oracle.com/cd/E24628_01/doc.121/e24473/blackouts.htm"
+    ],
+    [
+      "Cloud Control 12c component startup and shutdown",
+      "https://docs.oracle.com/cd/E29597_01/doc.1111/e24473/emctl.htm"
+    ],
+    [
+      "Cloud Control 12.1.0.4 and later OMS and repository system patching",
+      "https://docs.oracle.com/cd/E24628_01/doc.121/e24473/opatchauto_oms.htm"
+    ]
+  ]
+}</script>
+<script>
+const {flows,sources}=JSON.parse(document.getElementById('lesson-data').textContent);
+const get=id=>document.getElementById(id);
+const links=Array.from(document.querySelectorAll('[data-lesson]'));
+const components=Array.from(document.querySelectorAll('[data-node]'));
+let current=flows[0];
+let frame=0;
+function displayStep(){
+  const [node,title,explanation]=current[4][frame];
+  for(const component of components){
+    const active=component.dataset.node===node;
+    component.classList.toggle('active',active);
+    if(active) component.setAttribute('aria-current','step');
+    else component.removeAttribute('aria-current');
+  }
+  get('progress').textContent='Step '+(frame+1)+' of '+current[4].length;
+  get('step-title').textContent=title;
+  get('explain').textContent=explanation;
+  get('previous').disabled=frame===0;
+  get('reset').disabled=frame===0;
+  const end=frame===current[4].length-1;
+  get('next').disabled=end;
+  get('checkpoint').hidden=!end;
+  if(!end) get('answer').open=false;
+}
+function selectLesson(){
+  const id=location.hash.slice(1);
+  current=flows.find(f=>f[0]===id)||flows[0];
+  frame=0;
+  for(const link of links){
+    if(link.dataset.lesson===current[0]) link.setAttribute('aria-current','true');
+    else link.removeAttribute('aria-current');
+  }
+  get('flow-title').textContent=current[2];
+  get('setup').textContent=current[3];
+  get('question').textContent=current[5];
+  get('answer').querySelector('p').textContent=current[6];
+  get('answer').open=false;
+  const items=current[7].map(i=>{
+    const [label,url]=sources[i];
+    const anchor=document.createElement('a');
+    anchor.href=url;anchor.textContent=label;
+    const item=document.createElement('li'); item.append(anchor); return item;
+  });
+  get('refs').replaceChildren(...items);
+  displayStep();
+}
+for(const link of links) link.addEventListener('click',()=>{if(link.hash===location.hash) selectLesson();});
+window.addEventListener('hashchange',()=>{if(location.hash!=='#demo') selectLesson();});
+get('previous').addEventListener('click',()=>{if(frame>0){frame--;displayStep();}});
+get('next').addEventListener('click',()=>{if(frame<current[4].length-1){frame++;displayStep();}});
+get('reset').addEventListener('click',()=>{frame=0;displayStep();});
+selectLesson();
+</script>
+</body>
+</html>

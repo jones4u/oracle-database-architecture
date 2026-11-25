@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Offline Oracle Database 11g architecture and SQL execution trainer">
   <meta name="author" content="Cyril Jones S">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v77 | Updated : 25-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v78 | Updated : 25-Nov-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -2292,17 +2292,19 @@
       .component text { fill: #111; }
       .info-block p, .notes-panel p, .subtitle, .tag { color: #111; }
     }
+    .tower-nav,.operations-start{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 14px}.tower-nav a,.operations-start button{color:var(--text);text-underline-offset:3px}.tower-nav a[aria-current]{color:var(--gold);font-weight:700;text-decoration:none}.operations-start{padding:0 0 9px}.operations-start strong{font-size:.88rem}.answer-choices{display:flex;flex-wrap:wrap;gap:6px}.answer-choices button{text-align:left;white-space:normal}.answer-choices [aria-pressed=true]{outline:2px solid currentColor}.graded-check{border-top:1px solid var(--line);padding-top:.7rem}.graded-check [role=status]{min-height:1.3em}@media print{.tower-nav,.operations-start{display:none}}
+    .topology-compare{padding:10px 14px}.topology-compare summary{cursor:pointer;color:var(--text);font-weight:650}.topology-inner{padding:10px 0}.topology-inner label{display:block}.topology-inner select{max-width:100%}.topology-inner a{color:var(--text);text-decoration:underline}.topology-table{overflow:auto}.topology-table table{border-collapse:collapse;width:100%;margin-top:8px}.topology-table caption{text-align:left;margin:8px 0;font-weight:600}.topology-table th,.topology-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:8px;white-space:normal}.topology-table th[scope=row]{min-width:7em}.topology-table td:nth-child(3){min-width:13em}
   </style>
 </head>
 <body>
   <div class="app-shell">
-    <header class="trainer-header glass">
+    <header id="architecture-home" class="trainer-header glass">
       <div>
         <h1>Oracle Database 11g Interactive Architecture</h1>
         <p class="subtitle">Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v77 | Updated : 25-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v77 | Updated : 25-Nov-2026"></p>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v78 | Updated : 25-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v78 | Updated : 25-Nov-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2310,6 +2312,14 @@
       </div>
     </header>
 
+    <nav class="tower-nav glass" aria-label="Tower navigation">
+      <a aria-current="page" href="#architecture-home">11g Architecture home</a>
+      <a href="./rac.html" data-tower-file="rac.html">RAC</a>
+      <a href="./dataguard.html" data-tower-file="dataguard.html">Data Guard</a>
+      <a href="./rac-dataguard.html" data-tower-file="rac-dataguard.html">RAC + Data Guard</a>
+      <a href="./goldengate.html" data-tower-file="goldengate.html">GoldenGate</a>
+      <a href="./oem.html" data-tower-file="oem.html">Enterprise Manager (OEM)</a>
+    </nav>
     <nav class="button-bar glass" aria-label="Trainer controls">
       <button id="resetButton" type="button">Reset</button>
       <button id="focusModeButton" type="button" aria-pressed="false">Focus Mode</button>
@@ -2318,6 +2328,13 @@
       <button id="referencesButton" type="button">References</button>
     </nav>
 
+<details class="topology-compare glass" id="topologyMap">
+<summary>Compare a home workflow across the five towers</summary>
+<div class="topology-inner"><p>Direct follows the same operation. Adapted shows how the technology changes the path. Foundation identifies a shared database concept. Outside scope explains why the workflow does not carry over to that tower’s lessons.</p><label for="topologyLesson">11g Architecture workflow</label>
+<select id="topologyLesson"></select> <a id="topologyHomeLesson" href="#lesson=instance-startup">Open this home lesson</a>
+<div class="topology-table"><table><caption>How the workflow applies in each topology</caption>
+<thead><tr><th scope="col">Tower</th><th scope="col">Use</th><th scope="col">Reason</th><th scope="col">Walkthrough</th></tr></thead>
+<tbody id="topologyRows"></tbody></table></div></div></details>
     <section class="workflow-explorer glass" aria-labelledby="workflowExplorerTitle">
       <div class="workflow-explorer-head">
         <div>
@@ -2325,6 +2342,11 @@
           <p class="subtitle">Choose a grouped workflow, start the demo, and use the existing timeline controls to scrub, pause, or replay the architecture path.</p>
         </div>
         <div id="workflowCount" class="workflow-count" aria-live="polite">0 workflows</div>
+      </div>
+      <div class="operations-start"><strong>Start with database operations</strong>
+        <button type="button" data-home-lesson="instance-startup">Startup sequence</button>
+        <button type="button" data-home-lesson="shutdown-normal">Graceful shutdown</button>
+        <button type="button" data-home-lesson="patch-quarterly-psu-spu">Database patching</button>
       </div>
       <div class="explorer-controls" aria-label="Workflow filters">
         <label class="visually-hidden" for="workflowCategoryFilter">Workflow category</label>
@@ -2670,6 +2692,9 @@
             <g id="node-online-redo-logs" class="component" data-component-id="online-redo-logs" role="button" tabindex="0">
               <ellipse class="storage-shape" cx="828" cy="850" rx="58" ry="18"></ellipse><rect class="storage-shape" x="770" y="850" width="116" height="42"></rect><ellipse class="storage-shape" cx="828" cy="892" rx="58" ry="18"></ellipse><text x="828" y="873" text-anchor="middle">Online Redo</text><text x="828" y="889" text-anchor="middle">Logs</text>
             </g>
+            <g id="node-opatch" class="component" data-component-id="opatch" role="button" tabindex="0"><rect class="network-shape" x="23" y="777" width="149" height="34" rx="7"></rect><text x="97.5" y="799" text-anchor="middle">OPatch</text></g>
+            <g id="node-oracle-home" class="component" data-component-id="oracle-home" role="button" tabindex="0"><rect class="network-shape" x="23" y="819" width="149" height="34" rx="7"></rect><text x="97.5" y="841" text-anchor="middle">Database home</text></g>
+            <g id="node-home-inventory" class="component" data-component-id="home-inventory" role="button" tabindex="0"><rect class="network-shape" x="23" y="861" width="149" height="34" rx="7"></rect><text x="97.5" y="883" text-anchor="middle">Home inventory</text></g>
             <g id="node-disk-backup" class="component" data-component-id="disk-backup" role="button" tabindex="0">
               <ellipse class="storage-shape" cx="956" cy="850" rx="50" ry="16"></ellipse><rect class="storage-shape" x="906" y="850" width="100" height="42"></rect><ellipse class="storage-shape" cx="956" cy="892" rx="50" ry="16"></ellipse><text x="956" y="877" text-anchor="middle">Disk Backup</text>
             </g>
@@ -2727,7 +2752,7 @@
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v77 | Updated : 25-Nov-2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v78 | Updated : 25-Nov-2026.
   </div>
 
   <dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
@@ -2740,6 +2765,8 @@
       <ul>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/sqllangu.htm">Oracle 11g Concepts: SQL processing</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/memory.htm">Oracle 11g Concepts: memory architecture</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e25494/start.htm">Oracle 11gR2 Administrator’s Guide to starting up and shutting down</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/startup.htm">Oracle 11gR2 Concepts on instance states, closing, dismounting and recovery</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/process.htm">Oracle 11g Concepts: process architecture</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/physical.htm">Oracle 11g Concepts: physical storage structures</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/network.112/e41945/net_arch.htm">Oracle 11g Net Services: listener and connection architecture</a></li>
@@ -2756,6 +2783,12 @@
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e41573/sql_overview.htm">Oracle 11g Performance Tuning Guide: SQL tuning overview</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40402/waitevents003.htm">Oracle 11g Database Reference: wait-event descriptions</a></li>
         <li><a href="https://docs.oracle.com/cd/E18185_01/doc/license.112/e10594.pdf">Oracle 11g Licensing Information: Diagnostics and Tuning Pack boundaries</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/rac.112/e17264/softpatch2.htm">Oracle 11g Database software maintenance and OPatch</a></li>
+        <li><a href="https://www.oracle.com/security-alerts/cpujul2017.html">Oracle quarterly CPU advisory listing Database 11.2.0.4 (July 2017)</a></li>
+        <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/12.2/tdprc/managing-oracle-software-and-applying-patches.html">Oracle Database patch types and scope</a></li>
+        <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/18/cwwin/download-and-install-patch-updates.html">Oracle Database Windows patch bundles for 11.2.0.4 and later</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e23633/upgrade.htm">Oracle 11g Release 2 database upgrade and ORA-39700</a></li>
+        <li><a href="https://docs.oracle.com/en/cloud/paas/base-database/catalog/oracle-base-database-service.pdf">Oracle 11.2 patch SQL post-install example</a></li>
         <li><a href="https://www.premieronlinetrainings.com/blog/oracle-dba/Overview-of-oracle-11g-Architecture-with-explanation/10/">Supplemental architecture overview article</a></li>
       </ul>
     </div>
@@ -2794,7 +2827,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v77 | Updated : 25-Nov-2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v78 | Updated : 25-Nov-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;
@@ -3170,7 +3203,7 @@
         { id: "ddl-metadata-change", title: "DDL / Metadata Change", workflows: ["create-table-ddl", "alter-table-ddl", "ddl-lock-failure-rca"] },
         { id: "undo-rollback-read-consistency", title: "Undo / Rollback / Read Consistency", workflows: ["rollback-flow", "read-consistency", "snapshot-too-old-rca"] },
         { id: "redo-checkpoint-archiving", title: "Redo / Checkpoint / Archiving", workflows: ["dbwn-dirty-write", "checkpoint-flow", "redo-log-switch", "archive-destination-failure-rca"] },
-        { id: "startup-shutdown-recovery", title: "Startup / Shutdown / Recovery", workflows: ["instance-startup", "shutdown-immediate", "crash-recovery", "startup-file-failure-rca"] },
+        { id: "startup-shutdown-recovery", title: "Startup / Shutdown / Recovery", workflows: ["instance-startup", "shutdown-normal", "shutdown-transactional", "shutdown-immediate", "shutdown-abort", "crash-recovery", "startup-file-failure-rca"] },
         { id: "rman-backup-restore-recovery", title: "RMAN Backup / Restore / Recovery", workflows: ["rman-full-backup", "rman-restore-recover", "rman-backup-failure-rca"] },
         { id: "flashback", title: "Flashback", workflows: ["flashback-database", "flashback-unavailable-rca"] },
         { id: "monitoring-diagnostics-performance", title: "Monitoring / Diagnostics / Performance", workflows: [
@@ -3211,8 +3244,11 @@
         "dbwn-dirty-write": guide("Data-file write behind", "DBWn writes dirty buffers from the Database Buffer Cache to data files later, often because of checkpoint activity, buffer pressure, or write scheduling.", "DBWn writes data blocks, but it does not make COMMIT durable. LGWR makes redo durable first.", "Watch Database Buffer Cache, DBWn, and Data Files."),
         "checkpoint-flow": guide("Recovery position marker", "A checkpoint coordinates dirty-buffer write progress and records a recovery position. CKPT records progress in the control file and, for applicable checkpoint types, in data-file headers; DBWn writes the actual data blocks.", "Incremental checkpoint updates do not rewrite every data-file header, and checkpoint is not the process that confirms COMMIT.", "Watch CKPT, DBWn, Checkpoint Queue, Control Files, and Data Files."),
         "redo-log-switch": guide("Preserving redo history", "LGWR moves between online redo log groups as they fill. In ARCHIVELOG mode, ARCn copies filled groups to archived redo logs before reuse.", "Archived redo logs are essential for media recovery after restoring backups.", "Watch LGWR, Online Redo Logs, ARCn, and Archived Redo Logs."),
-        "instance-startup": guide("Opening the database", "Startup begins with the instance: SGA memory is allocated and background processes start. Then Oracle mounts control files and opens data files and redo logs.", "NOMOUNT, MOUNT, and OPEN are different startup stages.", "Watch Instance, SGA, background processes, Control Files, Data Files, and Redo Logs."),
-        "shutdown-immediate": guide("Controlled shutdown", "Shutdown immediate stops new work, disconnects sessions, rolls back uncommitted transactions through undo, writes required buffers, closes files, and releases memory.", "Shutdown immediate is controlled cleanup; it is not the same as a crash.", "Watch Listener, Server Process, Undo, Undo TBS, DBWn, Data Files, and SGA."),
+        "instance-startup": guide("Startup sequence", "Start from an idle instance and verify which memory, processes and files are available at each startup stage.", "NOMOUNT creates the instance. MOUNT opens the control files. OPEN makes the online database files available for normal use.", "Follow the instance and SGA, then the control files, then the data files and online redo logs."),
+        "shutdown-normal": guide("Wait for users to leave", "Trace the SQL*Plus default shutdown with one idle application session still connected.", "NORMAL waits for connected users to disconnect before the database closes consistently.", "Observe the idle session, the final checkpoint, file closure and SGA release."),
+        "shutdown-transactional": guide("Wait for existing transactions", "Follow a transaction already in progress when a planned shutdown starts.", "TRANSACTIONAL lets current transactions finish, blocks new transactions, then disconnects remaining sessions.", "Follow the last application commit, session disconnect, clean checkpoint, dismount and instance shutdown."),
+        "shutdown-immediate": guide("Roll back current work and close consistently", "Stop an instance with one uncommitted update and follow its clean close.", "IMMEDIATE rolls back incomplete work and closes cleanly. The amount of rollback affects how long shutdown takes.", "Follow unfinished DML to undo, then watch DBWn, LGWR, the control files and the instance."),
+        "shutdown-abort": guide("Recognize an inconsistent stop", "Compare a simulated emergency abort with the completed clean shutdown paths.", "An abort skips the clean shutdown checkpoint and leaves unfinished transaction recovery for restart.", "Compare the instance termination with the automatic redo and undo work after restart."),
         "crash-recovery": guide("Redo then transaction recovery", "After an inconsistent shutdown, Oracle automatically applies online redo from the checkpoint position. The roll-forward also reconstructs undo, which Oracle then uses to remove uncommitted effects; some transaction rollback can continue after the database becomes available.", "Instance recovery uses current online data files and online redo. It is different from media recovery, which restores files and may require archived redo.", "Watch SMON, Control Files, Online Redo Logs, Undo, Undo Tablespace, and Data Files."),
         "rman-full-backup": guide("RMAN backup path", "RMAN allocates a disk channel, consults the control file, and reads the data files into a backup set. DEVICE TYPE DISK selects disk and AS BACKUPSET selects backup pieces.", "RMAN understands Oracle files and recovery metadata better than ordinary file copying.", "Watch RMAN, Server Process, Data Files, Control Files, and Disk Backup."),
         "rman-restore-recover": guide("Restore plus recover", "Restore copies database files back from backup. Recover applies archived and online redo so restored files reach the target consistent point.", "Restore and recover are related but not the same operation.", "Watch Disk Backup, RMAN, Data Files, Archived Redo Logs, and Online Redo Logs."),
@@ -3541,21 +3577,46 @@
           step("switch-03", "ARCn copies filled redo", "Archive", "online-redo-logs", "arcn", ["online-redo-logs", "arcn"], ["arrow-online-redo-arcn"], "ARCn copies the filled online redo log.", "Archiver preserves history."),
           step("switch-04", "Archived log is available", "Recovery Input", "arcn", "archived-redo-logs", ["arcn", "archived-redo-logs", "duplexed-archived-logs"], ["arrow-arcn-archive", "arrow-arcn-duplex"], "Archived redo logs become available for media recovery.", "Recovery can move restored files forward.")
         ]),
-        "instance-startup": workflow("Instance Startup", "Startup / Shutdown / Recovery", "Basic", "Beginner / DBA", "Shows SGA allocation, process startup, mount, and open.", "STARTUP;", "Oracle allocates memory, starts processes, opens control files, then opens data files and redo logs.", notes("Startup moves from instance memory to mounted database files to open database.", "NOMOUNT has instance memory/processes; MOUNT opens control files; OPEN opens data files and redo logs.", "Powering up a control room, loading the map, then opening the vault.", "Startup is not a single instant state.", "Which files are opened at MOUNT?",
-          "At MOUNT, Oracle opens the control files to identify the database and its files. Data files and online redo logs are opened at the OPEN stage."), [
-          step("startup-01", "SGA is allocated", "NOMOUNT", "instance", "sga", ["instance", "sga"], [], "Oracle allocates the SGA.", "The live memory engine starts."),
-          step("startup-02", "Background processes start", "NOMOUNT", "instance", "pmon", ["pmon", "smon", "dbwn", "lgwr", "ckpt"], [], "Core background processes start.", "The instance workers come online."),
-          step("startup-03", "Control files open", "MOUNT", "sga", "control-files", ["control-files", "ckpt"], ["arrow-ckpt-control"], "Oracle opens control files and mounts the database.", "Control files describe the database structure."),
-          step("startup-04", "Data and redo files open", "OPEN", "control-files", "data-files", ["data-files", "online-redo-logs", "control-files"], [], "Data files and online redo logs are opened.", "The database can now open."),
-          step("startup-05", "Database is open", "Ready", "database", "listener", ["database", "listener", "pmon"], [], "The database is open for normal work. Remote clients can connect when a separately managed Oracle Net listener is running and the database service is registered with it.", "The SQL STARTUP command starts the database instance; it does not start the listener service itself.")
+        "instance-startup": workflow("Instance Startup / NOMOUNT, MOUNT and OPEN", "Startup / Shutdown / Recovery", "Basic", "Learner / DBA", "Start from an idle instance and verify which memory, processes and files are available at each startup stage.", "SQL*Plus staged example, single instance with local files and no Oracle Restart:\nCONNECT / AS SYSDBA\nSTARTUP NOMOUNT\nSELECT status FROM v$instance;\nALTER DATABASE MOUNT;\nSELECT status FROM v$instance;\nALTER DATABASE OPEN;\nSELECT open_mode FROM v$database;", "NOMOUNT creates the instance. MOUNT opens the control files. OPEN makes the online database files available for normal use.", notes("Start from an idle instance and verify which memory, processes and files are available at each startup stage.", "NOMOUNT creates the instance. MOUNT opens the control files. OPEN makes the online database files available for normal use.", "Ask learners which database files they can access at each stage before revealing the next frame.", "A successful MOUNT establishes access to the control files. A separate OPEN verifies the online database files.", "An administrator sees MOUNTED in V$INSTANCE after starting a healthy primary. Which files are already open, and what still has to happen before ordinary application queries can run?", "The control files are open. ALTER DATABASE OPEN opens the online data files and redo logs and performs the required consistency checks. For this primary the expected OPEN_MODE is READ WRITE."), [
+          step("instance-startup-1", "Connect to the intended idle instance", "Prerequisite", "user-process", "instance", ["user-process","instance"], [], "Select the intended Oracle home and SID. In this local, single-instance example the administrator connects with SYSDBA or SYSOPER privileges to an idle instance.", "SQL*Plus STARTUP can perform all three stages. The example pauses at each stage to observe the state."),
+          step("instance-startup-2", "Read initialization parameters", "Configuration", "instance", "sga", ["instance","sga"], [], "Oracle reads an SPFILE or a text PFILE. The initialization parameters determine instance settings including memory allocation.", "A parameter file must be readable before startup can establish the instance."),
+          step("instance-startup-3", "Allocate memory and start background processes", "NOMOUNT", "instance", "sga", ["instance","sga","dbwn","lgwr","ckpt","pmon","smon"], [], "Oracle allocates the SGA and starts the background processes. V$INSTANCE.STATUS reports STARTED.", "The initialized instance exists before it has opened any database control files."),
+          step("instance-startup-4", "Associate the instance with the database", "MOUNT", "instance", "control-files", ["instance","control-files"], [], "Oracle opens the control files named by CONTROL_FILES. They identify the data files and online redo logs. V$INSTANCE.STATUS reports MOUNTED.", "The control files can describe files whose contents are still unopened."),
+          step("instance-startup-5", "Open online files and check consistency", "OPEN", "database", "data-files", ["database","data-files","online-redo-logs","control-files","undo-tablespace"], [], "Oracle opens the online data files and online redo logs, acquires undo, and checks the files. This example starts after a clean shutdown.", "An unclean previous stop can require automatic instance recovery. A missing or damaged file requires diagnosis."),
+          step("instance-startup-6", "Verify the open primary and test the service", "Verify", "database", "server-process", ["database","server-process","listener","pmon","user-process"], [], "V$INSTANCE.STATUS reports OPEN, and V$DATABASE.OPEN_MODE reports READ WRITE for this primary. A test query through the application service confirms the client path.", "Remote access also requires a reachable listener with a registered service. SQL*Plus STARTUP does not start a separately managed listener.")
         ]),
-        "shutdown-immediate": workflow("Shutdown Immediate", "Startup / Shutdown / Recovery", "Intermediate", "DBA", "Shows session disconnect, rollback, file close, and SGA release.", "SHUTDOWN IMMEDIATE;", "Oracle blocks new work, disconnects sessions, rolls back uncommitted work, writes needed buffers, and closes files.", notes("Shutdown immediate is controlled shutdown, not a crash.", "Oracle rolls back active uncommitted transactions and closes files cleanly.", "The operations floor stops new visitors and cleans every desk before locking up.", "Shutdown immediate does not wait for users to log out voluntarily.", "Which background processes help make shutdown clean?",
-          "DBWn writes dirty buffers, LGWR flushes redo, and CKPT records the shutdown checkpoint so the database can close consistently."), [
-          step("shutdown-01", "Database rejects new work", "Quiesce", "database", "server-process", ["database", "server-process", "user-process"], [], "SHUTDOWN IMMEDIATE prevents new database connections and terminates current SQL work, but it does not stop the separately managed Oracle Net listener service.", "The listener can remain available for other registered services even while this database instance is shutting down."),
-          step("shutdown-02", "Sessions disconnect", "Disconnect", "server-process", "user-process", ["server-process", "user-process", "pmon"], ["arrow-server-user"], "Active sessions are disconnected.", "Users are moved out."),
-          step("shutdown-03", "Uncommitted work rolls back", "Rollback", "undo", "database-buffer-cache", ["undo", "undo-tablespace", "data-files", "smon", "database-buffer-cache"], ["arrow-buffer-undo", "arrow-undo-tablespace", "arrow-undo-tbs-datafiles"], "Uncommitted transactions are rolled back using undo records from the UNDO tablespace.", "Oracle cleans transactional state."),
-          step("shutdown-04", "Dirty buffers written", "Write", "database-buffer-cache", "data-files", ["dbwn", "database-buffer-cache", "data-files"], ["arrow-dbw-datafiles"], "Required dirty buffers are written.", "Files are made consistent."),
-          step("shutdown-05", "Files close and SGA releases", "Close", "database", "sga", ["data-files", "online-redo-logs", "control-files", "sga"], [], "Files close, background processes stop, and SGA is released.", "The instance shuts down cleanly.")
+        "shutdown-normal": workflow("Graceful Shutdown / NORMAL", "Startup / Shutdown / Recovery", "Basic", "Learner / DBA", "Trace the SQL*Plus default shutdown with one idle application session still connected.", "SQL*Plus in this simulation:\nSHUTDOWN NORMAL", "NORMAL waits for connected users to disconnect before the database closes consistently.", notes("Trace the SQL*Plus default shutdown with one idle application session still connected.", "NORMAL waits for connected users to disconnect before the database closes consistently.", "Keep an idle user visible after the transaction ends, then let that user disconnect.", "An idle session can keep NORMAL waiting even when every application transaction has finished.", "The final user committed but is still connected and idle. Why has a normal shutdown not yet reached the close stage?", "NORMAL waits for users to disconnect. Committing ends the transaction but leaves the session connected. When the final user logs off, the clean close can proceed."), [
+          step("shutdown-normal-1", "Request a normal shutdown", "Stop new connections", "user-process", "database", ["user-process","database","instance"], [], "The administrator issues SHUTDOWN NORMAL. Oracle refuses new connections to the database and allows existing sessions to disconnect.", "In SQL*Plus, SHUTDOWN without a mode defaults to NORMAL. Oracle Restart can have a different configured stop option."),
+          step("shutdown-normal-2", "Wait while an idle session remains", "Wait for logoff", "database", "user-session-data", ["database","user-session-data","server-process"], [], "The last user completes a transaction but leaves the application session connected. Shutdown is still waiting for that user.", "A transaction boundary and a session boundary are different events."),
+          step("shutdown-normal-3", "The final user logs off", "Drain complete", "user-process", "server-process", ["user-process","server-process","user-session-data"], [], "The remaining application session disconnects. The database can now proceed to its consistent close.", "Use the final logoff as the boundary where clean closing begins."),
+          step("shutdown-normal-4", "Complete the shutdown checkpoint", "Checkpoint", "database-buffer-cache", "data-files", ["database-buffer-cache","data-files","dbwn","lgwr","ckpt","online-redo-logs"], ["arrow-dbw-datafiles","arrow-lgwr-online-redo"], "Oracle writes the required dirty buffers and redo. DBWn writes data blocks, LGWR writes redo, and CKPT records checkpoint progress.", "Follow the two write paths. The shutdown checkpoint makes a consistent close possible."),
+          step("shutdown-normal-5", "Close data files and online redo logs", "CLOSE", "database", "data-files", ["database","data-files","online-redo-logs","control-files"], [], "Oracle closes the online data files and online redo log files. The database is still mounted, and its control files remain open.", "A database can be closed while it remains associated with an instance."),
+          step("shutdown-normal-6", "Dismount and close the control files", "DISMOUNT", "database", "control-files", ["database","control-files","instance","sga"], [], "The instance dismounts the database and closes its control files. The instance still occupies memory at this stage.", "Distinguish dismounting a database from terminating its instance."),
+          step("shutdown-normal-7", "Shut down the instance and verify completion", "Instance stopped", "instance", "sga", ["instance","sga","pmon","smon"], [], "Background processes stop and Oracle releases the SGA. The administrator sees the instance shutdown confirmation and can corroborate it in the alert log.", "On the next ordinary startup, this completed clean shutdown requires no instance recovery. A separately managed listener can remain running.")
+        ]),
+        "shutdown-transactional": workflow("Graceful Shutdown / TRANSACTIONAL", "Startup / Shutdown / Recovery", "Intermediate", "Learner / DBA", "Follow a transaction already in progress when a planned shutdown starts.", "SQL*Plus in this simulation:\nSHUTDOWN TRANSACTIONAL", "TRANSACTIONAL lets current transactions finish, blocks new transactions, then disconnects remaining sessions.", notes("Follow a transaction already in progress when a planned shutdown starts.", "TRANSACTIONAL lets current transactions finish, blocks new transactions, then disconnects remaining sessions.", "Ask the class to predict what happens if the application chooses to roll back its last transaction.", "The application chooses how to complete its active transaction. TRANSACTIONAL does not commit the user's work on its behalf.", "One user has finished a transaction but remains connected while another is still updating rows. What is the shutdown waiting for?", "It waits for the active transaction to finish by commit or rollback. After all current transactions finish, Oracle disconnects remaining sessions and closes cleanly."), [
+          step("shutdown-transactional-1", "Stop new connections and new transactions", "Begin drain", "database", "server-process", ["database","server-process","user-session-data"], [], "The administrator requests TRANSACTIONAL. New connections and new transactions are refused. A session that already has an active transaction can finish it.", "Watch the existing transaction being allowed to complete."),
+          step("shutdown-transactional-2", "Let the existing transaction finish", "Transaction boundary", "server-process", "online-redo-logs", ["server-process","online-redo-logs","lgwr","redo-log-buffer"], ["arrow-lgwr-online-redo"], "In this example the user commits. LGWR writes the commit redo. An application rollback would also end the transaction.", "This commit belongs to the application's decision, not to the shutdown command."),
+          step("shutdown-transactional-3", "Disconnect the remaining sessions", "Drain complete", "database", "user-process", ["database","user-process","server-process"], [], "Once the last transaction completes, Oracle disconnects any remaining clients and begins the same clean close used for IMMEDIATE.", "An idle connected user does not hold up this stage once all transactions are complete."),
+          step("shutdown-transactional-4", "Complete the shutdown checkpoint", "Checkpoint", "database-buffer-cache", "data-files", ["database-buffer-cache","data-files","dbwn","lgwr","ckpt","online-redo-logs"], ["arrow-dbw-datafiles","arrow-lgwr-online-redo"], "Oracle writes the required dirty buffers and redo. DBWn writes data blocks, LGWR writes redo, and CKPT records checkpoint progress.", "Follow the two write paths. The shutdown checkpoint makes a consistent close possible."),
+          step("shutdown-transactional-5", "Close data files and online redo logs", "CLOSE", "database", "data-files", ["database","data-files","online-redo-logs","control-files"], [], "Oracle closes the online data files and online redo log files. The database is still mounted, and its control files remain open.", "A database can be closed while it remains associated with an instance."),
+          step("shutdown-transactional-6", "Dismount and close the control files", "DISMOUNT", "database", "control-files", ["database","control-files","instance","sga"], [], "The instance dismounts the database and closes its control files. The instance still occupies memory at this stage.", "Distinguish dismounting a database from terminating its instance."),
+          step("shutdown-transactional-7", "Shut down the instance and verify completion", "Instance stopped", "instance", "sga", ["instance","sga","pmon","smon"], [], "Background processes stop and Oracle releases the SGA. The administrator sees the instance shutdown confirmation and can corroborate it in the alert log.", "On the next ordinary startup, this completed clean shutdown requires no instance recovery. A separately managed listener can remain running.")
+        ]),
+        "shutdown-immediate": workflow("Graceful Shutdown / IMMEDIATE", "Startup / Shutdown / Recovery", "Basic", "Learner / DBA", "Stop an instance with one uncommitted update and follow its clean close.", "SQL*Plus in this simulation:\nSHUTDOWN IMMEDIATE", "IMMEDIATE rolls back incomplete work and closes cleanly. The amount of rollback affects how long shutdown takes.", notes("Stop an instance with one uncommitted update and follow its clean close.", "IMMEDIATE rolls back incomplete work and closes cleanly. The amount of rollback affects how long shutdown takes.", "Compare the short pause of a small rollback with the longer cleanup of a large transaction.", "IMMEDIATE can take time. It includes rollback and a consistent close.", "Why can SHUTDOWN IMMEDIATE take time, and will a successful close require instance recovery on the next start?", "Oracle can spend time rolling back uncommitted transactions and completing the shutdown checkpoint. A successful IMMEDIATE close is consistent and does not itself require instance recovery on restart."), [
+          step("shutdown-immediate-1", "Stop current statements and block new work", "Begin shutdown", "database", "server-process", ["database","server-process","user-session-data"], [], "Oracle prevents new database connections and new transactions. It terminates current SQL statements without waiting for users to log out voluntarily.", "The Oracle Net listener is managed separately. Other services can remain reachable."),
+          step("shutdown-immediate-2", "Roll back incomplete transactions", "Rollback", "undo", "database-buffer-cache", ["undo","database-buffer-cache","undo-tablespace"], [], "The simulation's uncommitted update is reversed using undo. Previously committed changes remain committed.", "A large open transaction can make this phase take time."),
+          step("shutdown-immediate-3", "Disconnect clients", "End sessions", "server-process", "user-process", ["server-process","user-process","user-session-data"], [], "Oracle disconnects the connected clients as part of shutdown. The example now has no application session left.", "Shutdown confirmation comes after the remaining clean-close work finishes."),
+          step("shutdown-immediate-4", "Complete the shutdown checkpoint", "Checkpoint", "database-buffer-cache", "data-files", ["database-buffer-cache","data-files","dbwn","lgwr","ckpt","online-redo-logs"], ["arrow-dbw-datafiles","arrow-lgwr-online-redo"], "Oracle writes the required dirty buffers and redo. DBWn writes data blocks, LGWR writes redo, and CKPT records checkpoint progress.", "Follow the two write paths. The shutdown checkpoint makes a consistent close possible."),
+          step("shutdown-immediate-5", "Close data files and online redo logs", "CLOSE", "database", "data-files", ["database","data-files","online-redo-logs","control-files"], [], "Oracle closes the online data files and online redo log files. The database is still mounted, and its control files remain open.", "A database can be closed while it remains associated with an instance."),
+          step("shutdown-immediate-6", "Dismount and close the control files", "DISMOUNT", "database", "control-files", ["database","control-files","instance","sga"], [], "The instance dismounts the database and closes its control files. The instance still occupies memory at this stage.", "Distinguish dismounting a database from terminating its instance."),
+          step("shutdown-immediate-7", "Shut down the instance and verify completion", "Instance stopped", "instance", "sga", ["instance","sga","pmon","smon"], [], "Background processes stop and Oracle releases the SGA. The administrator sees the instance shutdown confirmation and can corroborate it in the alert log.", "On the next ordinary startup, this completed clean shutdown requires no instance recovery. A separately managed listener can remain running.")
+        ]),
+        "shutdown-abort": workflow("Shutdown ABORT / Recovery on Next Startup", "Startup / Shutdown / Recovery", "Intermediate", "Learner / DBA", "Compare a simulated emergency abort with the completed clean shutdown paths.", "Simulation of an emergency abort of an open single-instance database", "An abort skips the clean shutdown checkpoint and leaves unfinished transaction recovery for restart.", notes("Compare a simulated emergency abort with the completed clean shutdown paths.", "An abort skips the clean shutdown checkpoint and leaves unfinished transaction recovery for restart.", "Place the shutdown checkpoint and transaction rollback on a timeline, then identify which work moves to restart.", "Seeing the database OPEN after cache recovery does not prove that all background transaction rollback has finished.", "Why can a normal startup after ABORT require recovery even when all database files are present?", "The instance terminated without a consistent close. Oracle applies online redo to recover changes and uses undo to reverse incomplete transactions. Missing or damaged files are a different recovery problem."), [
+          step("shutdown-abort-1", "An emergency stop interrupts the open instance", "Abort", "database", "instance", ["database","instance","user-process","server-process"], [], "In the simulated outage, SQL terminates and connected clients lose their sessions. Oracle ends the instance without a clean shutdown checkpoint.", "Compare the abrupt stop with the file-close and dismount stages of a clean shutdown."),
+          step("shutdown-abort-2", "Incomplete work remains for recovery", "Instance stopped", "sga", "data-files", ["sga","data-files","online-redo-logs","undo"], [], "Dirty buffers can remain unwritten, and active transactions are not rolled back during the abort. Durable online redo survives in this example.", "The data files and redo are present. The files need instance recovery on restart."),
+          step("shutdown-abort-3", "Restart and perform automatic instance recovery", "Restart", "online-redo-logs", "data-files", ["online-redo-logs","data-files","smon","control-files"], [], "After restart and mount, Oracle applies redo from the required checkpoint position so the files can open consistently.", "Redo also reconstructs undo records for incomplete transactions."),
+          step("shutdown-abort-4", "Open and resolve incomplete transactions", "Verify", "undo", "database", ["undo","database","smon","database-buffer-cache"], [], "Oracle opens the database once cache recovery permits it. Transaction rollback can continue after open or occur on demand. The sample session sees the previously committed row value.", "The Instance Crash Recovery workflow traces the redo and undo paths in more detail.")
         ]),
         "crash-recovery": workflow("Instance Crash Recovery", "Startup / Shutdown / Recovery", "Advanced", "DBA / Recovery", "Shows redo roll-forward and undo rollback after a crash.", "Startup after SHUTDOWN ABORT or instance crash", "SMON uses control files and redo to roll forward, then undo records to roll back uncommitted work.", notes("Crash recovery uses redo first and undo second.", "Roll-forward reapplies changes from redo; rollback removes uncommitted transaction effects.", "After a power loss, the ledger is replayed and unfinished orders are cancelled.", "Crash recovery is not the same as restoring from backup.", "Why does redo get applied before undo?",
           "Redo first restores the recorded changes, including changes to undo blocks. Oracle can then use that undo to reverse transactions that were incomplete at the crash."), [
@@ -3966,6 +4027,138 @@
           step("perfrca-06", "Same workload is verified", "Verify", "server-process", "user-process", ["server-process", "user-process", "sga", "pga"], ["arrow-server-user"], "The same action and interval are retested, comparing response time, throughput, errors, DB CPU, and waits with the baseline.", "RCA closes only when the user symptom and measured bottleneck improve without regression.")
         ])
       });
+
+      (function installMaintenanceLessons() {
+  const group = { id: "database-patching", title: "Database Patching & Upgrades", workflows: [] };
+  operationGroups.push(group);
+  const op = "opatch", home = "oracle-home", inv = "home-inventory";
+  const db = "database", dict = "system-tablespace", inst = "instance";
+
+  componentMetadata[op] = c(op, "OPatch", "Software maintenance", "Oracle's utility for applying supported interim patches to an installed home.",
+    "OPatch checks prerequisites, updates supported home files and records inventory changes.", "The selected home and OPatch version determine the scope of the operation.",
+    "A foreground SQL statement runs in a server process. OPatch runs separately as a software maintenance utility.",
+    "Capture the inventory before and after maintenance and preserve the OPatch log.", "The database can still require its own SQL actions after a binary apply.",
+    "A software installer keeps a record of the files it changed.", "Select the patch README for the exact apply, post-install and rollback procedure.", [home, inv, db]);
+  componentMetadata[home] = c(home, "Oracle Database Home", "Software maintenance", "The directory containing an Oracle Database software installation.",
+    "A home supplies the executable, libraries and scripts used by database instances.", "Multiple databases can share one home and a server can contain several homes.",
+    "The running server uses code from the home. The data files store the database contents.",
+    "Map every database and process using the target home before planning downtime.", "Selecting an ORACLE_SID by itself does not select the OPatch binary or target home.",
+    "The same installed application can open several separate documents.", "Read the full home path in the inventory report.", [op, inv, inst]);
+  componentMetadata[inv] = c(inv, "Oracle Home Patch Inventory", "Software maintenance", "The installed component and interim patch record for a selected home.",
+    "OPatch reports the inventory relevant to a specific Oracle home.", "It supplies evidence for target selection, conflict analysis, before-and-after comparison and rollback.",
+    "Inventory is maintenance metadata outside the database. Database-side validation uses a separate connection and logs.",
+    "Confirm the home path and expected applied patch IDs.", "A matching binary inventory does not establish successful database SQL post-install work.",
+    "A service record shows which parts were installed.", "Compare the same home before and after the maintenance window.", [op, home, dict]);
+
+  // A binary maintenance step links only the maintenance nodes. Database actions
+  // highlight the instance or SYSTEM tablespace when that phase actually starts.
+  function phase(title, operation, source, target, explanation, checkpoint, related = []) {
+    return { title, operation, source, target, explanation, checkpoint, related };
+  }
+  function add(id, title, difficulty, purpose, example, watch, question, answer, steps, failure) {
+    const frames = steps.map((item, i) => step(id + "-" + (i + 1), item.title, item.operation, item.source, item.target,
+      [...new Set([item.source, item.target, ...item.related])], [], item.explanation, item.checkpoint));
+    const info = notes(purpose, answer, "Compare the change record with the running service.", watch, question, answer);
+    flows[id] = workflow(title, group.title, difficulty, "Database administration / maintenance", purpose, example, answer, info, frames);
+    workflowTeachingGuides[id] = guide(title, purpose, answer, watch);
+    if (failure) {
+      flows[id].scenarioType = "failure";
+      workflowFailureScenarios[id] = failure;
+    }
+    group.workflows.push(id);
+  }
+
+  add("patch-quarterly-psu-spu", "Quarterly Database Patching / PSU and SPU", "Basic",
+    "Work through a historical 11.2.0.4 single-instance maintenance window from Oracle's quarterly advisory to a verified application connection.",
+    "Read-only checks\nopatch lsinventory -detail\nSELECT instance_name, status FROM v$instance;\nSELECT open_mode FROM v$database;",
+    "Follow OPatch and the Oracle home first, then the database-side work and the client test.",
+    "The new patch appears in the home inventory. What remains to prove the full release succeeded?",
+    "Confirm required SQL work succeeded for each affected database. Then verify normal open mode, a fresh application connection and its representative operation.",
+    [
+      phase("Identify the target and quarter", "Scope", op, inv, "Record the home path, release, platform, installed one-offs and every database using this home. Match the historical CPU advisory to its patch availability document.", "CPU is Oracle's quarterly security release program. An advisory tells you which release and platform guidance to consult."),
+      phase("Choose one applicable patch line", "Select", inv, home, "For an 11g platform offering both lines, an SPU carries security fixes. A PSU contains the applicable security fixes plus selected critical database fixes. Identify the previously installed line and follow supported transitions.", "Choose the package for the existing baseline. A PSU already contains the corresponding security fixes, so a separate matching SPU is unnecessary."),
+      phase("Check prerequisites and recovery readiness", "Precheck", home, op, "Read the exact patch README for OPatch requirements, conflicts, free space and outage steps. Preserve inventory, protect the software home and inventory, and verify a recoverable database backup before the window.", "Check the rollback instructions and rehearse the representative query while the original system is healthy.", ["rman"]),
+      phase("Drain clients and take the required outage", "Quiesce", "user-process", inst, "For this offline patch example, stop admission of new work, allow in-flight work to finish and close all affected databases cleanly. Stop other processes using the home as directed by the README.", "Confirm which processes still use the home. A listener shared with another home has its own maintenance scope.", [home]),
+      phase("Apply the binary change", "Binary apply", op, home, "Use the patch's prescribed tool and procedure for the selected Database home. Read its completion log and compare the expected installed patch ID with the new inventory.", "The binary phase concerns the installed software and inventory.", [inv]),
+      phase("Complete each database's required SQL", "Post-install", home, dict, "Start each database in the state specified by the README and perform any required SQL work. Some 11g PSU READMEs prescribe catbundle.sql. Record the SQL spool and check the patch-specific registry history where applicable.", "Use the scripts and order supplied with this exact patch. A binary-only patch can have different post-install requirements.", [inst]),
+      phase("Verify the service before reopening traffic", "Verify", db, "user-process", "Confirm the expected OPEN/READ WRITE state for this primary, component status relative to baseline, successful SQL logs and a fresh connection through the application service. Run the same test transaction used before the patch.", "File the home inventory and per-database checks with the outcome of the client test.")
+    ]);
+
+  add("patch-one-off", "One-Off Fix / Conflict and Merge Decision", "Intermediate",
+    "Trace a targeted interim fix for one reproduced defect, including what to do when it overlaps an installed fix.",
+    "Read-only baseline\nopatch lsinventory -detail",
+    "Focus on the target home, installed fix coverage and the original test case.",
+    "Why can installing a conflicting one-off lose an already working fix?",
+    "Two patches may replace the same files while covering different fixes. Confirm supersedence or obtain a compatible merge or replacement, then retest both behaviors.",
+    [
+      phase("Match the defect to this build", "Identify", "user-process", home, "Record a reproducible symptom, fixed bug identifier, exact platform and current patch baseline. Obtain the release-specific one-off or approved overlay.", "Keep a test case for the requested fix and one for an existing affected fix."),
+      phase("Compare prerequisites and installed fixes", "Conflict check", op, inv, "Run the prescribed conflict and applicability checks against the staged patch and target home. Compare both bug coverage and file overlap.", "An already included fix, a superseding patch and a conflicting patch require different decisions."),
+      phase("Resolve the overlap", "Decide", inv, op, "If the target already contains the fix, confirm behavior and document that outcome. In this example, a true overlap requires a compatible replacement or merged patch from Oracle for the current baseline.", "Rerun the checks against the replacement. Forcing through a conflict can remove prior fixes."),
+      phase("Protect the baseline and apply", "Binary apply", op, home, "Verify a recoverable baseline, drain the affected services and take the README-specified outage. Apply the approved fix and capture its inventory and log.", "A one-off describes the purpose of a patch. Its README determines whether an outage or database SQL phase is needed."),
+      phase("Test both fixed behaviors", "Verify", home, db, "Complete any prescribed post-install actions, verify inventory and database state, and repeat the original defect test and the existing fix's regression test before restoring traffic.", "Successful installation and a successful behavioral test answer different questions.", ["user-process"])
+    ]);
+
+  add("patch-windows-bundle", "Platform Bundle / Windows Database Home", "Intermediate",
+    "Follow a historical 11.2.0.4 Windows database bundle from platform selection to a verified Windows service and database.",
+    "Read-only checks\nopatch lsinventory -detail\nSELECT name, open_mode FROM v$database;",
+    "Confirm which database services actually use the Windows home being patched.",
+    "Which evidence establishes that the Windows bundle reached the intended database?",
+    "Match the package to the Windows platform, home path and baseline. Verify binary inventory, required database-side logs and a new application connection through the restored service.",
+    [
+      phase("Identify the Windows home", "Scope", op, inv, "Map the Oracle Windows service and each database sharing the target home. Record the Windows architecture, database patch set, installed bundles and individual fixes.", "The platform and release determine the applicable bundle."),
+      phase("Evaluate the cumulative bundle", "Select", inv, home, "Read the Windows bundle README for included fixes, prerequisites and conflicts with existing one-offs. Check which installed fixes are included or need an overlay.", "A Windows bundle can have different contents and instructions from a Unix Database PSU for the same quarter."),
+      phase("Protect and stop the affected services", "Outage", inst, home, "Confirm software and database recovery points. Drain the workload, shut down the database cleanly, and stop the dependent Windows services identified by the instructions.", "Identify processes holding binaries in the selected home before replacement."),
+      phase("Apply and inspect the inventory", "Binary apply", op, inv, "Apply the chosen Windows bundle using its documented procedure and check that the expected bundle and fixes are recorded against the target home.", "Read the OPatch log for the actual binary result.", [home]),
+      phase("Restore and verify the service", "Verify", home, "user-process", "Restart in the documented order, complete any database-side actions in each affected database and check their logs. Validate the open database, listener service connection and application result.", "A Windows service reporting Running is only one piece of evidence.", [db])
+    ]);
+
+  add("patch-set-upgrade", "Patch Set Upgrade / 11.2.0.3 to 11.2.0.4", "Advanced",
+    "Move a single-instance database to a new 11.2.0.4 software home and follow the accompanying database dictionary upgrade.",
+    "Read-only checks\nSELECT version FROM v$instance;\nSELECT comp_id, version, status FROM dba_registry;",
+    "Watch software installation in the new home separately from the subsequent database upgrade.",
+    "The target home is installed. Why does that alone leave the database upgrade unfinished?",
+    "The binaries now exist, but the database dictionary and installed components still require the supported upgrade path and post-upgrade validation.",
+    [
+      phase("Assess the supported upgrade path", "Pre-upgrade", home, db, "Confirm the source and target releases, platform, components and upgrade prerequisites. Run the target release's pre-upgrade checks and resolve blockers.", "Preserve the database backup, recoverability evidence and tested fallback plan before changing its dictionary."),
+      phase("Install a separate target home", "Install", home, inv, "Starting at 11.2.0.2, 11gR2 database patch sets are full software installations. Install the target 11.2.0.4 software in a separate home and verify the target inventory and prerequisites.", "The original home and the database files are separate assets."),
+      phase("Cut over and upgrade the dictionary", "Upgrade", home, dict, "Drain applications and shut down cleanly. Use the supported DBUA or documented manual upgrade from the new home. In the manual 11g path, upgrade mode and the prescribed upgrade scripts prepare dictionary and component versions.", "Changing an environment variable alone cannot make the upgraded database compatible with its old binaries.", [inst]),
+      phase("Run post-upgrade checks", "Validate", dict, db, "Review upgrade logs and component statuses, run prescribed post-upgrade actions and recompilation, and compare invalid objects with the pre-upgrade baseline.", "Compare every expected installed component with the target version."),
+      phase("Reconnect using the new home", "Service test", home, "user-process", "Confirm the running instance uses the intended version and service configuration, connect through the application service and verify a representative business operation. Capture the upgraded state and a new backup.", "Keep the recovery plan aligned with the upgraded database state.", [db])
+    ]);
+
+  add("patch-rollback", "Interim Patch Rollback / Restore Service", "Advanced",
+    "Trace a supported rollback after an interim patch causes a regression, from evidence collection to a reverified service.",
+    "Read-only baseline\nopatch lsinventory -detail",
+    "Compare the requested rollback point, software inventory, database changes and functional test.",
+    "The patch ID has gone from inventory after rollback. What proves recovery?",
+    "Confirm the documented SQL rollback state for every affected database, the expected remaining fixes, the database open state, and a passing application test.",
+    [
+      phase("Identify the regression and rollback target", "Assess", "user-process", inv, "Compare the failing operation with its pre-patch baseline. Record the installed home, logs, exact patch ID, dependencies and databases affected.", "Check whether the README supports rollback and which dependent fixes or SQL changes it affects."),
+      phase("Choose the documented recovery path", "Plan", inv, home, "Follow the patch-specific rollback instructions, including the required database state and ordering of binary and SQL actions. If the patch cannot be rolled back, use the tested supported recovery path.", "A patch-set upgrade needs its own recovery or downgrade plan."),
+      phase("Return the home and databases to the expected state", "Rollback", op, home, "In the maintenance window, control application access and run the approved steps in the prescribed order. Save binary rollback and database-side logs for each affected database.", "Retry a partially completed rollback only after establishing which phases actually finished.", [dict]),
+      phase("Compare the inventories and SQL evidence", "Verify", inv, db, "Check the retained patch set and individual fixes, the expected database-side history and component status. Investigate any mismatch before restoring traffic.", "The target is the agreed validated state, which may still include unrelated patches."),
+      phase("Retest the service and original symptom", "Service test", db, "user-process", "Verify a new connection, open mode, the failed business action and the return of required dependent services. Record any original defect reintroduced by removing its fix.", "Use the same test, input and success condition that exposed the regression.")
+    ]);
+
+  add("patch-upgrade-mode-rca", "Patch Set Upgrade Failure / ORA-39700", "Advanced",
+    "Diagnose a normal startup attempted with the new home before the planned manual 11g patch-set upgrade has completed.",
+    "ORA-39700: database must be opened with UPGRADE option",
+    "Correlate the selected executable home, database dictionary and documented upgrade stage.",
+    "An ORA-39700 appears during this planned cutover. Which evidence should guide the next step?",
+    "Confirm the home path, recorded source dictionary version and documented upgrade stage. Resume the supported upgrade procedure only after verifying that combination.",
+    [
+      phase("Recognize the rejected open", "Observe", home, inst, "A planned 11.2.0.3 to 11.2.0.4 manual upgrade has installed the target binaries. A normal startup is attempted before the dictionary upgrade. The alert log records ORA-39700.", "Record the first error and the startup context.", [dict]),
+      phase("Identify the home and upgrade state", "Correlate", inv, dict, "Compare the operator's executable path and target inventory with the pre-upgrade report and upgrade logs. Determine whether upgrade work already ran or stopped partway.", "A new executable version and an older dictionary explain this example."),
+      phase("Resume the supported upgrade", "Resolve", home, dict, "After confirming backups and the planned stage, follow the target 11g upgrade guide for the required instance state, upgrade mode and scripts. Preserve logs from any interrupted run.", "A routine PSU installation does not use this patch-set upgrade sequence.", [inst]),
+      phase("Prove normal service", "Verify", db, "user-process", "Check the upgrade results, component versions and status. Open normally under the intended home and verify a fresh application session and its smoke test.", "The absence of the original startup error alone does not establish a successful upgrade.")
+    ], failureScenario(
+      "Normal open with a newly installed home reports ORA-39700 during a planned manual patch-set upgrade.",
+      "An ordinary startup was attempted where the documented manual upgrade requires upgrade mode. Verify the intended home and any interrupted upgrade work.",
+      "Correlate the alert log, exact executable path, inventory, pre-upgrade report and upgrade logs.",
+      "Resume the supported 11g upgrade path for the verified state and validate each installed component and service.",
+      "Keep the old and new home identities explicit. Reopening an upgraded database with older binaries is unsupported.",
+      [oracleError("ORA-39700", "database must be opened with UPGRADE option", "Normal startup was attempted during a planned manual upgrade.")]));
+})();
 
       function init() {
         protectDeveloperCredit();
@@ -5310,6 +5503,124 @@
           </div>`;
       }
 
+      const operationalChecks = {
+  "instance-startup": [
+    "What confirms that a healthy primary has opened for ordinary read/write work?",
+    [
+      "V$INSTANCE shows STARTED",
+      "V$DATABASE shows READ WRITE",
+      "A listener is running"
+    ],
+    1,
+    "An open-mode check confirms the database state. A started instance or a running listener can exist before OPEN."
+  ],
+  "shutdown-normal": [
+    "An idle client is still connected. What does NORMAL wait for?",
+    [
+      "The client to disconnect",
+      "The next log switch",
+      "A listener restart"
+    ],
+    0,
+    "NORMAL waits for connected users to log off before a consistent shutdown."
+  ],
+  "shutdown-transactional": [
+    "What must finish before TRANSACTIONAL disconnects clients?",
+    [
+      "Every idle user must log off",
+      "Existing active transactions",
+      "A listener reload"
+    ],
+    1,
+    "Existing transactions may finish. Oracle then disconnects remaining clients and closes consistently."
+  ],
+  "shutdown-immediate": [
+    "What happens to uncommitted transactions during IMMEDIATE?",
+    [
+      "They commit automatically",
+      "They remain for the next startup",
+      "Oracle rolls them back during shutdown"
+    ],
+    2,
+    "IMMEDIATE terminates active SQL and rolls back uncommitted transactions. Rollback may take time."
+  ],
+  "shutdown-abort": [
+    "Why can startup after ABORT need recovery?",
+    [
+      "The clean close was skipped",
+      "All durable redo was erased",
+      "The listener modified the control files"
+    ],
+    0,
+    "Redo rolls changes forward and undo resolves incomplete transactions after an inconsistent shutdown."
+  ],
+  "patch-quarterly-psu-spu": [
+    "What establishes that the quarterly patch is complete?",
+    [
+      "Publication of the advisory",
+      "Expected home inventory, required SQL postchecks and a service test",
+      "The listener alone is reachable"
+    ],
+    1,
+    "Verify the exact home, all README-required database work and a representative service test."
+  ],
+  "patch-one-off": [
+    "What should follow an unresolved one-off conflict?",
+    [
+      "Force the install",
+      "Change database compatibility",
+      "Check for a supported replacement or merged fix"
+    ],
+    2,
+    "Confirm the bugs and approved conflict resolution for the exact platform and installed baseline."
+  ],
+  "patch-windows-bundle": [
+    "Which document identifies this bundle’s prerequisites?",
+    [
+      "The README for the exact Windows bundle and target home",
+      "Any quarterly announcement",
+      "Another platform’s instructions"
+    ],
+    0,
+    "Check the platform, target home, inventory and the bundle-specific procedure."
+  ],
+  "patch-set-upgrade": [
+    "What needs verification after a patch-set upgrade?",
+    [
+      "Only the new directory name",
+      "Database upgrade logs and component status as well as binaries",
+      "The last log switch"
+    ],
+    1,
+    "New binaries and the corresponding database dictionary upgrade require separate verification."
+  ],
+  "patch-rollback": [
+    "What establishes a successful rollback?",
+    [
+      "Only a successful OPatch exit",
+      "Only listener status",
+      "Expected inventory, required database reversal and application checks"
+    ],
+    2,
+    "Verify the expected binary and database states and confirm representative application behavior."
+  ],
+  "patch-upgrade-mode-rca": [
+    "A post-install step reports a required database mode. What should you check first?",
+    [
+      "The exact README, current database mode and failure log",
+      "Whether the listener uses another port",
+      "Whether a newer patch has a shorter README"
+    ],
+    0,
+    "Identify the failed operation and its documented prerequisites before resuming."
+  ]
+};
+      document.addEventListener("click", event => {
+        const button = event.target.closest("[data-check-choice]"); if (!button) return;
+        const area = button.closest(".graded-check"), check = operationalChecks[state.activeFlowId];
+        for (const choice of area.querySelectorAll("button")) choice.setAttribute("aria-pressed", String(choice === button));
+        area.querySelector("[role=status]").textContent = (Number(button.dataset.checkChoice) === check[2] ? "Correct. " : "Try again. ") + check[3];
+      });
       function workflowCompletionTemplate(notes) {
         const question = notes.question && notes.answer
           ? `<p>${escapeHtml(notes.question)}</p>
@@ -5318,7 +5629,9 @@
                <p>${escapeHtml(notes.answer)}</p>
              </details>`
           : "";
-        return htmlBlock("End of Workflow", `${question}<p>Use Reset timeline to return to step 1, or use the diagram’s reset button to choose another workflow.</p>`, "end-workflow");
+        const check = operationalChecks[state.activeFlowId];
+        const graded = check ? '<section class="graded-check"><h4>Check your decision</h4><p>' + escapeHtml(check[0]) + '</p><div class="answer-choices">' + check[1].map((label,i) => '<button type="button" aria-pressed="false" data-check-choice="' + i + '">' + escapeHtml(label) + '</button>').join("") + '</div><p role="status" aria-live="polite"></p></section>' : "";
+        return htmlBlock("End of Workflow", graded + '<p><button type="button" data-compare-current>Compare this workflow across towers</button></p>' + `${question}<p>Use Reset timeline to return to step 1, or use the diagram’s reset button to choose another workflow.</p>`, "end-workflow");
       }
 
       function componentTemplate(meta) {
@@ -6024,7 +6337,1590 @@
     })();
 
     document.addEventListener("DOMContentLoaded", OracleTrainer.init);
+    function openLinkedLesson() {
+      const id = new URLSearchParams(location.hash.slice(1)).get("lesson");
+      if (id && Object.hasOwn(OracleTrainer._flows,id)) { OracleTrainer.selectFlow(id); OracleTrainer.goToStep(0); }
+    }
+    document.addEventListener("DOMContentLoaded", openLinkedLesson);
+    window.addEventListener("hashchange", openLinkedLesson);
+    for (const button of document.querySelectorAll("[data-home-lesson]")) {
+      button.addEventListener("click", () => { OracleTrainer.selectFlow(button.dataset.homeLesson); OracleTrainer.goToStep(0); });
+    }
+    if (location.protocol === "file:" && /standalone-v\d+\.html$/i.test(location.pathname)) {
+      for (const link of document.querySelectorAll("[data-tower-file]")) link.href = "./github-publish/oracle-11g-architecture/" + link.dataset.towerFile;
+    } else if (/\/old_versions\/index-v\d+\.html$/i.test(location.pathname)) {
+      for (const link of document.querySelectorAll("[data-tower-file]")) link.href = "../" + link.dataset.towerFile;
+    }
     window.OracleTrainer = OracleTrainer;
   </script>
+<script type="application/json" id="topologyData">{
+  "user-login": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-5",
+      "reason": "Follow the SCAN redirect, local listener handoff and established dedicated session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A client connects to a service offered by the primary or an eligible standby."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-5",
+      "reason": "Follow a client reconnecting to its primary-role service after a planned site transition."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract and Replicat use configured database credentials; the published lesson concerns replicated changes."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#first-sample",
+      "reason": "Target discovery illustrates a management agent connecting with monitoring credentials."
+    }
+  ],
+  "dedicated-server-session": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-5",
+      "reason": "The node listener hands the client to a dedicated server on the selected instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dedicated server processes belong to the database instance handling the client session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "After site and instance selection the established session uses that instance's server process."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The pipeline diagram follows GoldenGate processes rather than a user session’s server-process lifecycle."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Monitoring credentials create database sessions; interactive dedicated-session behavior remains a database topic."
+    }
+  ],
+  "session-cleanup": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The owning instance's PMON handles a failed foreground. A whole-instance loss has a separate recovery path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An abandoned client session is cleaned up on its database instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the owning site and instance before diagnosing a departed foreground process."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A Replicat restart uses its checkpoint and trail. It is a different event from foreground session cleanup."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An agent's missing sample cannot establish that a user session needed PMON cleanup."
+    }
+  ],
+  "connection-failure-rca": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-6",
+      "reason": "Use the redirect and node listener state to identify which connection leg failed."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check endpoint, service registration and current role before treating a login failure as a transport problem."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-5",
+      "reason": "Verify that the primary-role service runs at the new site and the client can reach that endpoint."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#network-interruption",
+      "reason": "Distinguish a broken pump-to-target trail connection from an application login failure."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Check target reachability independently of an agent or OMS connectivity failure."
+    }
+  ],
+  "select-first-execution": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-5",
+      "reason": "Trace the first login and SQL handoff. The selected instance performs a first hard parse locally."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-soft-parse": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The selected RAC instance parses SQL using its local library cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-hard-parse": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The selected RAC instance parses SQL using its local library cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-cache-hit": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-7",
+      "reason": "Compare a local hit with a local miss that can be served by a peer cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A query runs against the buffer cache of its local primary or readable standby instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace an instance cache supplying a block inside one site before following redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An ordinary SELECT cache hit creates no replicated row change."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring examples do not reproduce individual consistent gets."
+    }
+  ],
+  "select-cache-miss": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-7",
+      "reason": "Compare a peer-cache block transfer with a global grant followed by a shared-storage read."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The database executing the SELECT resolves the missing block against its local database files."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "A primary instance obtains a block from its local RAC peer across the cluster interconnect."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "GoldenGate captures change records; it does not supply blocks to the source buffer cache."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A single database block read is outside the target discovery and incident examples."
+    }
+  ],
+  "sort-temp-spill": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A server process on the executing instance uses its PGA and the database TEMP tablespace."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side sort uses local work areas and temporary space. Redo Apply teaches a different path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The site and instance executing the statement own its work area."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail buffering and network backlog are separate from a database SQL sort spill."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A TEMP work-area or execution-plan drill-down is beyond the current monitoring lessons."
+    }
+  ],
+  "sql-parse-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Inspect the exact parse error, schema, privileges and SQL at the instance serving the session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Resolve SQL name and access errors on the role serving the client."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check the session's service, site and schema before diagnosing SQL parsing."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A source statement that fails parsing does not produce a committed row change."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A target being up cannot establish that an individual SQL statement parsed."
+    }
+  ],
+  "insert-commit": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The hosting instance generates undo and writes commit redo to its own thread."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-1",
+      "reason": "Trace a locally committed row through transport, standby reception and physical apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace the primary instance’s redo thread and the separate intersite transport path."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Follow a committed source row through capture, trail and target apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A monitoring sample does not acknowledge an application commit."
+    }
+  ],
+  "update-commit": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-9",
+      "reason": "Repeated updates to rows in a shared hot block make current-block transfers visible."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-1",
+      "reason": "Follow an updated row’s redo from the primary to the physical standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Follow a remote block read, an update and the corresponding thread’s redo at the standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Trace committed DML into the trail and then into a target transaction."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The management stack observes target health rather than replaying a user update."
+    }
+  ],
+  "commit-durability": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary RAC instance uses its online redo thread for normal commit durability."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-2",
+      "reason": "Compare completion of an ASYNC commit with the remote durable acknowledgment in healthy SYNC/AFFIRM."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "The write belongs to the instance’s thread. Receipt at the other site is a separate milestone."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Distinguish source commit success from later completion of target apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Agent upload and OMS acknowledgment do not establish whether a database commit is durable."
+    }
+  ],
+  "dml-statement-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An error rolls back the failed statement on its executing instance. Earlier transaction work needs separate examination."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Distinguish statement rollback on the primary from committing a transaction and applying its redo at the standby."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed statement on its originating instance before interpreting redo at the remote site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A failed source DML statement does not become a committed row operation for replication."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A target-level availability event does not diagnose a constraint violation in one statement."
+    }
+  ],
+  "create-table-ddl": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DDL changes the shared database dictionary; inter-instance locks and invalidations require a dedicated RAC DDL lesson."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A physical standby recovers logged dictionary changes by applying redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dictionary changes originate on a primary instance and physical recovery propagates their redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The GoldenGate examples teach row changes. DDL replication depends on separate configuration and supported objects."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM lessons cover target telemetry and maintenance status, not dictionary change execution."
+    }
+  ],
+  "alter-table-ddl": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DDL changes the shared database dictionary; inter-instance locks and invalidations require a dedicated RAC DDL lesson."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A physical standby recovers logged dictionary changes by applying redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dictionary changes originate on a primary instance and physical recovery propagates their redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The GoldenGate examples teach row changes. DDL replication depends on separate configuration and supported objects."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM lessons cover target telemetry and maintenance status, not dictionary change execution."
+    }
+  ],
+  "ddl-lock-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the blocking session across instances and distinguish its locks from block-transfer waits."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side DDL lock wait is a concurrency problem at the executing database."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the primary service, instance and blocker identity to localize the DDL wait."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "DDL lock diagnostics and configured DDL replication need a separate GoldenGate scenario."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring examples do not expose a DDL blocking-session chain."
+    }
+  ],
+  "rollback-flow": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-8",
+      "reason": "Observe undo of incomplete work when a RAC instance fails and its client reconnects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Physical redo carries the changes needed for standby recovery, including changes involving undo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Keep a user-requested rollback on one instance distinct from instance recovery and site failover."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The capture/apply example publishes committed row changes; a rolled-back source transaction has no committed row outcome."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A sampled metric cannot establish whether a particular application transaction rolled back."
+    }
+  ],
+  "read-consistency": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-7",
+      "reason": "Trace the transfer of a suitable consistent-read image from a peer's cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Read consistency is enforced by the database serving the query. Standby apply progress determines which changes have reached it."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Identify a suitable block image on a peer within the primary site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Target query visibility follows target-side commit and can lag the source. The target has its own consistent reads."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Telemetry freshness and database statement read consistency use different mechanisms."
+    }
+  ],
+  "snapshot-too-old-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The reader still needs a suitable earlier block version and retained undo across the RAC database."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Diagnose the query’s snapshot and undo at the database serving it. Transport lag alone does not explain ORA-01555."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record the query site, instance, duration and undo evidence before attributing the failure to replication."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail retention measures a different history from undo needed for a consistent read."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not diagnose lost undo for an individual cursor."
+    }
+  ],
+  "dbwn-dirty-write": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DBWn writes changed buffers to the shared data files. ASM manages their layout, while the database instance issues the write."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Primary DBWn and physical standby apply update separate sets of database files."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Within each RAC database, buffer writes reach that site's shared storage."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract obtains change information from redo rather than tracking DBWn data-file writes."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current monitoring lessons do not isolate DBWn I/O."
+    }
+  ],
+  "checkpoint-flow": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Associate checkpoint progress with the correct instance thread and shared file headers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Database checkpoint, redo receipt and standby apply position answer different recovery questions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Keep instance thread progress distinct from the standby apply position and the state of the other site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Database and GoldenGate checkpoints mark different kinds of progress. Trail positions govern process restart."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A successful agent upload does not measure checkpoint completion."
+    }
+  ],
+  "redo-log-switch": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Each RAC instance switches groups in its own online redo thread."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-4",
+      "reason": "Compare waiting for archival at the standby with reading its current standby redo log during real-time apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-2",
+      "reason": "Count online groups and standby log groups for each primary instance's thread."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Capture follows source redo across file boundaries and relies on access to the required retained logs."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM walkthroughs do not chart database redo group reuse."
+    }
+  ],
+  "archive-destination-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed archive destination for the affected instance and redo thread."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-5",
+      "reason": "Follow a missing archived sequence through transport restoration and gap resolution."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-3",
+      "reason": "Use both thread and sequence to identify redo missing from the receiving site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Capture may need retained archived redo after an interruption. Check log availability at its required position."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#threshold-incident",
+      "reason": "If the target exposes a relevant threshold, track the observed incident separately from repairing the destination."
+    }
+  ],
+  "instance-startup": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#startup",
+      "reason": "Bring cluster resources and local instances online according to configured dependencies."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#startup",
+      "reason": "Startup decisions depend on the primary or standby role and the required apply state."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#startup",
+      "reason": "Verify both clusters, database roles and the single 11g standby apply instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-startup",
+      "reason": "After the database is ready, start capture, pump and apply from their known positions."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-startup",
+      "reason": "Distinguish startup of the monitoring stack from startup of a monitored database."
+    }
+  ],
+  "shutdown-normal": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Wait for or drain user sessions on the intended RAC instance, then verify service placement on its peers."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "Account for the database role, outstanding transport and standby apply before a planned stop."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-transactional": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Trace the last transaction on the selected instance as the clustered service drains."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "A final primary transaction must finish before closing. Track its redo receipt and apply separately at the standby."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-immediate": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Drain or relocate cluster-managed services and distinguish stopping one instance from stopping the database."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "Account for the database role, outstanding transport and standby apply before a planned stop."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-abort": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-8",
+      "reason": "Observe the impact of losing one instance while a peer survives; recover incomplete transactions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An abrupt primary stop and a standby promotion are independent decisions. Evaluate redo availability and role policy."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Compare losing a single instance with isolation or failure of the primary site."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#replicat-recovery",
+      "reason": "Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify whether the target actually went down before interpreting a gap in telemetry as a crash."
+    }
+  ],
+  "crash-recovery": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-8",
+      "reason": "A surviving instance recovers the failed instance’s redo thread and rolls back incomplete work."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "A primary outage can raise a separate site failover decision. Inspect received redo and target readiness."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Determine whether local instance recovery or a site-level role transition applies."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#replicat-recovery",
+      "reason": "Separate the target database's crash recovery from restart of the trail consumer."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Use independent evidence to distinguish actual failure from stale monitoring data."
+    }
+  ],
+  "startup-file-failure-rca": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#startup",
+      "reason": "Locate an unavailable dependent resource such as an ASM disk group before diagnosing the database startup stage."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Test file availability and MOUNT/OPEN state against the intended role. A mounted standby can be healthy."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the site, instance, role and file type before treating a startup fault as a site failure."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A missing database control or data file is outside the logical capture and apply stack."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Validate the target independently when startup and the monitoring view disagree."
+    }
+  ],
+  "rman-full-backup": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "RMAN backs up the shared database files. A RAC channel also needs access to its backup device and required archived redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "RMAN backups taken in a Data Guard configuration require attention to the source role, redo and backup accessibility."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Recovery planning must identify the site, shared files, timelines and every required primary redo thread."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract checkpoints and trail files serve logical replication, not an RMAN database backup."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An OEM backup job and its device configuration are outside this monitoring curriculum."
+    }
+  ],
+  "rman-restore-recover": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A restore targets the shared database files and recovery must have the required redo from all threads."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "After failover, review reinstating the former primary or rebuilding its standby. RMAN restore details remain on the home page."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Choose reinstatement or re-creation of the former primary after checking flashback eligibility."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A replication checkpoint does not restore Oracle data files or replace RMAN media recovery."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current OEM lessons do not schedule RMAN recovery or select restore pieces."
+    }
+  ],
+  "rman-backup-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check which RAC channel, node, device and backup path failed."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the backup role, channel and archived redo availability independently of apply health."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed job by site, database role, instance and device before interpreting a protection gap."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "RMAN backup channel diagnostics are separate from trail and checkpoint retention."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM workflows cover alerts and collection health, without a backup-job diagnostic example."
+    }
+  ],
+  "flashback-database": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Flashback acts on the shared database timeline and requires coordination of RAC instances."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "Flashback Database can permit the old primary to be reinstated after a role transition."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Evaluate flashback enablement and retained history before reinstating the former primary."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A source or target rewind can invalidate capture or apply positions. Replication resynchronization needs a separate plan."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Monitoring history does not provide flashback logs for database rewind."
+    }
+  ],
+  "flashback-unavailable-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check flashback configuration and retained logs for the shared RAC database."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "When the old primary cannot be reinstated, assess rebuilding it as a standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Choose standby re-creation if the former primary lacks sufficient flashback history."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Preserved trail files and checkpoints are independent of the database flashback window."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "OEM metric retention does not determine database flashback eligibility."
+    }
+  ],
+  "session-monitoring": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Include instance identifiers when comparing sessions, waits and services across RAC nodes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the role of the database hosting the observed sessions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Track site, service and instance when sessions reconnect following a topology change."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Extract and Replicat database sessions can be identified, while replication progress also needs process and trail positions."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#first-sample",
+      "reason": "Establish which database target, credentials, collection interval and timestamp produced a metric sample."
+    }
+  ],
+  "known-sql-slowness": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect evidence on the instance that handled the affected session and include its instance ID."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect these measurements on the affected database role and record the sample time."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record site, database role and instance along with the incident interval."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A database performance symptom alone does not identify a logical replication bottleneck."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify collection freshness and target reachability before interpreting a missing or outdated sample."
+    }
+  ],
+  "top-sql-discovery": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Compare SQL evidence per instance before aggregating activity across the cluster."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Rank SQL at the role serving the workload and keep redo transport timing separate."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Preserve service, site and instance dimensions when ranking SQL across a clustered deployment."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Top SQL by database time is distinct from identifying a lagging replication stage."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The supplied OEM examples do not implement a Top SQL drill-down."
+    }
+  ],
+  "spike-window-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect evidence on the instance that handled the affected session and include its instance ID."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect these measurements on the affected database role and record the sample time."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record site, database role and instance along with the incident interval."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A database performance symptom alone does not identify a logical replication bottleneck."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify collection freshness and target reachability before interpreting a missing or outdated sample."
+    }
+  ],
+  "single-block-read-diagnosis": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-7",
+      "reason": "Separate actual shared-disk I/O from a peer-cache block transfer."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute a foreground read to the instance serving that query before comparing standby apply I/O."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace an in-cluster block transfer independently from intersite redo transport."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A source foreground block read does not locate a delay in capture, pump or apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The supplied OEM examples do not resolve single-block I/O waits."
+    }
+  ],
+  "multiblock-read-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Examine the scan and underlying storage on the executing instance; verify shared-storage load across nodes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Observe the scan at the database where it executes, including a readable standby when configured."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute scan I/O to the correct site and instance before comparing shared-storage load."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A full scan performed for a user query is separate from GoldenGate redo capture."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "No current OEM walkthrough attributes multiblock reads to execution-plan operations."
+    }
+  ],
+  "redo-commit-latency": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Measure foreground commit waits and LGWR I/O on the instance owning the relevant redo thread."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-2",
+      "reason": "Test how remote durable acknowledgment in SYNC/AFFIRM contributes to commit time."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Separate the primary instance's redo path from the intersite redo transport path."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#isolate-lag",
+      "reason": "Separate source commit latency from time subsequently spent in capture, pump or apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Check comparable sample times before using target metrics to investigate a latency spike."
+    }
+  ],
+  "temp-spill-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A server process on the executing instance uses its PGA and the database TEMP tablespace."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side sort uses local work areas and temporary space. Redo Apply teaches a different path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The site and instance executing the statement own its work area."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail buffering and network backlog are separate from a database SQL sort spill."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A TEMP work-area or execution-plan drill-down is beyond the current monitoring lessons."
+    }
+  ],
+  "row-lock-contention": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the waiting session, blocking instance and open transaction. A row-lock wait differs from a hot-block transfer."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the live blocking transaction at the primary or other writable role being queried."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Correlate blocker and waiter at the same database while retaining both RAC instance identifiers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A target-side blocked apply session can delay replication. Confirm its blocking transaction separately."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current OEM lessons do not display database lock graphs."
+    }
+  ],
+  "buffer-contention": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-9",
+      "reason": "Correlate a repeatedly modified block with inter-instance transfers, waits and workload placement."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute a buffer wait to the primary or standby process and object before interpreting its impact."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Identify which private interconnect carries a primary-site block before investigating intersite lag."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail congestion and Oracle buffer-cache contention affect different resources."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The target monitoring examples do not identify a hot Oracle block."
+    }
+  ],
+  "shared-pool-parse-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Each RAC instance has its own library cache; compare parse pressure per instance and service."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "free-buffer-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Relate free-buffer waits to DBWn and file writes on the affected RAC instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check which role and process are waiting for reusable database buffers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Separate pressure in one instance’s buffer cache from a site-wide transport backlog."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A buffered trail or pump backlog is a different resource from a free database buffer."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The available management walkthroughs do not diagnose DBWn free-buffer waits."
+    }
+  ],
+  "archive-log-switch-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check the thread that is attempting to reuse a group and its own checkpoint and archival progress."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Distinguish a local switch blocked by archival or checkpoint progress from remote transport and apply lag."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-2",
+      "reason": "Inspect online and standby log group counts by thread before attributing delayed reuse to the other site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check required source redo availability for capture separately from the reason a primary log group cannot be reused."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#threshold-incident",
+      "reason": "Investigate an observed storage threshold and close the incident after confirming the underlying cause."
+    }
+  ],
+  "performance-incident-rca": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-9",
+      "reason": "Correlate workload, repeated block identity and global cache waits to diagnose one RAC-specific incident."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-5",
+      "reason": "Use receive and apply positions to localize a specific redo continuity incident."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Localize a disruption to one instance, the transport network or the entire site before escalation."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#isolate-lag",
+      "reason": "Compare positions over time to find the pipeline stage accumulating delay."
+    },
+    {
+      "kind": "Direct",
+      "target": "oem.html#threshold-incident",
+      "reason": "Trace a monitored condition through event creation, ownership and verification."
+    }
+  ],
+  "patch-quarterly-psu-spu": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Check both node homes, service placement and whether the exact patch supports rolling application."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Check patch-specific standby-first eligibility and role-specific work, then verify transport and apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Sequence maintenance by site, Oracle home and instance, then check both primary redo threads and standby apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Track component compatibility and post-maintenance health across the management stack."
+    }
+  ],
+  "patch-one-off": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Determine cluster eligibility and one-off conflicts separately for each affected home."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Confirm primary and standby eligibility for this specific interim patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Check conflicts and compatible mixed states for each home, site and instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check capture and apply compatibility for the exact interim database or GoldenGate patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Scope the interim correction to the intended database target or management component."
+    }
+  ],
+  "patch-windows-bundle": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Choose the Windows bundle and installation instructions for the specific RAC and Grid homes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the platform-specific bundle README on both databases and verify their roles and transport state."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Validate four nodes' Windows home versions and role-transition compatibility against the bundle README."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the supported GoldenGate build for the Windows database home; database bundle installation is separate."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "Use a bounded monitoring blackout for the Windows target maintenance window."
+    }
+  ],
+  "patch-set-upgrade": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "A patch set is an upgrade. Use release-specific RAC and Grid upgrade sequencing before any node changes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Plan database upgrade and standby compatibility using the exact upgrade guide and permitted transition path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A patch-set upgrade requires a verified cross-site, multi-instance upgrade design for the target release."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Confirm GoldenGate source and target compatibility and preserve positions during the database version transition."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Check management stack, agent and plug-in compatibility before monitoring the upgraded target."
+    }
+  ],
+  "patch-rollback": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Coordinate rollback eligibility and verification by home and node according to the specific README."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Restore supported versions on the affected sites and verify shipping and apply in the correct direction."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Verify version parity, role, service placement and redo continuity after a supported rollback."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check process compatibility and resume only from verified checkpoints after maintenance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "End the blackout only after the service and fresh target samples confirm the recovery."
+    }
+  ],
+  "patch-upgrade-mode-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "If a cluster database needs upgrade mode, use its exact RAC upgrade guide and confirm allowed instance count."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the database role before interpreting upgrade-mode requirements in a postpatch SQL script."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the affected database role, instance and home before resuming a failed postpatch SQL step."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Database dictionary upgrade mode is separate from a GoldenGate process patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "Keep maintenance evidence and independently confirm the database’s open state before ending the monitoring blackout."
+    }
+  ]
+}</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const records=JSON.parse(document.getElementById("topologyData").textContent);
+  const towers=[["rac.html","RAC"],["dataguard.html","Data Guard"],["rac-dataguard.html","RAC + Data Guard"],["goldengate.html","GoldenGate"],["oem.html","Enterprise Manager (OEM)"]];
+  const select=document.getElementById("topologyLesson"), rows=document.getElementById("topologyRows");
+  const flows=window.OracleTrainer._flows;
+  for (const id of Object.keys(records).sort((a,b)=>flows[a].title.localeCompare(flows[b].title))) select.add(new Option(flows[id].title,id));
+  function render() {
+    const id=select.value; rows.replaceChildren();
+    document.getElementById("topologyHomeLesson").href="#lesson="+encodeURIComponent(id);
+    records[id].forEach((cell,i)=>{
+      const tr=document.createElement("tr"); tr.dataset.kind=cell.kind;
+      const label=document.createElement("th");label.scope="row";label.textContent=towers[i][1];tr.append(label);
+      tr.insertCell().textContent=cell.kind;tr.insertCell().textContent=cell.reason;
+      const dest=tr.insertCell();
+      if(cell.target) {const link=document.createElement("a"); const nav=document.querySelector("[data-tower-file=\""+towers[i][0]+"\"]");
+        link.href=nav.getAttribute("href").split("#")[0]+"#"+cell.target.split("#")[1];link.textContent="Open lesson";dest.append(link);}
+      else {dest.textContent="—";}rows.append(tr);
+    });
+  }
+  select.addEventListener("change",render);
+  const panel=document.getElementById("topologyMap");
+  panel.addEventListener("toggle",()=>{const active=OracleTrainer._state.activeFlowId;if(panel.open && records[active]) {select.value=active;render();}});
+  const route=new URLSearchParams(location.hash.slice(1)).get("lesson");select.value=records[route]?route:"instance-startup";render();
+  document.getElementById("topologyHomeLesson").addEventListener("click",()=>{OracleTrainer.selectFlow(select.value);OracleTrainer.goToStep(0);});
+  document.addEventListener("click",event=>{const b=event.target.closest("[data-compare-current]");if(!b)return;
+    panel.open=true;select.value=OracleTrainer._state.activeFlowId;render();panel.scrollIntoView();select.focus({preventScroll:true});});
+});</script>
 </body>
 </html>
