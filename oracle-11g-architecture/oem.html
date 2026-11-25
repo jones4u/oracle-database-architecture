@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="copyright" content="Designer : Cyril Jones S | Version : v1 | Updated : 25-Nov-2026">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
 <title>Oracle Enterprise Manager · Oracle 11g Architecture</title>
 <style>
 :root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#63ecff}
@@ -11,12 +11,12 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">11g Architecture home</a>
+<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a>
 <a href="./rac.html">RAC</a>
 <a href="./dataguard.html">Data Guard</a>
 <a href="./rac-dataguard.html">RAC + Data Guard</a>
 <a href="./goldengate.html">GoldenGate</a>
-<a href="./oem.html" aria-current="page">Enterprise Manager</a></nav><h1>Oracle Enterprise Manager</h1><p class="sub">Trace an observation from an Oracle 11g database to the administrator who acts on it.</p><p class="scope">Enterprise Manager Cloud Control 12c (12.1) · Oracle Database 11g target · Central monitoring · Trainer v1</p></header>
+<a href="./oem.html" aria-current="page">Enterprise Manager</a></nav><h1>Oracle Enterprise Manager</h1><p class="sub">Trace an observation from an Oracle 11g database to the administrator who acts on it.</p><p class="scope">Enterprise Manager Cloud Control 12c (12.1) · Oracle Database 11g target · Central monitoring · Trainer v2</p></header>
 <main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#first-sample" data-lesson="first-sample"><small>Basic</small>Discover a database and see its first sample</a>
 <a href="#threshold-incident" data-lesson="threshold-incident"><small>Intermediate</small>Follow a threshold breach to its owner</a>
 <a href="#patch-blackout" data-lesson="patch-blackout"><small>Advanced</small>Track a patch window with a blackout</a>
@@ -29,7 +29,7 @@
 <li data-node="repo"><strong>Management Repository</strong><small>Stores management, metric and incident data</small></li>
 <li data-node="console"><strong>Cloud Control console</strong><small>Displays target evidence to the operator</small></li>
 <li data-node="rules"><strong>Incident rules</strong><small>Route configured events and notifications</small></li></ul><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools"><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
-<details id="homeFoundations" style="margin:1rem 0"><summary>Related 11g Architecture home workflows</summary><ul></ul></details>
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
 <script>(function(){
 const related={"first-sample":[["user-login","Target discovery illustrates a management agent connecting with monitoring credentials."],["session-monitoring","Establish which database target, credentials, collection interval and timestamp produced a metric sample."]],"stale-evidence":[["connection-failure-rca","Check target reachability independently of an agent or OMS connectivity failure."],["shutdown-abort","Verify whether the target actually went down before interpreting a gap in telemetry as a crash."],["crash-recovery","Use independent evidence to distinguish actual failure from stale monitoring data."],["startup-file-failure-rca","Validate the target independently when startup and the monitoring view disagree."],["known-sql-slowness","Verify collection freshness and target reachability before interpreting a missing or outdated sample."],["spike-window-diagnosis","Verify collection freshness and target reachability before interpreting a missing or outdated sample."],["redo-commit-latency","Check comparable sample times before using target metrics to investigate a latency spike."]],"threshold-incident":[["archive-destination-failure-rca","If the target exposes a relevant threshold, track the observed incident separately from repairing the destination."],["archive-log-switch-pressure","Investigate an observed storage threshold and close the incident after confirming the underlying cause."],["performance-incident-rca","Trace a monitored condition through event creation, ownership and verification."]],"oem-startup":[["instance-startup","Distinguish startup of the monitoring stack from startup of a monitored database."]],"oem-graceful-shutdown":[["shutdown-normal","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."],["shutdown-transactional","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."],["shutdown-immediate","Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."]],"oem-patching":[["patch-quarterly-psu-spu","Track component compatibility and post-maintenance health across the management stack."],["patch-one-off","Scope the interim correction to the intended database target or management component."],["patch-set-upgrade","Check management stack, agent and plug-in compatibility before monitoring the upgraded target."]],"patch-blackout":[["patch-windows-bundle","Use a bounded monitoring blackout for the Windows target maintenance window."],["patch-rollback","End the blackout only after the service and fresh target samples confirm the recovery."],["patch-upgrade-mode-rca","Keep maintenance evidence and independently confirm the database’s open state before ending the monitoring blackout."]]};
 function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
@@ -42,7 +42,7 @@ function showRelated(){const current=document.querySelector("[data-lesson][aria-
 window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
 <!-- /authored-home-crosslinks -->
 </main>
-<footer><p>Related 11g Architecture lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=session-monitoring">Observe database sessions</a></p><a href="./index.html">Return to 11g Architecture home</a></footer>
+<footer><p>Related Stand-Alone DB lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=session-monitoring">Observe database sessions</a></p><a href="./index.html">Return to Stand-Alone DB</a></footer>
 <script type="application/json" id="lesson-data">{
   "flows": [
     [

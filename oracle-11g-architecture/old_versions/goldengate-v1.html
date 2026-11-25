@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v1 | Updated : 25-Nov-2026">
+<title>Oracle GoldenGate · Oracle 11g Architecture</title>
+<style>
+:root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#ffd166}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 "Segoe UI",Arial,sans-serif}a{color:var(--accent)}button,a,summary{touch-action:manipulation}button,summary{cursor:pointer}button{font:inherit}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:3px}header,main,footer{max-width:1180px;margin:auto;padding:0 clamp(16px,3vw,38px)}header{padding-top:22px}nav{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;padding-bottom:14px;border-bottom:1px solid var(--line)}nav a{display:inline-block;text-decoration:none;border-radius:6px;padding:5px 9px;color:var(--muted);font-size:.92rem}nav a:first-child{color:var(--text);font-weight:650}nav a[aria-current]{background:var(--accent);color:#10151b;font-weight:650}nav a:hover,.menu a:hover{background:#263442;color:#fff}h1,h2,h3,p{margin:0}h1{font-size:clamp(1.9rem,4vw,3rem);line-height:1.12;margin:25px 0 8px;letter-spacing:-.027em}h2{font-size:1.22rem}h3{font-size:1.12rem}.sub{font-size:1.08rem}.scope,.muted,footer{color:var(--muted)}.scope{font-size:.92rem;margin-top:3px}.layout{display:grid;grid-template-columns:minmax(210px,275px) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:start;margin:25px auto}.menu a{display:block;color:var(--text);text-decoration:none;line-height:1.35;padding:11px 12px;border:1px solid var(--line);border-radius:7px;margin-top:8px}.menu small{display:block;color:var(--muted);margin-bottom:3px}.menu a[aria-current]{border-color:var(--accent);background:#222c34}.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(14px,2.2vw,24px)}.setup{margin:6px 0 14px;color:var(--muted)}.map{list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 15px}.map li{padding:8px 9px;background:#10151b;border:1px solid var(--line);border-radius:6px;line-height:1.32}.map strong,.map small{display:block}.map small{margin-top:3px;color:var(--muted)}.map .active{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}.map .active strong,.state{color:var(--accent)}.state{font-size:.87rem;font-weight:650}.frame{border-top:1px solid var(--line);padding-top:13px;min-height:109px}.frame p{margin-top:4px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tools button{padding:6px 13px;color:var(--text);background:#28323e;border:1px solid var(--line);border-radius:6px}button.primary{background:var(--accent);color:#111820;font-weight:650}.tools button:disabled{opacity:.48;cursor:default}.check{border-top:1px solid var(--line);margin:17px 0 0;padding-top:13px}.check p{margin:4px 0}.check summary{color:var(--accent);font-weight:600}.refs{margin:17px 0 0}.refs ul{margin:5px 0 0;padding-left:20px}.refs a{font-size:.92rem}footer{padding-bottom:24px;font-size:.88rem}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:6px;background:#162532;padding:7px;z-index:9}[hidden]{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.menu h2{grid-column:1/-1}.menu a{margin:0;font-size:.93rem}.map{grid-template-columns:repeat(2,minmax(0,1fr))}.frame{min-height:0}}@media(max-width:390px){.map{grid-template-columns:1fr 1fr}.menu a{padding:8px}.tools button{padding:6px 11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">11g Architecture home</a>
+<a href="./rac.html">RAC</a>
+<a href="./dataguard.html">Data Guard</a>
+<a href="./rac-dataguard.html">RAC + Data Guard</a>
+<a href="./goldengate.html" aria-current="page">GoldenGate</a>
+<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · One-way replication · Trainer v1</p></header>
+<main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#trace-a-commit" data-lesson="trace-a-commit"><small>Basic</small>Follow a committed row</a>
+<a href="#network-interruption" data-lesson="network-interruption"><small>Intermediate</small>Resume after a network interruption</a>
+<a href="#replicat-recovery" data-lesson="replicat-recovery"><small>Advanced</small>Recover a stopped Replicat</a>
+<a href="#isolate-lag" data-lesson="isolate-lag"><small>Ultra-advanced</small>Find where lag accumulated</a>
+<a href="#gg-startup" data-lesson="gg-startup"><small>Basic</small>Start a classic GoldenGate replication path</a>
+<a href="#gg-graceful-shutdown" data-lesson="gg-graceful-shutdown"><small>Intermediate</small>Drain and gracefully stop GoldenGate</a>
+<a href="#gg-patching" data-lesson="gg-patching"><small>Advanced</small>Patch GoldenGate and validate delivery</a></aside><section id="demo" class="box" aria-label="Manual demo" tabindex="-1"><h2 id="flow-title"></h2><p class="setup" id="setup"></p><h3>Architecture</h3><p class="muted">Source redo → Extract → local trail → pump → Collector → remote trail → Replicat → target rows.</p><ul class="map" id="architecture" aria-label="Components highlighted in the current step"><li data-node="manager"><strong>Managers</strong><small>Manage classic groups on each installation</small></li><li data-node="source"><strong>Source 11g database</strong><small>Redo records for changes to mapped tables</small></li>
+<li data-node="extract"><strong>Primary Extract</strong><small>Captures changes and tracks transaction boundaries</small></li>
+<li data-node="trail"><strong>Local trail</strong><small>Durable capture output on the source host</small></li>
+<li data-node="pump"><strong>Data pump</strong><small>Reads the local trail and sends records</small></li>
+<li data-node="collector"><strong>Target Collector</strong><small>Receives records and writes the remote trail</small></li>
+<li data-node="remote"><strong>Remote trail</strong><small>Ordered input for target delivery</small></li>
+<li data-node="replicat"><strong>Replicat</strong><small>Maps and applies trail transactions</small></li>
+<li data-node="target"><strong>Target database</strong><small>Commits applied changes and checkpoints</small></li></ul><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools"><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related 11g Architecture home workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"network-interruption":[["connection-failure-rca","Distinguish a broken pump-to-target trail connection from an application login failure."]],"trace-a-commit":[["insert-commit","Follow a committed source row through capture, trail and target apply."],["update-commit","Trace committed DML into the trail and then into a target transaction."],["commit-durability","Distinguish source commit success from later completion of target apply."]],"gg-startup":[["instance-startup","After the database is ready, start capture, pump and apply from their known positions."]],"gg-graceful-shutdown":[["shutdown-normal","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-transactional","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-immediate","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."]],"replicat-recovery":[["shutdown-abort","Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."],["crash-recovery","Separate the target database's crash recovery from restart of the trail consumer."]],"isolate-lag":[["redo-commit-latency","Separate source commit latency from time subsequently spent in capture, pump or apply."],["performance-incident-rca","Compare positions over time to find the pipeline stage accumulating delay."]],"gg-patching":[["patch-quarterly-psu-spu","Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."],["patch-one-off","Check capture and apply compatibility for the exact interim database or GoldenGate patch."],["patch-rollback","Check process compatibility and resume only from verified checkpoints after maintenance."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main>
+<footer><p>Related 11g Architecture lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to 11g Architecture home</a></footer>
+<script type="application/json" id="lesson-data">{
+  "flows": [
+    [
+      "trace-a-commit",
+      "Basic",
+      "Follow a committed row",
+      "The source and reporting target start with the same ORDERS row. Supplemental logging and mapping are in place. The target has a Replicat checkpoint table.",
+      [
+        [
+          "source",
+          "A transaction changes the order",
+          "A session updates order 420 and commits. The source database records the change and commit in its redo."
+        ],
+        [
+          "extract",
+          "Extract recognizes the commit",
+          "Classic Extract reads redo for the mapped table, retains transaction context and sends the committed change to its trail."
+        ],
+        [
+          "trail",
+          "The local trail holds the change",
+          "The captured record is available on disk even if the network or Replicat briefly falls behind."
+        ],
+        [
+          "pump",
+          "The data pump forwards the record",
+          "The secondary Extract reads the local trail and sends the change to the target host."
+        ],
+        [
+          "collector",
+          "Collector receives the stream",
+          "The target Collector writes the arriving records to the remote trail."
+        ],
+        [
+          "replicat",
+          "Replicat maps the change",
+          "Replicat reads the remote trail and applies the mapped update on the reporting database."
+        ],
+        [
+          "target",
+          "The reporting row becomes visible",
+          "Once Replicat commits, a fresh query on the target sees the new value. The original source commit and this target commit happened at different times."
+        ]
+      ],
+      "What does a successful source COMMIT tell you about the reporting copy?",
+      "It establishes the source transaction outcome. To establish delivery, check Replicat progress and verify the committed value on the target.",
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      "network-interruption",
+      "Intermediate",
+      "Resume after a network interruption",
+      "The pump loses its connection. Extract is healthy and the local trail has enough free space. Replicat can consume any data already received.",
+      [
+        [
+          "trail",
+          "Capture continues locally",
+          "The local trail advances while the pump cannot deliver. Compare the local trail growth against its available space."
+        ],
+        [
+          "remote",
+          "The target drains its backlog",
+          "Replicat can consume existing records in the remote trail. Once exhausted, it waits for new input."
+        ],
+        [
+          "pump",
+          "The pump reconnects",
+          "With connectivity restored and the required files retained, the pump resumes from its recorded trail position."
+        ],
+        [
+          "collector",
+          "Delivery resumes",
+          "New records reach the remote trail. Observe its write position advance again."
+        ],
+        [
+          "target",
+          "Verify the catch-up",
+          "Follow the delayed test order into the target and compare its value with the source. Check that the backlog is shrinking."
+        ]
+      ],
+      "Why can capture continue even while the remote trail stops growing?",
+      "Primary Extract writes locally. The pump can resume delivery from the retained local trail after the connection returns.",
+      [
+        0,
+        2
+      ]
+    ],
+    [
+      "replicat-recovery",
+      "Advanced",
+      "Recover a stopped Replicat",
+      "A mapped UPDATE cannot find its expected target row. In this simulation the configured error behavior stops Replicat, while capture and transport continue.",
+      [
+        [
+          "remote",
+          "Locate the accumulated records",
+          "The remote trail keeps advancing after delivery stops. Record the last Replicat checkpoint and compare its progression across samples."
+        ],
+        [
+          "replicat",
+          "Identify the failing operation",
+          "Inspect the process report and database error. Match the reported table, key and operation with the expected source and target state."
+        ],
+        [
+          "target",
+          "Reconcile the affected data",
+          "The DBA corrects the simulated target baseline to the state expected immediately before the failing operation. Validate the repair against the source change history."
+        ],
+        [
+          "replicat",
+          "Resume from the checkpoint",
+          "Replicat resumes normal recovery from its saved position. Observe it commit the repaired transaction and advance its checkpoint."
+        ],
+        [
+          "target",
+          "Verify row outcomes",
+          "Compare the affected key and its values, then follow a later committed change. Delivery progress and row validation answer different questions."
+        ]
+      ],
+      "Why would advancing past the failed record leave an open correctness question?",
+      "Skipping the update could leave the target divergent. Establish the cause, reconcile the row, and verify the transaction outcome.",
+      [
+        0,
+        2,
+        3
+      ]
+    ],
+    [
+      "isolate-lag",
+      "Ultra-advanced",
+      "Find where lag accumulated",
+      "A reporting user sees an old order. New source transactions are arriving regularly. Use successive observations at the same stage to locate the delay.",
+      [
+        [
+          "extract",
+          "Check capture progress",
+          "Extract moves forward through source redo, and new records appear in the local trail throughout the sample window."
+        ],
+        [
+          "pump",
+          "Check transport independently",
+          "The pump reads newer local trail positions. On the target, the remote trail receives newer transactions during the same interval."
+        ],
+        [
+          "replicat",
+          "Find the stalled stage",
+          "Replicat stays on the same transaction in successive samples. The accompanying database wait sample shows its target session waiting on a row lock."
+        ],
+        [
+          "target",
+          "Test the diagnosis",
+          "The blocking transaction ends in the simulation. Replicat commits, its checkpoint advances, and the delayed order appears."
+        ]
+      ],
+      "Which observation distinguishes slow apply from a transport outage?",
+      "Fresh transactions are arriving in the remote trail while Replicat is stalled on its target operation. Compare positions over time within each stream and correlate with the target session.",
+      [
+        2,
+        3
+      ]
+    ],
+    [
+      "gg-startup",
+      "Basic",
+      "Start a classic GoldenGate replication path",
+      "Both Oracle databases are available. The source and target have consistent starting data, configured groups, retained trails and known checkpoints. This is a restart of an existing one-way deployment.",
+      [
+        [
+          "source",
+          "Verify the database prerequisites",
+          "Confirm the source database is open, the target accepts Replicat connections and the required redo and trail files still cover the saved checkpoints. Check the paths and mappings for this deployment."
+        ],
+        [
+          "manager",
+          "Start Manager at each installation",
+          "Start the configured source and target Managers. Verify their status separately. The target Manager can launch a dynamic Collector when the pump connects."
+        ],
+        [
+          "extract",
+          "Resume capture from its checkpoint",
+          "Start the primary Extract if its configured automatic startup has not already done so. Check its report, read checkpoint and local trail output."
+        ],
+        [
+          "pump",
+          "Resume forwarding",
+          "Start or verify the pump. Track its local-trail read checkpoint and confirm incoming writes to the target's remote trail."
+        ],
+        [
+          "replicat",
+          "Resume delivery",
+          "Start or verify Replicat and confirm it reads the intended remote trail from its saved checkpoint. Record its status and any report errors."
+        ],
+        [
+          "target",
+          "Verify a new committed change",
+          "Commit a unique test marker on a mapped source row. Verify the expected target value, advancing checkpoints and acceptable lag before handing back the replication service."
+        ]
+      ],
+      "Every group reports RUNNING but the test marker exists only on the source. Can delivery be declared ready?",
+      "Keep the release open. Trace the marker or checkpoint progression through capture, local trail, pump, remote trail and Replicat, then verify the target commit.",
+      [
+        0,
+        1,
+        3
+      ]
+    ],
+    [
+      "gg-graceful-shutdown",
+      "Intermediate",
+      "Drain and gracefully stop GoldenGate",
+      "A planned outage covers one classic capture group, one pump and one Replicat. Mapped writes can be paused. One marker transaction is the final intended business change.",
+      [
+        [
+          "source",
+          "Establish a finish line",
+          "Pause new mapped DML and DDL, settle open transactions, commit the final marker and record its identity. Keep the databases available while replication drains."
+        ],
+        [
+          "extract",
+          "Finish capture",
+          "Wait until primary Extract reports that it has reached the end of the source log for this workload. Record its checkpoint and stop this group normally."
+        ],
+        [
+          "pump",
+          "Drain the final local trail records",
+          "Confirm the pump has reached the final local trail position after capture stopped. Record the pump checkpoint, then stop the pump normally."
+        ],
+        [
+          "replicat",
+          "Finish the target trail",
+          "Wait until Replicat reports end-of-file on the now-stable remote trail. Verify the final marker in the target and stop Replicat normally."
+        ],
+        [
+          "manager",
+          "Stop Manager and preserve restart evidence",
+          "After the groups have stopped, stop both Managers if their installations are in the outage scope. Save group status and checkpoints and retain all trails required for restart."
+        ]
+      ],
+      "Replicat briefly showed end-of-file while the pump was still delivering. Is that sufficient to stop the target?",
+      "Wait for the final source commit to be captured, the pump to drain and the remote trail to stop changing. Verify both final Replicat progress and the committed marker on the target.",
+      [
+        0,
+        3,
+        4
+      ]
+    ],
+    [
+      "gg-patching",
+      "Advanced",
+      "Patch GoldenGate and validate delivery",
+      "A historical patch applies to the identified GoldenGate 11.2.1 classic installation on each host. This example has a coordinated outage and no DDL replication. The package README defines the installation and rollback procedure.",
+      [
+        [
+          "manager",
+          "Select the GoldenGate patch",
+          "Record source and target GoldenGate builds, OS, database versions, group modes and trail format. Confirm the patch applies to those GoldenGate installations and verify cross-version trail compatibility if their builds can differ."
+        ],
+        [
+          "source",
+          "Quiesce and drain",
+          "Rehearse the recovery path. Pause mapped changes, finish the controlled marker transaction and drain capture, pump and delivery. Verify the marker at the target and retain the restart positions."
+        ],
+        [
+          "manager",
+          "Protect the installation and apply",
+          "Stop the affected groups and Managers cleanly. Preserve the pre-change installation, configuration, checkpoints and required trails. Install the selected patch in the named GoldenGate directory using its own instructions."
+        ],
+        [
+          "extract",
+          "Verify the running builds",
+          "Restart Managers and groups from their saved checkpoints in the documented sequence. Verify process versions and reports on both hosts. Confirm the expected trail format, checkpoint progress and absence of new errors."
+        ],
+        [
+          "target",
+          "Make the release decision",
+          "Submit a new mapped marker. Compare the final target row and check that capture, transport and apply advance. If validation fails, keep changes controlled and use the documented rollback and data reconciliation plan."
+        ]
+      ],
+      "The patched Manager reports the new build but Replicat stops on the trail. Has the patch succeeded end to end?",
+      "No. Inspect the Replicat report and trail compatibility, retain the relevant checkpoints and trails, and verify a fresh marker is applied before opening normal traffic.",
+      [
+        0,
+        2,
+        4
+      ]
+    ]
+  ],
+  "sources": [
+    [
+      "GoldenGate architecture and checkpoints",
+      "https://docs.oracle.com/cd/E35209_01/doc.1121/e29397.pdf"
+    ],
+    [
+      "Oracle Database capture setup",
+      "https://docs.oracle.com/cd/E35209_01/doc.1121/e35957.pdf"
+    ],
+    [
+      "Troubleshooting and tuning",
+      "https://docs.oracle.com/cd/E35209_01/doc.1121/e35180.pdf"
+    ],
+    [
+      "GGSCI and parameter reference",
+      "https://docs.oracle.com/cd/E35209_01/doc.1121/e29399.pdf"
+    ],
+    [
+      "GoldenGate 11.2.1 upgrade and maintenance sequencing",
+      "https://docs.oracle.com/cd/E35209_01/doc.1121/e36359.pdf"
+    ]
+  ]
+}</script>
+<script>
+const {flows,sources}=JSON.parse(document.getElementById('lesson-data').textContent);
+const get=id=>document.getElementById(id);
+const links=Array.from(document.querySelectorAll('[data-lesson]'));
+const components=Array.from(document.querySelectorAll('[data-node]'));
+let current=flows[0];
+let frame=0;
+function displayStep(){
+  const [node,title,explanation]=current[4][frame];
+  for(const component of components){
+    const active=component.dataset.node===node;
+    component.classList.toggle('active',active);
+    if(active) component.setAttribute('aria-current','step');
+    else component.removeAttribute('aria-current');
+  }
+  get('progress').textContent='Step '+(frame+1)+' of '+current[4].length;
+  get('step-title').textContent=title;
+  get('explain').textContent=explanation;
+  get('previous').disabled=frame===0;
+  get('reset').disabled=frame===0;
+  const end=frame===current[4].length-1;
+  get('next').disabled=end;
+  get('checkpoint').hidden=!end;
+  if(!end) get('answer').open=false;
+}
+function selectLesson(){
+  const id=location.hash.slice(1);
+  current=flows.find(f=>f[0]===id)||flows[0];
+  frame=0;
+  for(const link of links){
+    if(link.dataset.lesson===current[0]) link.setAttribute('aria-current','true');
+    else link.removeAttribute('aria-current');
+  }
+  get('flow-title').textContent=current[2];
+  get('setup').textContent=current[3];
+  get('question').textContent=current[5];
+  get('answer').querySelector('p').textContent=current[6];
+  get('answer').open=false;
+  const items=current[7].map(i=>{
+    const [label,url]=sources[i];
+    const anchor=document.createElement('a');
+    anchor.href=url;anchor.textContent=label;
+    const item=document.createElement('li'); item.append(anchor); return item;
+  });
+  get('refs').replaceChildren(...items);
+  displayStep();
+}
+for(const link of links) link.addEventListener('click',()=>{if(link.hash===location.hash) selectLesson();});
+window.addEventListener('hashchange',()=>{if(location.hash!=='#demo') selectLesson();});
+get('previous').addEventListener('click',()=>{if(frame>0){frame--;displayStep();}});
+get('next').addEventListener('click',()=>{if(frame<current[4].length-1){frame++;displayStep();}});
+get('reset').addEventListener('click',()=>{frame=0;displayStep();});
+selectLesson();
+</script>
+</body>
+</html>

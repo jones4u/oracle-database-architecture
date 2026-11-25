@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v1 | Updated : 25-Nov-2026">
+  <title>Real Application Clusters · Oracle 11g R2 Architecture</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
+    a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
+    @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+  </style>
+</head>
+<body>
+  <a class="sr" href="#lesson">Skip to lesson</a>
+  <header><nav aria-label="Tower navigation"><a href="./index.html">11g Architecture home</a> <a href="./rac.html" aria-current="page">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>Real Application Clusters</h1><p>Follow a client connection, a cached block, and a service across a two-node Oracle RAC database.</p><p class="ver">Oracle Database 11g Release 2 · Tower v1</p></header>
+  <main><div class="layout"><section id="lesson" class="panel"><label for="workflow">Workflow</label><select id="workflow"><option value="rac-1">Locate two instances and one database</option><option value="rac-2">Follow the Grid Infrastructure dependencies</option><option value="rac-3">Follow a data-file read through an ASM disk group</option><option value="rac-4">Advertise a database service to the listeners</option><option value="rac-5">Trace a client login through SCAN</option><option value="rac-6">Identify which listener a failed login reached</option><option value="rac-7">Retrieve a remote consistent-read block</option><option value="rac-8">Recover after one database instance fails</option><option value="rac-9">Diagnose a hot block across instances</option><option value="startup">Startup sequence · bring a two-node RAC service online</option><option value="graceful-shutdown">Graceful shutdown · one instance or the whole RAC database</option><option value="patching">Patching · decide whether two RAC homes can roll</option></select>
+    <p><a id="foundation" href="./index.html">11g home foundation</a></p><p id="level" class="level"></p><h2 id="title"></h2><p id="setup"></p>
+    <h3 id="progress"></h3><p id="step" class="step" aria-live="polite"></p>
+    <p id="focus" class="focus"></p><div class="actions"><button id="prev" type="button">Previous</button><button id="next" class="next" type="button">Next step</button></div>
+    <h3>Correctness check</h3><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details>
+  </section><section class="panel" aria-label="Architecture"><h2>Architecture</h2><p class="note">Highlighted components take part in this step. Select any component to find its workflows.</p><section><h3>Clients and public network</h3><div class="actors"><button type="button" class="actor" data-actor="client" aria-pressed="false">Client</button><button type="button" class="actor" data-actor="scan" aria-pressed="false">SCAN listener</button><button type="button" class="actor" data-actor="node" aria-pressed="false">Node listener</button><button type="button" class="actor" data-actor="service" aria-pressed="false">SALES_APP service</button></div></section><section><h3>Cluster and database instances</h3><div class="actors"><button type="button" class="actor" data-actor="i1" aria-pressed="false">SALES1 / cache</button><button type="button" class="actor" data-actor="i2" aria-pressed="false">SALES2 / cache</button><button type="button" class="actor" data-actor="pmon" aria-pressed="false">PMON registration</button><button type="button" class="actor" data-actor="gcs" aria-pressed="false">GCS / LMS</button><button type="button" class="actor" data-actor="net" aria-pressed="false">Private interconnect</button></div></section><section><h3>Grid Infrastructure and storage</h3><div class="actors"><button type="button" class="actor" data-actor="gi" aria-pressed="false">OHASD / CSSD / CRSD</button><button type="button" class="actor" data-actor="ocr" aria-pressed="false">OCR / voting files</button><button type="button" class="actor" data-actor="asm" aria-pressed="false">ASM / +DATA</button><button type="button" class="actor" data-actor="disk" aria-pressed="false">Shared database files</button></div></section><p class="status" id="inspect" aria-live="polite"></p></section></div>
+  <div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Continue with <a href="./rac-dataguard.html#both-6">a RAC instance, transport link or site outage</a>.</p><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related 11g Architecture home workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"rac-5":[["user-login","Follow the SCAN redirect, local listener handoff and established dedicated session."],["dedicated-server-session","The node listener hands the client to a dedicated server on the selected instance."],["select-first-execution","Trace the first login and SQL handoff. The selected instance performs a first hard parse locally."]],"rac-6":[["connection-failure-rca","Use the redirect and node listener state to identify which connection leg failed."]],"rac-7":[["select-cache-hit","Compare a local hit with a local miss that can be served by a peer cache."],["select-cache-miss","Compare a peer-cache block transfer with a global grant followed by a shared-storage read."],["read-consistency","Trace the transfer of a suitable consistent-read image from a peer's cache."],["single-block-read-diagnosis","Separate actual shared-disk I/O from a peer-cache block transfer."]],"rac-9":[["update-commit","Repeated updates to rows in a shared hot block make current-block transfers visible."],["buffer-contention","Correlate a repeatedly modified block with inter-instance transfers, waits and workload placement."],["performance-incident-rca","Correlate workload, repeated block identity and global cache waits to diagnose one RAC-specific incident."]],"rac-8":[["rollback-flow","Observe undo of incomplete work when a RAC instance fails and its client reconnects."],["shutdown-abort","Observe the impact of losing one instance while a peer survives; recover incomplete transactions."],["crash-recovery","A surviving instance recovers the failed instance’s redo thread and rolls back incomplete work."]],"startup":[["instance-startup","Bring cluster resources and local instances online according to configured dependencies."],["startup-file-failure-rca","Locate an unavailable dependent resource such as an ASM disk group before diagnosing the database startup stage."]],"graceful-shutdown":[["shutdown-normal","Wait for or drain user sessions on the intended RAC instance, then verify service placement on its peers."],["shutdown-transactional","Trace the last transaction on the selected instance as the clustered service drains."],["shutdown-immediate","Drain or relocate cluster-managed services and distinguish stopping one instance from stopping the database."]],"patching":[["patch-quarterly-psu-spu","Check both node homes, service placement and whether the exact patch supports rolling application."],["patch-one-off","Determine cluster eligibility and one-off conflicts separately for each affected home."],["patch-set-upgrade","A patch set is an upgrade. Use release-specific RAC and Grid upgrade sequencing before any node changes."],["patch-rollback","Coordinate rollback eligibility and verification by home and node according to the specific README."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main><footer><a href="./index.html">Return to 11g Architecture home</a></footer>
+  <script type="application/json" id="data">[
+  {
+    "id": "rac-1",
+    "title": "Locate two instances and one database",
+    "level": "Basic",
+    "setup": "Two instances named SALES1 and SALES2 open the same RAC database on shared storage.",
+    "steps": [
+      "Select SALES1 and identify its SGA, buffer cache and background processes.",
+      "Switch to SALES2 and locate its separate memory, redo thread and undo tablespace.",
+      "Trace both instances to the same shared data files and control files."
+    ],
+    "actors": [
+      [
+        "i1"
+      ],
+      [
+        "i2"
+      ],
+      [
+        "i1",
+        "i2",
+        "disk"
+      ]
+    ],
+    "question": "Which components belong to an instance when both instances open SALES?",
+    "answer": "Each instance has its own memory and processes, uses a distinct redo thread, and uses its own undo tablespace. Both instances access the files of the same database.",
+    "refs": [
+      [
+        "RAC architecture and processing",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admcon.htm"
+      ]
+    ],
+    "home": "user-login"
+  },
+  {
+    "id": "rac-2",
+    "title": "Follow the Grid Infrastructure dependencies",
+    "level": "Basic",
+    "setup": "The example uses two Linux nodes, Oracle Clusterware, and storage managed by ASM.",
+    "steps": [
+      "Locate the Grid home for Clusterware and ASM and the separate database home on each node.",
+      "Follow OHASD at the base of the local stack and CSSD as it establishes cluster membership.",
+      "Select a voting file to inspect membership information, then open OCR to see the resource configuration.",
+      "Follow CRSD and its agents as they bring a service online once its required database instance is available."
+    ],
+    "actors": [
+      [
+        "gi",
+        "asm"
+      ],
+      [
+        "gi"
+      ],
+      [
+        "gi",
+        "ocr"
+      ],
+      [
+        "gi",
+        "service"
+      ]
+    ],
+    "question": "Where would you look for a resource definition and where would you look for membership information?",
+    "answer": "OCR stores cluster resource configuration. Voting files hold cluster membership information used by Cluster Synchronization Services. Resource dependencies determine when a service can start.",
+    "refs": [
+      [
+        "Oracle Clusterware architecture",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41959/intro.htm"
+      ],
+      [
+        "ASM architecture",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e18951/asmcon.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "rac-3",
+    "title": "Follow a data-file read through an ASM disk group",
+    "level": "Intermediate",
+    "setup": "A shared data file is in the +DATA disk group. The required block is absent from both database buffer caches.",
+    "steps": [
+      "Select the local ASM instance and inspect the mounted +DATA disk group.",
+      "Follow the file-open request as ASM supplies file extent information to the database instance.",
+      "After receiving the global grant, follow the database read directly from shared storage into its buffer cache."
+    ],
+    "actors": [
+      [
+        "asm"
+      ],
+      [
+        "asm",
+        "i1"
+      ],
+      [
+        "gcs",
+        "disk",
+        "i1"
+      ]
+    ],
+    "question": "Which instance supplies the file layout, and which instance reads the data block?",
+    "answer": "ASM manages the disk group and supplies file layout metadata. The database instance uses that information to issue the data-file read.",
+    "refs": [
+      [
+        "ASM architecture",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e18951/asmcon.htm"
+      ],
+      [
+        "Monitoring RAC performance",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/monitor.htm"
+      ]
+    ],
+    "home": "select-cache-miss"
+  },
+  {
+    "id": "rac-4",
+    "title": "Advertise a database service to the listeners",
+    "level": "Intermediate",
+    "setup": "An application service named SALES_APP is running on both instances before any client connects.",
+    "steps": [
+      "Select PMON on SALES1 and watch it register the service and instance with its node listener.",
+      "Follow remote registration to the SCAN listeners identified by REMOTE_LISTENER.",
+      "Repeat on SALES2 and inspect the registered handlers for SALES_APP."
+    ],
+    "actors": [
+      [
+        "i1",
+        "pmon",
+        "node"
+      ],
+      [
+        "pmon",
+        "scan"
+      ],
+      [
+        "i2",
+        "pmon",
+        "service"
+      ]
+    ],
+    "question": "What makes the SCAN listeners aware that both instances offer this service?",
+    "answer": "In Oracle Database 11g Release 2, each instance's PMON registers its services with the local listener and SCAN listeners and supplies load information. Registration happens independently of an individual client connection.",
+    "refs": [
+      [
+        "RAC network and service registration",
+        "https://docs.oracle.com/cd/E11882_01/install.112/e48195/undrstnd.htm"
+      ]
+    ],
+    "home": "user-login"
+  },
+  {
+    "id": "rac-5",
+    "title": "Trace a client login through SCAN",
+    "level": "Intermediate",
+    "setup": "A dedicated-server client requests SALES_APP. Node 2 is the preferred destination in this example.",
+    "steps": [
+      "Resolve the SCAN name and follow the connection to a SCAN listener on the public network.",
+      "Read the redirect containing the address of the local listener on node 2.",
+      "Follow the client's new connection to the node listener and its handoff to the dedicated server.",
+      "Send a SELECT and follow the established session to its database server process."
+    ],
+    "actors": [
+      [
+        "client",
+        "scan"
+      ],
+      [
+        "scan",
+        "node"
+      ],
+      [
+        "client",
+        "node",
+        "i2"
+      ],
+      [
+        "client",
+        "i2"
+      ]
+    ],
+    "question": "Does the SCAN listener carry the SQL traffic after login?",
+    "answer": "The SCAN listener provides a redirect. The client establishes its session through the node listener, then exchanges SQL traffic with the database server process.",
+    "refs": [
+      [
+        "RAC network and service registration",
+        "https://docs.oracle.com/cd/E11882_01/install.112/e48195/undrstnd.htm"
+      ]
+    ],
+    "home": "dedicated-server-session"
+  },
+  {
+    "id": "rac-6",
+    "title": "Identify which listener a failed login reached",
+    "level": "Advanced",
+    "setup": "A new login reaches a SCAN listener but fails after its redirect. An established dedicated session on the same database is still processing SQL.",
+    "steps": [
+      "Read the simulated connection trace. Name resolution succeeded and the SCAN listener returned the address of a node listener.",
+      "Compare the simulated output of srvctl status scan_listener and srvctl status listener. Select the node listener named in the redirect.",
+      "Match the Grid-managed listener resource to its listener process and endpoint. The node listener in this run is offline.",
+      "Replay with the node listener available and the service registered. Watch a fresh connection complete its handoff."
+    ],
+    "actors": [
+      [
+        "client",
+        "scan",
+        "node"
+      ],
+      [
+        "gi",
+        "scan",
+        "node"
+      ],
+      [
+        "node"
+      ],
+      [
+        "client",
+        "node",
+        "i2"
+      ]
+    ],
+    "question": "Which observation narrows the fault to the second connection?",
+    "answer": "A redirect proves the first listener answered. The second endpoint and its resource state explain this example. A working established session confirms that SQL can still reach an existing server process.",
+    "refs": [
+      [
+        "RAC network and service registration",
+        "https://docs.oracle.com/cd/E11882_01/install.112/e48195/undrstnd.htm"
+      ],
+      [
+        "Oracle RAC administration and SRVCTL reference",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960.pdf"
+      ]
+    ],
+    "home": "connection-failure-rca"
+  },
+  {
+    "id": "rac-7",
+    "title": "Retrieve a remote consistent-read block",
+    "level": "Advanced",
+    "setup": "SALES1 needs a block absent from its buffer cache. SALES2 holds a suitable consistent-read image.",
+    "steps": [
+      "Start the query on SALES1 and watch the local lookup miss.",
+      "Follow the global cache request as GCS coordinates access and LMS on SALES2 sends the block across the private interconnect.",
+      "Place the block in SALES1's buffer cache and return the requested rows.",
+      "Replay with both caches empty and watch a global grant permit a shared-storage read."
+    ],
+    "actors": [
+      [
+        "i1"
+      ],
+      [
+        "gcs",
+        "i2",
+        "net"
+      ],
+      [
+        "i1",
+        "client"
+      ],
+      [
+        "gcs",
+        "disk",
+        "i1"
+      ]
+    ],
+    "question": "What changed between the two runs after the local lookup missed?",
+    "answer": "The first run obtained a block image from the peer cache. In the second run, a grant allowed SALES1 to read from shared storage.",
+    "refs": [
+      [
+        "RAC architecture and processing",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admcon.htm"
+      ],
+      [
+        "Monitoring RAC performance",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/monitor.htm"
+      ]
+    ],
+    "home": "read-consistency"
+  },
+  {
+    "id": "rac-8",
+    "title": "Recover after one database instance fails",
+    "level": "Advanced",
+    "setup": "SALES1 fails with uncommitted work. Its host remains online, SALES2 is available, and the service is configured to run on SALES2.",
+    "steps": [
+      "Observe the loss of the SALES1 session and inspect the healthy host and surviving instance.",
+      "Follow recovery of the failed instance's redo thread and the undo of uncommitted work.",
+      "Reconnect the client to the service on SALES2 and inspect the last committed state."
+    ],
+    "actors": [
+      [
+        "i1",
+        "i2"
+      ],
+      [
+        "i2",
+        "disk"
+      ],
+      [
+        "client",
+        "service",
+        "i2"
+      ]
+    ],
+    "question": "What happens to an uncommitted update when the client reconnects?",
+    "answer": "The uncommitted change is rolled back. A new connection can use the surviving service. A failed database instance and a lost cluster node are different failure cases.",
+    "refs": [
+      [
+        "Database instance and recovery",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40540/startup.htm"
+      ],
+      [
+        "Oracle Net advanced features",
+        "https://docs.oracle.com/cd/E11882_01/network.112/e41945/advcfg.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "rac-9",
+    "title": "Diagnose a hot block across instances",
+    "level": "Ultra-advanced",
+    "setup": "Sessions on SALES1 and SALES2 repeatedly modify different rows in the same block. The simulated wait samples identify the same file and block.",
+    "steps": [
+      "Compare the repeated transfer of the current block between the two buffer caches.",
+      "Inspect a completed gc current block 2-way transfer and a gc current block busy sample with delayed delivery.",
+      "Correlate file and block identifiers, SQL access patterns and measured wait time before attributing the delay to the network.",
+      "Replay with the writes directed to one instance and compare transfer counts and session response times."
+    ],
+    "actors": [
+      [
+        "i1",
+        "net",
+        "i2"
+      ],
+      [
+        "gcs",
+        "net"
+      ],
+      [
+        "gcs",
+        "i1",
+        "i2"
+      ],
+      [
+        "i1"
+      ]
+    ],
+    "question": "What evidence supports cross-instance contention for this block?",
+    "answer": "Repeated access to the same block from both instances, delayed current-block transfers and shorter waits after concentrating the writes support the diagnosis. A normal two-way transfer alone does not establish a performance problem.",
+    "refs": [
+      [
+        "Monitoring RAC performance",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/monitor.htm"
+      ],
+      [
+        "RAC architecture and processing",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admcon.htm"
+      ]
+    ],
+    "home": "buffer-contention"
+  },
+  {
+    "id": "startup",
+    "title": "Startup sequence · bring a two-node RAC service online",
+    "level": "Basic",
+    "setup": "Both nodes were cleanly stopped. This administrator-managed example uses Grid Infrastructure, ASM and a service configured on both instances.",
+    "steps": [
+      "Trace the two Grid stacks establishing membership and obtaining cluster resource configuration. Check voting-file access and the configured dependencies.",
+      "Bring up the local ASM instances and mount the required disk groups. Verify the shared database files are accessible to both nodes.",
+      "Follow each instance from NOMOUNT to MOUNT to OPEN through its managed database resource. Each has its own memory and redo thread.",
+      "Check service placement, local and SCAN listener registration, then open a new session by service name and identify its instance."
+    ],
+    "actors": [
+      [
+        "gi",
+        "ocr"
+      ],
+      [
+        "gi",
+        "asm",
+        "disk"
+      ],
+      [
+        "i1",
+        "i2",
+        "disk"
+      ],
+      [
+        "pmon",
+        "scan",
+        "node",
+        "service"
+      ]
+    ],
+    "question": "Which observation verifies the service from a learner’s perspective?",
+    "options": [
+      "Both operating systems answer ping",
+      "The intended service accepts a connection on an eligible open instance",
+      "A single SCAN VIP exists"
+    ],
+    "correct": 1,
+    "answer": "Resource states and instance open modes explain readiness. A new connection through the intended service tests the entire client path.",
+    "refs": [
+      [
+        "Managing RAC instances and services",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admin.htm"
+      ],
+      [
+        "11gR2 Server Control reference",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/srvctladmin.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "graceful-shutdown",
+    "title": "Graceful shutdown · one instance or the whole RAC database",
+    "level": "Intermediate",
+    "setup": "SALES1 and SALES2 are open. The application service can run on SALES2. Compare node maintenance with a whole-database outage.",
+    "steps": [
+      "For one-node maintenance, move or stop the service according to its placement policy. Give the application a chance to finish work or reconnect. Existing sessions need their own draining or reconnect plan.",
+      "Stop SALES1 with the approved consistent shutdown mode. In this IMMEDIATE example active work rolls back and the local instance closes and dismounts.",
+      "Check that SALES1 is down, SALES2 remains open and a fresh service connection reaches SALES2. Its separate redo thread continues.",
+      "Replay for a complete database shutdown. Stop application work, stop the database resource across all configured instances, and verify both instances stopped. Leave shared Grid resources running for unrelated databases."
+    ],
+    "actors": [
+      [
+        "service",
+        "client",
+        "i2"
+      ],
+      [
+        "i1",
+        "disk"
+      ],
+      [
+        "i2",
+        "service",
+        "client"
+      ],
+      [
+        "gi",
+        "i1",
+        "i2"
+      ]
+    ],
+    "question": "Which evidence proves the intended one-node maintenance outcome?",
+    "options": [
+      "Both instances and ASM are down",
+      "SALES1 is down and the service works on SALES2",
+      "Only the node listener is stopped"
+    ],
+    "correct": 1,
+    "answer": "The maintenance boundary is one instance. Check the targeted resource and verify the surviving application service.",
+    "refs": [
+      [
+        "Managing RAC instances and services",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admin.htm"
+      ],
+      [
+        "11gR2 Server Control reference",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/srvctladmin.htm"
+      ]
+    ],
+    "home": "shutdown-immediate"
+  },
+  {
+    "id": "patching",
+    "title": "Patching · decide whether two RAC homes can roll",
+    "level": "Advanced",
+    "setup": "Two RAC nodes have separately installed database homes. An 11g quarterly PSU or a one-off is being evaluated. The Grid home is a different target.",
+    "steps": [
+      "Identify the exact home, release, platform, inventory and conflicts on both nodes. Read the patch README for RAC rolling eligibility, home layout and database SQL steps. Resolve conflicts and prepare recovery before starting.",
+      "For a certified rolling patch with enough service capacity, move application work away from the first instance. Follow the README to stop the affected resources and patch that node’s home.",
+      "Restart and verify the first instance, binary inventory and a service test before repeating on the second node. If rolling is unsupported or homes are shared differently, take the documented coordinated outage path.",
+      "At the documented point complete any required SQL actions once per database as directed. Compare every home inventory, database-side results and both service paths. If verification fails, pause and use the supported rollback plan."
+    ],
+    "actors": [
+      [
+        "gi",
+        "i1",
+        "i2"
+      ],
+      [
+        "service",
+        "i2",
+        "i1"
+      ],
+      [
+        "i1",
+        "service",
+        "i2"
+      ],
+      [
+        "disk",
+        "i1",
+        "i2"
+      ]
+    ],
+    "question": "What permits this node-by-node procedure?",
+    "options": [
+      "Every quarterly patch is rolling",
+      "The other instance is open",
+      "The specific patch and home topology support rolling and the surviving services can carry the work"
+    ],
+    "correct": 2,
+    "answer": "Rolling support is a property of the patch and topology. A quarterly name or a healthy peer alone is insufficient.",
+    "refs": [
+      [
+        "Reducing downtime for planned maintenance",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/schedule_outage.htm"
+      ],
+      [
+        "Managing RAC instances and services",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admin.htm"
+      ]
+    ],
+    "home": "patch-quarterly-psu-spu"
+  }
+]</script>
+  <script>
+    const flows = JSON.parse(document.getElementById('data').textContent);
+    const select = document.getElementById('workflow');
+    const names = new Map([...document.querySelectorAll('.actor')].map(b => [b.dataset.actor, b.textContent]));
+    const el = id => document.getElementById(id);
+    let pos = 0;
+    function paint() {
+      const flow = flows[select.selectedIndex];
+      el('level').textContent = flow.level;
+      el('title').textContent = flow.title;
+      el('setup').textContent = flow.setup;
+      el('progress').textContent = 'Step ' + (pos + 1) + ' of ' + flow.steps.length;
+      el('step').textContent = flow.steps[pos];
+      el('focus').textContent = 'In focus · ' + flow.actors[pos].map(a => names.get(a)).join(' · ');
+      el('question').textContent = flow.question;
+      el('foundation').href = './index.html#lesson=' + flow.home;
+      el('foundation').textContent = 'Home lesson · ' + flow.home.split('-').join(' ');
+      el('verdict').textContent = '';
+      el('decision').replaceChildren(...(flow.options || []).map((label, i) => {
+        const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+        button.addEventListener('click', () => { el('verdict').textContent = (i === flow.correct ? 'Correct. ' : 'Try again. ') + flow.answer; });
+        return button;
+      }));
+      el('answer').querySelector('p').textContent = flow.answer;
+      el('prev').disabled = pos === 0;
+      el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      for (const b of document.querySelectorAll('.actor')) b.setAttribute('aria-pressed', String(flow.actors[pos].includes(b.dataset.actor)));
+      el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
+    }
+    function readRoute() {
+      const requested = location.hash.slice(1);
+      select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
+      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+    }
+    select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
+    window.addEventListener('hashchange', readRoute);
+    el('next').addEventListener('click', () => {pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {if(pos>0) pos--; el('answer').open=false;paint();});
+    for (const b of document.querySelectorAll('.actor')) b.addEventListener('click', () => {
+      const related=flows.filter(flow=>flow.actors.some(step=>step.includes(b.dataset.actor)));
+      el('inspect').textContent=b.textContent+' appears in '+related.map(flow=>flow.title).join(' · ')+'.';
+    });
+    readRoute();
+  </script>
+</body></html>

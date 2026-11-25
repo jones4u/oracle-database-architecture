@@ -1,6 +1,6 @@
 # Oracle Database 11g Architecture
 
-[Open the 11g Architecture home page](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/). Start here for single-instance lessons or choose a tower from the navigation. Each tower links back to the 11g Architecture home page.
+[Open the Stand-Alone DB page](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/). Start here for single-instance lessons or choose a tower from the navigation. Each tower links back to the Stand-Alone DB page.
 
 ## A first session
 
@@ -13,7 +13,7 @@ To explore a component on its own, use the diagram search. Search for **LGWR**, 
 ## Compare a workflow across technologies
 
 1. On the home page, expand **Compare a home workflow across the five towers** and choose any workflow. Each row explains whether the lesson carries over directly, changes with the topology, supplies background, or falls outside that tower’s lessons.
-2. Choose **Open lesson** in a matching row. For example, compare **INSERT + COMMIT** in a physical standby configuration with the committed transaction that GoldenGate captures and delivers to its target. On the tower page, expand **Related 11g Architecture home workflows** to return to a specific foundation lesson.
+2. Choose **Open lesson** in a matching row. For example, compare **INSERT + COMMIT** in a physical standby configuration with the committed transaction that GoldenGate captures and delivers to its target. On the tower page, expand **Related Stand-Alone DB workflows** to return to a specific foundation lesson.
 3. For operations, follow **Startup**, **Graceful shutdown**, and **Patching** in each tower. Use the starting conditions to identify which instance, site, product home, or service the maintenance affects. Answer the final checkpoint using the evidence from that topology.
 
 ## Practice database operations on the home page
@@ -26,7 +26,7 @@ To explore a component on its own, use the diagram search. Search for **LGWR**, 
 
 | Tower | Start with this question |
 |---|---|
-| [11g Architecture](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/) | How does a single instance open, execute work, commit, and close? |
+| [Stand-Alone DB](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/) | How does a single instance open, execute work, commit, and close? |
 | [RAC and Grid Infrastructure](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/rac.html) | How do two instances serve one database? |
 | [Data Guard](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/dataguard.html) | When has a standby received a change, and when has it applied it? |
 | [RAC + Data Guard](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/rac-dataguard.html) | Which failures can a cluster handle locally, and which can lead to a database role change? |

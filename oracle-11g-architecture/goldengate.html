@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="copyright" content="Designer : Cyril Jones S | Version : v1 | Updated : 25-Nov-2026">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
 <title>Oracle GoldenGate · Oracle 11g Architecture</title>
 <style>
 :root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#ffd166}
@@ -11,12 +11,12 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">11g Architecture home</a>
+<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a>
 <a href="./rac.html">RAC</a>
 <a href="./dataguard.html">Data Guard</a>
 <a href="./rac-dataguard.html">RAC + Data Guard</a>
 <a href="./goldengate.html" aria-current="page">GoldenGate</a>
-<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · One-way replication · Trainer v1</p></header>
+<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · One-way replication · Trainer v2</p></header>
 <main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#trace-a-commit" data-lesson="trace-a-commit"><small>Basic</small>Follow a committed row</a>
 <a href="#network-interruption" data-lesson="network-interruption"><small>Intermediate</small>Resume after a network interruption</a>
 <a href="#replicat-recovery" data-lesson="replicat-recovery"><small>Advanced</small>Recover a stopped Replicat</a>
@@ -31,7 +31,7 @@
 <li data-node="remote"><strong>Remote trail</strong><small>Ordered input for target delivery</small></li>
 <li data-node="replicat"><strong>Replicat</strong><small>Maps and applies trail transactions</small></li>
 <li data-node="target"><strong>Target database</strong><small>Commits applied changes and checkpoints</small></li></ul><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools"><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
-<details id="homeFoundations" style="margin:1rem 0"><summary>Related 11g Architecture home workflows</summary><ul></ul></details>
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
 <script>(function(){
 const related={"network-interruption":[["connection-failure-rca","Distinguish a broken pump-to-target trail connection from an application login failure."]],"trace-a-commit":[["insert-commit","Follow a committed source row through capture, trail and target apply."],["update-commit","Trace committed DML into the trail and then into a target transaction."],["commit-durability","Distinguish source commit success from later completion of target apply."]],"gg-startup":[["instance-startup","After the database is ready, start capture, pump and apply from their known positions."]],"gg-graceful-shutdown":[["shutdown-normal","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-transactional","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-immediate","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."]],"replicat-recovery":[["shutdown-abort","Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."],["crash-recovery","Separate the target database's crash recovery from restart of the trail consumer."]],"isolate-lag":[["redo-commit-latency","Separate source commit latency from time subsequently spent in capture, pump or apply."],["performance-incident-rca","Compare positions over time to find the pipeline stage accumulating delay."]],"gg-patching":[["patch-quarterly-psu-spu","Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."],["patch-one-off","Check capture and apply compatibility for the exact interim database or GoldenGate patch."],["patch-rollback","Check process compatibility and resume only from verified checkpoints after maintenance."]]};
 function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
@@ -44,7 +44,7 @@ function showRelated(){const current=document.querySelector("[data-lesson][aria-
 window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
 <!-- /authored-home-crosslinks -->
 </main>
-<footer><p>Related 11g Architecture lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to 11g Architecture home</a></footer>
+<footer><p>Related Stand-Alone DB lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to Stand-Alone DB</a></footer>
 <script type="application/json" id="lesson-data">{
   "flows": [
     [
