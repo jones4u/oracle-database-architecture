@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v3 | Updated : 26-Nov-2026">
+  <title>Data Guard · Oracle 11g R2 Architecture</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
+    a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
+    @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+
+    :root { --redo:#62dfc2; --ack:#aabadf; --manage:#dfb7ff; --blocked:#ff9e99; --paper:#0d1820; }
+    main,header,footer { max-width:1320px; }
+    h1 { margin-top:16px; }
+    .dg-intro { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+    .dg-intro .ver { color:#afd5c9; }
+    .dg-workflow { display:grid; grid-template-columns: minmax(14em, 2fr) auto 1fr; gap:4px 14px; align-items:center; margin:18px 0 9px; }
+    .dg-workflow label { grid-column:1/-1; }
+    .dg-workflow select { margin:0; }
+    .dg-workflow p { margin:0; }
+    .dg-architecture { padding:13px 16px; background:linear-gradient(140deg,#162532,#101c26); }
+    .dg-heading { display:flex; gap:8px 18px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .dg-heading h2 { margin:0; }
+    .dg-actions { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+    .dg-actions button,.dg-actions select { width:auto; margin:0; padding:4px 9px; font-size:.9rem; }
+    .dg-actions .next { font-weight:650; }
+    .dg-actions label { font-size:.85rem; margin-left:5px; }
+    .dg-stage { border-left:3px solid var(--redo); padding:2px 12px; margin:10px 0; }
+    .dg-stage #progress { margin:0; color:var(--redo); }
+    .dg-stage #step { min-height:0; font-size:1rem; margin:2px 0 0; }
+    .dg-viewport { background:#0b171f; border:1px solid #344855; border-radius:7px; overflow:auto; overscroll-behavior-x:contain; }
+    .dg-viewport svg { display:block; width:100%; min-width:760px; height:auto; }
+    .dg-viewport.fit svg { min-width:0; }
+    .dg-view { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:5px 15px; margin:6px 0 0; }
+    .dg-view p { margin:0; }
+    .dg-view button { display:none; padding:3px 8px; font-size:.84rem; }
+    .dg-focus { font-weight:600; color:#b3e9db; min-height:1.5em; }
+    .dg-inspection { display:flex; align-items:baseline; gap:4px 8px; flex-wrap:wrap; min-height:2.2rem; margin:7px 0 0; }
+    .dg-inspection strong { color:#f4d59f; }
+    .dg-inspection span { color:#cedce3; }
+    .dg-context { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:14px 0; }
+    .dg-context h2 { font-size:1.08rem; }
+    .dg-context .level { margin:0; }
+    .dg-context .refs { border-top:1px solid var(--line); padding-top:8px; font-size:.86rem; }
+    .dg-legend { display:flex; flex-wrap:wrap; align-items:center; gap:2px 13px; color:var(--muted); font-size:.82rem; }
+    .dg-legend i { display:inline-block; width:16px; border-top:2px solid; margin-right:4px; vertical-align:middle; }
+    .dg-legend .ctrl { border-top-style:dashed; color:var(--manage); }
+    .dg-legend .ack {color:var(--ack);}
+    .dg-legend .redo {color:var(--redo);}
+    .dg-legend .blocked {border-top-style:dotted; color:var(--blocked);}
+    .dg-site { fill:#11232d; stroke:#37505c; }
+    .dg-site.alt {fill:#14222d;}
+    .arch-node { cursor:pointer; }
+    .arch-node .shape { fill:#172b36; stroke:#466170; stroke-width:1.2; }
+    .arch-node text { font-family:"Segoe UI",sans-serif; fill:#e0edf2; font-size:14px; font-weight:620; pointer-events:none; }
+    .arch-node text.detail { fill:#b5c9d3; font-size:11px; font-weight:400; }
+    .arch-node .node-mark { fill:none; stroke:#83a4b0; stroke-width:1.5; }
+    .arch-node.storage .shape { fill:#20323a; }
+    .arch-node.manage .shape { fill:#28283d; stroke:#625675; }
+    .arch-node.link .shape {fill:#12313b;}
+    .arch-node.site .shape { fill:#1c3542; }
+    .arch-node.site text { font-size:16px; }
+    .arch-node:focus .shape,.arch-node:hover .shape { stroke:#fff; stroke-width:2.3; }
+    .arch-node.is-active .shape {stroke:var(--active);stroke-width:2.3;fill:#393324;}
+    .arch-node.is-active text {fill:#fff1ce;}
+    .arch-node[data-inspected=true] .shape {stroke:#fff;stroke-dasharray:4 2;}
+    .arch-node.is-down .shape {stroke:var(--blocked);stroke-dasharray:4 3;}
+    .arch-edge {pointer-events:none;color:var(--redo);}
+    .arch-edge .line {fill:none;stroke:#3e5460;stroke-width:1.6;marker-end:url(#dg-muted);}
+    .arch-edge.ack {color:var(--ack);}
+    .arch-edge.control {color:var(--manage);}
+    .arch-edge.control .line {stroke-dasharray:4 5;}
+    .arch-edge.is-active .line {stroke:currentColor;stroke-width:2.7;marker-end:url(#dg-live);}
+    .arch-edge.is-active.control .line {marker-end:url(#dg-ctrl);}
+    .arch-edge.is-active.ack .line {marker-end:url(#dg-ack);}
+    .arch-edge.is-blocked .line {stroke:var(--blocked);stroke-dasharray:3 4;stroke-width:2.4;marker-end:none;}
+    .arch-edge .packet { fill:currentColor; }
+    .arch-edge.optional:not(.is-active):not(.is-blocked) {display:none;}
+    .dg-caption { fill:#adc4cf; font:600 11px "Segoe UI",sans-serif; letter-spacing:.08em; }
+    .dg-caption.role {fill:#81d4c5;font-size:12px;letter-spacing:.02em;}
+    .dg-caption.state {fill:#f4cf8c;font-size:12px;letter-spacing:0;}
+    @media(max-width:760px){.dg-workflow{grid-template-columns:1fr auto}.dg-workflow>p:last-child{grid-column:1/-1}.dg-architecture{padding:10px}.dg-context{grid-template-columns:1fr;gap:8px}.dg-view button{display:inline-block}.dg-heading{gap:4px}.dg-heading h2{font-size:1.1rem}.dg-viewport:focus{outline:2px solid var(--active);outline-offset:1px}}
+    @media(prefers-reduced-motion:reduce){.dg-viewport{scroll-behavior:auto}.packet{display:none}}
+
+
+  </style>
+</head>
+<body>
+  <a class="sr" href="#lesson">Skip to lesson</a>
+  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html">RAC</a> <a href="./dataguard.html" aria-current="page">Data Guard</a> <a href="./rac-dataguard.html">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>Data Guard</h1><p>Follow one database change from local commit to remote receipt, apply, and a possible change of roles.</p><p class="ver">Oracle Database 11g Release 2 (11.2.0.4) · Tower v3</p></header>
+  <main>
+    <div id="lesson" class="dg-workflow"><label for="workflow">Workflow</label><select id="workflow"><option value="dg-1">Follow one commit to a physical standby</option><option value="dg-2">Compare asynchronous and synchronous commit</option><option value="dg-3">Compare the three protection modes</option><option value="dg-4">Read the current standby redo log as it fills</option><option value="dg-5">Diagnose a redo gap after a network interruption</option><option value="dg-6">Switch roles during planned maintenance</option><option value="dg-7">Fail over after loss of the primary</option><option value="dg-8">Decide whether the fast-start failover observer should act</option><option value="startup">Startup sequence · restore transport and physical standby apply</option><option value="graceful-shutdown">Graceful shutdown · take a protected pair offline</option><option value="patching">Patching · evaluate standby-first eligibility</option></select><p id="level" class="level"></p><p><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></p></div>
+    <section class="panel dg-architecture" aria-labelledby="dg-architecture-title">
+      <div class="dg-heading"><h2 id="dg-architecture-title">Physical standby architecture</h2>
+        <div class="dg-actions" aria-label="Workflow playback">
+          <button id="prev" type="button">Previous</button><button id="next" type="button" class="next">Next step</button>
+          <button type="button" data-arch-play aria-pressed="false">Play</button><label for="dg-speed">Speed</label>
+          <select id="dg-speed" data-arch-speed><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+        </div>
+      </div>
+      <div class="dg-stage"><h3 id="progress"></h3><p id="step" aria-live="polite"></p></div>
+      <div class="dg-viewport" id="dg-viewport" tabindex="0" aria-label="Data Guard diagram. On small screens, scroll sideways to explore both sites.">
+        <svg id="dg-canvas" data-architecture-diagram viewBox="0 0 1080 529" role="group" aria-labelledby="dg-svg-title dg-svg-desc">
+          <title id="dg-svg-title">Oracle Data Guard physical standby architecture</title>
+          <desc id="dg-svg-desc">Site A and Site B have independent instance memory and files. Select a component for its role. Active arrows show redo, acknowledgments, or management communication for the current step.</desc>
+          <defs><marker id="dg-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#526b77"/></marker>
+            <marker id="dg-live" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#62dfc2"/></marker>
+            <marker id="dg-ctrl" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#dfb7ff"/></marker>
+            <marker id="dg-ack" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#aabadf"/></marker></defs>
+          <g id="dg-regions"></g><g id="dg-edges"></g><g id="dg-nodes"></g>
+        </svg>
+      </div>
+      <div class="dg-view"><div class="dg-legend" aria-label="Path key"><span><i class="redo"></i>Redo / work</span><span><i class="ack"></i>Acknowledgment</span><span><i class="ctrl"></i>Broker control</span><span><i class="blocked"></i>Unavailable</span></div><button id="dg-zoom" type="button" aria-pressed="false">Fit both sites</button></div>
+      <p class="dg-focus" id="dg-focus"></p>
+      <div class="dg-inspection" aria-live="polite"><strong id="inspect-title">Inspect a component</strong><span id="inspect">Select a process, file, or site in the diagram to see its role.</span></div>
+    </section>
+    <div class="dg-context"><section class="panel"><h2 id="title"></h2><p id="setup"></p><p id="focus" class="note"></p>
+      <div class="refs"><b>Oracle 11gR2 references</b><p id="sources"></p><a href="https://docs.oracle.com/cd/E11882_01/server.112/e41134/concepts.htm">Physical standby architecture</a> <a href="https://docs.oracle.com/cd/E11882_01/server.112/e40402/bgprocesses.htm">11g background process reference</a></div></section>
+      <section class="panel"><h2>Correctness check</h2><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section></div>
+    <p class="related">Continue with <a href="./rac-dataguard.html#both-2">standby redo logs for two primary threads</a>.</p><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"dg-1":[["insert-commit","Trace a locally committed row through transport, standby reception and physical apply."],["update-commit","Follow an updated row’s redo from the primary to the physical standby."]],"dg-2":[["commit-durability","Compare completion of an ASYNC commit with the remote durable acknowledgment in healthy SYNC/AFFIRM."],["redo-commit-latency","Test how remote durable acknowledgment in SYNC/AFFIRM contributes to commit time."]],"dg-4":[["redo-log-switch","Compare waiting for archival at the standby with reading its current standby redo log during real-time apply."]],"dg-5":[["archive-destination-failure-rca","Follow a missing archived sequence through transport restoration and gap resolution."],["performance-incident-rca","Use receive and apply positions to localize a specific redo continuity incident."]],"startup":[["instance-startup","Startup decisions depend on the primary or standby role and the required apply state."]],"graceful-shutdown":[["shutdown-normal","Account for the database role, outstanding transport and standby apply before a planned stop."],["shutdown-transactional","A final primary transaction must finish before closing. Track its redo receipt and apply separately at the standby."],["shutdown-immediate","Account for the database role, outstanding transport and standby apply before a planned stop."]],"dg-7":[["crash-recovery","A primary outage can raise a separate site failover decision. Inspect received redo and target readiness."],["rman-restore-recover","After failover, review reinstating the former primary or rebuilding its standby. RMAN restore details remain on the home page."],["flashback-database","Flashback Database can permit the old primary to be reinstated after a role transition."],["flashback-unavailable-rca","When the old primary cannot be reinstated, assess rebuilding it as a standby."]],"patching":[["patch-quarterly-psu-spu","Check patch-specific standby-first eligibility and role-specific work, then verify transport and apply."],["patch-one-off","Confirm primary and standby eligibility for this specific interim patch."],["patch-rollback","Restore supported versions on the affected sites and verify shipping and apply in the correct direction."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main><footer><a href="./index.html">Return to Stand-Alone DB</a></footer>
+  <script type="application/json" id="data">[
+  {
+    "id": "dg-1",
+    "title": "Follow one commit to a physical standby",
+    "level": "Basic",
+    "setup": "Site A is the primary. Site B has a mounted physical standby with standby redo logs and real-time apply enabled. Transport is asynchronous.",
+    "steps": [
+      "Update a row at Site A and commit. The log writer persists the transaction’s redo in the primary online redo log.",
+      "Watch redo travel to Site B. The client can receive commit confirmation before that redo reaches Site B.",
+      "Follow the remote file server process (RFS) as it writes the incoming redo into a standby redo log.",
+      "Follow managed recovery (MRP0) as it coordinates applying the changes described by the redo to the standby datafiles."
+    ],
+    "actors": [
+      [
+        "app",
+        "a",
+        "al"
+      ],
+      [
+        "al",
+        "wan"
+      ],
+      [
+        "rfs",
+        "srl"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "The application saw a successful commit. What can you conclude about Site B?",
+    "answer": "With asynchronous transport, that confirmation establishes local redo durability. Remote receipt and standby apply can occur later.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ]
+    ],
+    "home": "insert-commit"
+  },
+  {
+    "id": "dg-2",
+    "title": "Compare asynchronous and synchronous commit",
+    "level": "Intermediate",
+    "setup": "Run the same transaction twice. The first run uses ASYNC. The second has a healthy, synchronized SYNC/AFFIRM standby in maximum availability mode.",
+    "steps": [
+      "Increase the simulated network delay and commit a row with ASYNC. Observe the client reply while the remote write is still pending.",
+      "Replay the commit with SYNC/AFFIRM. Wait for both the primary redo flush and the standby’s acknowledgment of its redo-log write.",
+      "Pause standby apply while transport stays healthy. Compare the client reply with the separate apply indicator."
+    ],
+    "actors": [
+      [
+        "app",
+        "al",
+        "wan"
+      ],
+      [
+        "al",
+        "srl",
+        "app"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Which standby event is on the commit path in the healthy SYNC/AFFIRM run?",
+    "answer": "The standby acknowledges durable receipt of the redo in its standby redo log. Applying that redo to standby datafiles is a separate event.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "commit-durability"
+  },
+  {
+    "id": "dg-3",
+    "title": "Compare the three protection modes",
+    "level": "Intermediate",
+    "setup": "A single synchronized standby is healthy. Repeat the loss of its transport link separately under each protection mode.",
+    "steps": [
+      "Under maximum performance with ASYNC, acknowledge local commits and track unsent redo.",
+      "Under maximum availability with SYNC/AFFIRM, trace the remote acknowledgment while healthy. After failure detection, follow continued primary operation and the interval of reduced protection.",
+      "Under maximum protection, observe the primary shut down when it cannot write to any qualifying synchronized standby."
+    ],
+    "actors": [
+      [
+        "app",
+        "al"
+      ],
+      [
+        "al",
+        "wan",
+        "srl"
+      ],
+      [
+        "a",
+        "wan"
+      ]
+    ],
+    "question": "Which mode keeps the primary running on loss of its only synchronized destination, then restores protection when it catches up?",
+    "answer": "Maximum availability. Maximum performance commits locally in this example. Maximum protection prioritizes the durability guarantee when the last synchronized destination is lost.",
+    "refs": [
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "commit-durability"
+  },
+  {
+    "id": "dg-4",
+    "title": "Read the current standby redo log as it fills",
+    "level": "Intermediate",
+    "setup": "The 11g physical standby is mounted in ARCHIVELOG mode and has standby redo logs. Compare SQL-managed archived-log apply and real-time apply.",
+    "steps": [
+      "Receive redo into the current standby redo log and observe archived-log apply waiting until that log is archived.",
+      "Replay with 11g real-time apply enabled. MRP0 can process the incoming redo as RFS fills the current standby redo log.",
+      "Compare the mounted standby with a separately illustrated read-only standby running apply. The latter supplies real-time query through the Active Data Guard option."
+    ],
+    "actors": [
+      [
+        "rfs",
+        "srl"
+      ],
+      [
+        "srl",
+        "mrp"
+      ],
+      [
+        "b",
+        "mrp"
+      ]
+    ],
+    "question": "Must users be able to query the standby for real-time apply to work?",
+    "answer": "A mounted physical standby can apply incoming redo. Read-only access while application of redo continues is the separately licensed Active Data Guard real-time query capability.",
+    "refs": [
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ],
+      [
+        "Data Guard configuration",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/config_dg.htm"
+      ]
+    ],
+    "home": "redo-log-switch"
+  },
+  {
+    "id": "dg-5",
+    "title": "Diagnose a redo gap after a network interruption",
+    "level": "Advanced",
+    "setup": "This example has one redo thread. The standby has applied sequence 41. Sequence 43 is present in the archive, but sequence 42 is missing.",
+    "steps": [
+      "Compare the received and applied sequence numbers and inspect the blocking range in V$ARCHIVE_GAP.",
+      "Restore connectivity in the simulation and follow automatic gap resolution as the missing sequence arrives.",
+      "Watch recovery process sequence 42 and then 43. Check for further blocking gaps and recheck lag against fresh timestamps."
+    ],
+    "actors": [
+      [
+        "rfs",
+        "mrp"
+      ],
+      [
+        "wan",
+        "rfs"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Why does receiving sequence 43 fail to advance recovery through sequence 43?",
+    "answer": "Physical recovery requires a continuous redo stream. The missing changes in sequence 42 must be available before recovery can proceed through 43.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ]
+    ],
+    "home": "archive-destination-failure-rca"
+  },
+  {
+    "id": "dg-6",
+    "title": "Switch roles during planned maintenance",
+    "level": "Advanced",
+    "setup": "Both sites are healthy. The application uses a service configured for the primary role, and the physical standby is ready for a planned role exchange.",
+    "steps": [
+      "Check database roles and switchover readiness, and prepare the application for its planned reconnect.",
+      "Follow the role exchange while the final primary redo reaches the standby. Watch Site A become the physical standby and Site B become primary.",
+      "Reconnect the application to the primary-role service and issue a sample transaction on Site B.",
+      "Follow the new redo from B to A and verify that apply resumes at the former primary."
+    ],
+    "actors": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "al",
+        "wan",
+        "b"
+      ],
+      [
+        "app",
+        "svc",
+        "b"
+      ],
+      [
+        "bl",
+        "wan",
+        "as",
+        "af"
+      ]
+    ],
+    "question": "What demonstrates that the switchover has restored protection in the new direction?",
+    "answer": "Site B accepts the application transaction, and Site A receives and applies its redo as the new physical standby. A successful switchover exchanges roles without data loss.",
+    "refs": [
+      [
+        "Database role transitions",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/role_management.htm"
+      ],
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "dg-7",
+    "title": "Fail over after loss of the primary",
+    "level": "Advanced",
+    "setup": "The primary becomes unavailable while transport is asynchronous. The standby has received some redo that it has yet to apply.",
+    "steps": [
+      "Inspect the target’s last received and applied positions. Identify any primary redo that is still accessible for recovery.",
+      "Follow a complete failover in the simulation. Apply the available redo before the standby takes the primary role.",
+      "Reconnect the application and test a new transaction. Check whether the original test transaction survived using the recovered data.",
+      "Review the former primary’s recovery options. Reinstate it when Flashback Database prerequisites and sufficient history are available, or rebuild it as a standby."
+    ],
+    "actors": [
+      [
+        "a",
+        "wan",
+        "srl"
+      ],
+      [
+        "mrp",
+        "b"
+      ],
+      [
+        "app",
+        "b",
+        "bf"
+      ],
+      [
+        "br",
+        "a"
+      ]
+    ],
+    "question": "Which interval is at risk if the primary’s last redo cannot be recovered?",
+    "answer": "Changes whose redo never reached the standby and cannot be obtained elsewhere can be lost. Redo already received can still be applied during a complete failover.",
+    "refs": [
+      [
+        "Database role transitions",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/role_management.htm"
+      ],
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "dg-8",
+    "title": "Decide whether the fast-start failover observer should act",
+    "level": "Ultra-advanced",
+    "setup": "Broker fast-start failover is enabled with a separate observer, a synchronized eligible standby in maximum availability mode, and default observer behavior. The scenario tests connectivity failures.",
+    "steps": [
+      "Isolate the observer from the primary while the standby retains contact with the primary. Track the standby’s view of the primary.",
+      "Replay with the primary isolated from both observer and standby. Keep the observer connected to the target and advance the configured failure threshold.",
+      "Inspect the target’s readiness and synchronization state. Trace promotion only on the eligible branch of the scenario.",
+      "Restore the old primary and inspect whether broker can reinstate it as a standby. Confirm transport and apply in the new direction."
+    ],
+    "actors": [
+      [
+        "br",
+        "a",
+        "b"
+      ],
+      [
+        "br",
+        "b"
+      ],
+      [
+        "br",
+        "b"
+      ],
+      [
+        "br",
+        "wan",
+        "a"
+      ]
+    ],
+    "question": "Should one observer losing contact with a healthy primary initiate failover in this scenario?",
+    "answer": "No. With the default behavior and this connectivity-failure scenario, the standby’s continuing contact with the primary prevents promotion. Losing contact from both locations and satisfying the configured eligibility checks changes the decision.",
+    "refs": [
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ],
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "startup",
+    "title": "Startup sequence · restore transport and physical standby apply",
+    "level": "Basic",
+    "setup": "After planned maintenance both databases were cleanly shut down. The database roles are known. Site B is a physical standby with standby redo logs. This example uses mounted Redo Apply.",
+    "steps": [
+      "Verify database identity, existing roles, protection mode and broker ownership. If the policy needs a synchronized destination for primary availability, arrange receiver readiness before resuming writes.",
+      "Bring the physical standby to MOUNT and enable its intended apply state. A broker-managed site uses its broker policy. Confirm the receiving service is reachable.",
+      "Start the known primary through OPEN READ WRITE. Re-establish transport and check destination health. Opening the standby as primary would be a separate role transition.",
+      "Follow a new primary change to the standby logs. Confirm receipt and apply progress with fresh timestamps and the expected database roles."
+    ],
+    "actors": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "b",
+        "srl",
+        "mrp"
+      ],
+      [
+        "a",
+        "al",
+        "wan"
+      ],
+      [
+        "rfs",
+        "srl",
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Which evidence closes this startup?",
+    "options": [
+      "The primary listener responds",
+      "Both databases are read/write",
+      "The primary accepts writes and a new redo change is received and applied by the physical standby"
+    ],
+    "correct": 2,
+    "answer": "Database open state, redo destination health and fresh standby progress test the role-specific paths end to end.",
+    "refs": [
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ],
+      [
+        "Data Guard protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "graceful-shutdown",
+    "title": "Graceful shutdown · take a protected pair offline",
+    "level": "Intermediate",
+    "setup": "A planned full-site maintenance window has been approved for both members. Preserve the role assignment and record the last received and applied positions.",
+    "steps": [
+      "Quiesce application writes using the agreed service procedure. Check protection requirements and any fast-start failover policy before the coordinated outage.",
+      "Record final application redo and confirm receipt and apply through the agreed boundary while transport is available. Retain needed archives for any outstanding tail.",
+      "Shut the primary down consistently under the plan. Keeping a required synchronized destination available during this phase avoids an unintended protection-mode interaction.",
+      "Stop managed recovery through the mechanism that owns it, then consistently shut the standby. Verify each instance stopped and roles were not promoted. On restart verify fresh transport and apply."
+    ],
+    "actors": [
+      [
+        "app",
+        "svc",
+        "a"
+      ],
+      [
+        "al",
+        "wan",
+        "srl"
+      ],
+      [
+        "a",
+        "al"
+      ],
+      [
+        "mrp",
+        "b"
+      ]
+    ],
+    "question": "What is the evidence for the agreed pre-outage recovery point?",
+    "options": [
+      "A log sequence from the primary alone",
+      "Received and applied positions on the intended standby correlated with the recorded primary boundary",
+      "A stopped listener"
+    ],
+    "correct": 1,
+    "answer": "The evidence must cover the primary boundary and the standby’s actual progress. Preserve the tail needed for restart.",
+    "refs": [
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ],
+      [
+        "Data Guard protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "shutdown-immediate"
+  },
+  {
+    "id": "patching",
+    "title": "Patching · evaluate standby-first eligibility",
+    "level": "Advanced",
+    "setup": "A single-instance primary protects a physical standby. The proposed 11.2 database-home patch may be a PSU or a one-off.",
+    "steps": [
+      "Inventory both homes, check release, platform, conflicts, recoverability and the exact patch README. Look specifically for Data Guard standby-first certification. A database patch-set upgrade uses a different procedure.",
+      "For a certified example, follow the documented standby maintenance steps and patch its binary home. Bring it back to its supported standby state. Observe the mixed-home interval allowed by the README.",
+      "Verify transport, redo apply and expected standby inventory. Assess rollback readiness or pause if verification fails before touching the primary.",
+      "Complete the documented primary phase and SQL work at the prescribed database and role. For an uncertified patch, use its documented coordinated procedure. Confirm binary levels, role, service and fresh apply on the pair."
+    ],
+    "actors": [
+      [
+        "a",
+        "b",
+        "br"
+      ],
+      [
+        "b",
+        "mrp"
+      ],
+      [
+        "wan",
+        "rfs",
+        "mrp"
+      ],
+      [
+        "a",
+        "al",
+        "wan"
+      ]
+    ],
+    "question": "Which property authorizes the temporary mismatch of primary and standby binary homes?",
+    "options": [
+      "The standby has little apply lag",
+      "Standby-first certification for this exact patch",
+      "Both machines use the same operating system"
+    ],
+    "correct": 1,
+    "answer": "Eligibility comes from the exact patch documentation. Successful transport proves connectivity but does not establish certification.",
+    "refs": [
+      [
+        "Reducing downtime for planned maintenance",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/schedule_outage.htm"
+      ],
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ]
+    ],
+    "home": "patch-quarterly-psu-spu"
+  }
+]</script>
+  <script>
+    const flows = JSON.parse(document.getElementById('data').textContent);
+    const select = document.getElementById('workflow');
+    // Each frame explicitly identifies the physical or control path that its lesson demonstrates.
+    // Node keys beginning with p or s follow database roles. Site A and Site B stay in fixed places.
+    function frame(edges, nodes, caption, config = {}) {
+      const keys = list => list ? list.split(' ') : [];
+      return {edges:keys(edges), nodes:keys(nodes), caption, ...config};
+    }
+    const frames = {
+      'dg-1': [
+        frame('session-service client-connect redo-flush local-write','app pSite','Local durability · LGWR flushes commit redo to the primary online log.'),
+        frame('async-read transport-send transport-receive client-reply','pSender sReceiver','ASYNC · remote receipt may follow the client reply.'),
+        frame('receive-write','sSite','Receipt · RFS writes the incoming redo into the active standby redo log.'),
+        frame('apply-current recover-files','sSite','Apply · managed recovery consumes the current SRL and recovers standby data blocks.')
+      ],
+      'dg-2': [
+        frame('redo-flush local-write client-reply','pSite wan','ASYNC · a delayed remote destination need not hold up local commit.'),
+        frame('local-write sync-submit transport-send transport-receive receive-write remote-ack','pRedo app','SYNC/AFFIRM · the commit waits for local persistence and the durable remote acknowledgment.'),
+        frame('transport-send transport-receive receive-write remote-ack','sApply','Transport continues while Redo Apply is paused.',{standby:'Apply paused',blocked:['apply-current','recover-files']})
+      ],
+      'dg-3': [
+        frame('redo-flush local-write client-reply','pSender','Maximum performance · the client can receive local commit confirmation with unsent redo.'),
+        frame('local-write client-reply','pSender sReceiver','Maximum availability · after failure detection, primary writes continue with reduced protection.',{link:'Disconnected',blocked:['transport-send','transport-receive','remote-ack']}),
+        frame('','pSite pWriter pSender sReceiver','Maximum protection · loss of the only qualifying synchronized destination stops the primary.',{primaryState:'Shut down',link:'Disconnected',blocked:['local-write','transport-send','transport-receive']})
+      ],
+      'dg-4': [
+        frame('receive-write','sArchive sApply','Archived-log apply · recovery waits for archival of the current log.',{standby:'Waiting for archival'}),
+        frame('receive-write apply-current recover-files','sSite','Real-time apply · MRP0 coordinates recovery directly from the SRL as RFS fills it.'),
+        frame('apply-current recover-files','sSite sAccess','READ ONLY WITH APPLY · this replay illustrates the Active Data Guard real-time query option.',{standby:'Read only with apply'})
+      ],
+      'dg-5': [
+        frame('','sArchive sApply','Gap · sequence 43 is available but recovery still needs sequence 42.',{standby:'Waiting for sequence 42',blocked:['apply-archive']}),
+        frame('gap-transfer','pArchive sArchive wan','Gap resolution · retrieve missing archived sequence 42 into the standby archive destination.',{link:'Available again'}),
+        frame('apply-archive recover-files','sSite','Contiguous apply · recovery now processes sequence 42, then sequence 43.')
+      ],
+      'dg-6': [
+        frame('','pSite sSite svc','Readiness · compare database roles, transport health and switchover readiness before the role exchange.'),
+        frame('transport-send transport-receive receive-write apply-current','pSite sSite','Final A → B redo · both databases finish the planned exchange; Site B takes the primary role next.',{primaryState:'Preparing standby role',standby:'Completing recovery'}),
+        frame('session-service client-connect redo-flush local-write','pSite','Site B now serves writes · reconnect through the primary-role service and commit at B.',{reverse:true}),
+        frame('transport-send transport-receive receive-write apply-current recover-files','sSite','Reverse direction · B ships redo to A, where Redo Apply protects the new primary.',{reverse:true})
+      ],
+      'dg-7': [
+        frame('','sReceiver sLog sApply','Target assessment · compare received and applied positions and identify any recoverable tail redo.',{primaryState:'Unreachable',link:'No primary contact',blocked:['transport-send','transport-receive']}),
+        frame('apply-current recover-files','sSite','Complete failover · recover the available redo at B before promoting it.',{primaryState:'Unreachable',standby:'Applying available redo',blocked:['transport-send','transport-receive']}),
+        frame('session-service client-connect redo-flush local-write','pSite','B is primary · verify service and transactions against the recovered data.',{reverse:true,standby:'Former primary offline',offlineStandby:true,blocked:['transport-send','transport-receive']}),
+        frame('','pSite sSite operator','Restore protection · reinstate the former primary if eligible, otherwise re-create the physical standby.',{reverse:true,standby:'Reinstate or rebuild',candidate:true})
+      ],
+      'dg-8': [
+        frame('observer-standby','observer pDmon sDmon','Observer isolated from A · the standby still sees the primary, so the target remains a standby.',{observer:true,blocked:['observer-primary']}),
+        frame('observer-standby','observer sDmon','Primary isolated from observer and target · evaluate the configured connectivity-failure threshold.',{observer:true,primaryState:'Isolated',link:'Disconnected',blocked:['observer-primary','transport-send','transport-receive']}),
+        frame('observer-standby','observer sSite sApply','Target decision · only the eligible synchronized branch proceeds to promotion.',{observer:true,primaryState:'Isolated',standby:'Checking eligibility',blocked:['observer-primary','transport-send','transport-receive']}),
+        frame('transport-send transport-receive receive-write apply-current recover-files','operator sDmon','Successful reinstatement branch · B is primary, A receives and applies new redo.',{observer:true,reverse:true})
+      ],
+      'startup': [
+        frame('','pSite sSite operator','Verify the configured identities and roles before starting the two independent databases.',{primaryState:'Planned startup',standby:'Planned startup'}),
+        frame('','sSite sReceiver sApply','Standby startup · mount Site B, enable recovery and verify receiver readiness.',{primaryState:'Awaiting startup',standby:'Mounted / ready'}),
+        frame('','pSite pSender wan svc','Primary startup · verify OPEN READ WRITE and the configured transport destination.'),
+        frame('transport-send transport-receive receive-write apply-current recover-files','pSite sSite','End-to-end proof · send fresh redo and verify receipt and apply at B.')
+      ],
+      'graceful-shutdown': [
+        frame('','app svc pSite operator','Maintenance boundary · stop new application writes and check protection and observer policy.',{primaryState:'Draining application'}),
+        frame('transport-send transport-receive receive-write apply-current recover-files','pSite','Recovery boundary · confirm receipt and apply through the agreed last application change.',{primaryState:'Application drained'}),
+        frame('','pSite pWriter pLog sReceiver','Site A stopped cleanly · keep the required destination available during primary shutdown.',{primaryState:'Shut down',standby:'Mounted / ready'}),
+        frame('','pSite sSite sApply','Coordinated shutdown complete · both instances have stopped; their database roles remain assigned.',{primaryState:'Shut down',standby:'Shut down'})
+      ],
+      'patching': [
+        frame('','pSite sSite operator','Readiness · verify both database homes, recoverability and patch-specific standby-first certification.'),
+        frame('','sSite sApply','Standby phase · service the Site B database home during the permitted mixed-home interval.',{standby:'Patch maintenance',blocked:['apply-current','recover-files']}),
+        frame('transport-send transport-receive receive-write apply-current recover-files','sSite','Validation point · prove transport, receipt and apply in the patched standby home.'),
+        frame('transport-send transport-receive receive-write apply-current recover-files','pSite sSite svc','Primary phase complete · verify home inventories, database SQL work, services and fresh apply at both sites.')
+      ]
+    };
+    const actorNames = {a:'Database A',b:'Database B',al:'Online redo A',bl:'Online redo B',as:'Standby logs A',af:'Data files A',bf:'Data files B',rfs:'RFS at B',srl:'Standby logs B',mrp:'Managed recovery B',wan:'Redo transport',br:'Broker / observer',svc:'Primary-role service',app:'Application'};
+    const svgNS='http://www.w3.org/2000/svg';
+    function tag(name, attrs={}, value) {
+      const element=document.createElementNS(svgNS,name);
+      for(const [key,val] of Object.entries(attrs)) element.setAttribute(key,String(val));
+      if(value!==undefined) element.textContent=value;
+      return element;
+    }
+    function layoutDiagram(f) {
+      const nodes=new Map(), edges=new Map();
+      const source=f.reverse?'B':'A', target=f.reverse?'A':'B';
+      function node(id,x,y,w,h,title,description,info,kind='process',actor='') {
+        nodes.set(id,{id,x,y,w,h,title,description,info,kind,actor});
+      }
+      node('app',20,12,174,47,'Application','Transaction client','Issues SQL through an established database session and observes the commit response.','link','app');
+      node('svc',237,12,191,47,'Write service','Primary-role endpoint','The application connects through a service configured for the current primary. Clients reconnect following a role change.','link','svc');
+      node('operator',652,12,187,47,'Broker control','DGMGRL / administrator','The administrator can use the Data Guard broker to manage intended state and database roles. DMON processes implement broker management at member databases.','manage','br');
+      node('observer',867,12,189,47,'Observer','Optional · FSFO','An external broker observer monitors the primary and target when fast-start failover is enabled. Target eligibility and protection settings constrain the failover decision.','manage');
+      node('wan',465,180,150,51,'Redo transport',f.link||'Oracle Net','Redo transport uses Oracle Net between databases. It can be synchronous or asynchronous relative to transaction commitment. This is a separate path from management traffic.','link','wan');
+      for (const site of ['A','B']) {
+        const isSource=site===source, pre=isSource?'p':'s', alias=site.toLowerCase();
+        const inner=site==='A'?252:650, outer=site==='A'?25:877, boxX=site==='A'?20:645;
+        const role=isSource?'Primary':f.offlineStandby||f.candidate?'Former primary':'Physical standby';
+        const state=isSource?f.primaryState||'Open read/write':f.standby||'Mounted / apply';
+        node(pre+'Site',boxX+4,94,412,47,'Site '+site+'  ·  '+role,state,'Database '+site+' has its own instance and database files. The role determines whether it originates or applies production redo. Current state: '+state+'.','site',alias);
+        if (isSource) {
+          node('pRedo',outer,180,178,51,'Server / SGA','Redo log buffer','A foreground server performs the change. Redo entries are buffered in the instance. At normal commit, the foreground waits for LGWR to make the required redo durable.');
+          node('pSender',inner,180,178,51,f.transportMode==='ASYNC'?'NSAn':f.transportMode==='SYNC'?'NSSn':'NSAn / NSSn',
+            f.transportMode==='ASYNC'?'ASYNC transport':f.transportMode==='SYNC'?'SYNC transport':'Redo transport sender',
+            'In 11.2, NSAn ships redo from current online redo logs for ASYNC destinations. NSSn works on behalf of LGWR for a SYNC destination. AFFIRM requires a durable standby-log write before the remote acknowledgment.');
+          node('pWriter',outer,270,178,51,'LGWR','Local redo flush','The log writer writes redo from the buffer to the current online redo log group. The resulting local durability and the remote transport/apply milestones are distinct.');
+          node('pLog',inner,270,178,51,'Online redo log','Current group','Holds locally durable redo for the source instance. A log switch makes a completed group available for archival.','storage',site==='A'?'al':'bl');
+          node('pFiles',outer,359,178,51,'Data files','Primary database','DBWn writes changed buffers to data files independently of the normal commit acknowledgment.','storage',site==='A'?'af':'bf');
+          node('pArchive',inner,359,178,51,'Archived redo','Source archive','Archived redo can supply sequences missing at a standby. Compare thread and sequence within a database incarnation.','storage');
+          node('pReserved',inner,449,178,48,'Standby redo logs','Ready for role change','Standby redo logs are provisioned at the current primary to receive redo if it later operates as the standby.','storage',site==='A'?'as':'srl');
+        } else {
+          node('sReceiver',inner,180,178,51,'RFS','Remote file server','RFS at the receiving database writes incoming redo into the active standby redo log on the normal streaming path.','process',site==='B'?'rfs':'');
+          node('sApply',outer,180,178,51,'MRP0','Managed Redo Apply','The 11g physical standby managed recovery process coordinates media recovery and may use parallel recovery workers to update database blocks.','process',site==='B'?'mrp':'');
+          node('sLog',inner,270,178,51,'Standby redo log','Current receiving group','Stores incoming redo. With SYNC/AFFIRM a durable write to this log is acknowledged to the primary.','storage',site==='B'?'srl':'as');
+          node('sFiles',outer,270,178,51,'Data files','Physical standby copy','Redo Apply changes the standby data blocks. Received redo can be durable in the standby redo log before it has been applied here.','storage',site==='B'?'bf':'af');
+          node('sArchive',inner,359,178,51,'Archived redo','Standby archive','ARCn archives completed standby redo logs. Archived logs can also be received to fill a gap. Recovery requires the necessary contiguous redo stream.','storage');
+          node('sAccess',outer,359,178,51,'Open mode','Mounted / read-only','A mounted physical standby can run real-time apply. Opening it read-only while apply continues requires the Active Data Guard real-time query option.','process');
+          node('sReserved',inner,449,178,48,'Online redo logs','For a future primary role','The standby database includes online redo log files for its eventual primary role. The receiving path shown here uses standby redo logs.','storage',site==='B'?'bl':'al');
+        }
+        node(pre+'Dmon',outer,449,178,48,'DMON','Broker management','When broker management is enabled, the DMON processes maintain the configuration and coordinate management actions across the databases.','manage');
+      }
+      const P=(id,side) => {
+        const n=nodes.get(id);
+        return {t:[n.x+n.w/2,n.y],b:[n.x+n.w/2,n.y+n.h],l:[n.x,n.y+n.h/2],r:[n.x+n.w,n.y+n.h/2]}[side];
+      };
+      const dst=f.reverse?'l':'r', back=f.reverse?'r':'l';
+      function edge(id, from, to, points, label, kind='redo',optional=false) {
+        const d=points.map(([x,y],i)=>(i?'L':'M')+x+' '+y).join(' ');
+        edges.set(id,{id,from,to,d,label,kind,optional});
+      }
+      function sideways(id,from,to,label,cls,optional=false) {
+        const left=nodes.get(from).x<nodes.get(to).x;
+        edge(id,from,to,[P(from,left?'r':'l'),P(to,left?'l':'r')],label,cls,optional);
+      }
+      function vertical(id,from,to,label) {edge(id,from,to,[P(from,'b'),P(to,'t')],label);}
+      function viaY(id,from,fromSide,to,toSide,y,label,cl,optional) {
+        const a=P(from,fromSide),b=P(to,toSide);
+        edge(id,from,to,[a,[a[0],y],[b[0],y],b],label,cl,optional);
+      }
+      function elbow(id,from,to,k,label) {
+        const a=P(from,dst), b=P(to,back), mid=(a[0]+b[0])/2+k;
+        edge(id,from,to,[a,[mid,a[1]],[mid,b[1]],b],label);
+      }
+      sideways('session-service','app','svc','Request the primary-role database service','redo',true);
+      viaY('client-connect','svc','b','pRedo','t',153,'Establish an application session at the current primary','redo',true);
+      viaY('client-reply','pRedo','t','app','b',155,'The source session returns a commit result to its client','ack',true);
+      vertical('redo-flush','pRedo','pWriter','Redo entries from the instance buffer reach LGWR.');
+      sideways('local-write','pWriter','pLog','LGWR writes the local online redo log.');
+      edge('async-read','pLog','pSender',[P('pLog','t'),P('pSender','b')],'NSAn reads redo from the current online redo log for asynchronous shipping.','redo',true);
+      const syncStart=P('pWriter',dst),syncEnd=P('pSender',back),syncX=(syncStart[0]+syncEnd[0])/2;
+      edge('sync-submit','pWriter','pSender',[syncStart,[syncX,syncStart[1]],[syncX,syncEnd[1]],syncEnd],'LGWR engages NSSn to transmit redo to a synchronous destination.','redo',true);
+      sideways('transport-send','pSender','wan','Send redo from the primary site across the transport network.');
+      sideways('transport-receive','wan','sReceiver','Receive the transported redo stream at standby RFS.');
+      vertical('receive-write','sReceiver','sLog','RFS writes to the standby redo log.');
+      viaY('remote-ack','sReceiver','t','pSender','t',155,'SYNC/AFFIRM acknowledges the durable standby log write to the sender.','ack',true);
+      elbow('apply-current','sLog','sApply',0,'Real-time apply reads the current standby redo log.');
+      elbow('apply-archive','sArchive','sApply',f.reverse?11:-11,'Managed recovery reads available contiguous archived sequences.');
+      vertical('recover-files','sApply','sFiles','Managed recovery coordinates recovery of physical data blocks.');
+      vertical('archive-srl','sLog','sArchive','ARCn archives a completed standby redo log group.');
+      vertical('archive-orl','pLog','pArchive','ARCn archives a switched primary online redo log group.');
+      sideways('gap-transfer','pArchive','sArchive','Gap resolution transfers the required archived redo between the sites.','redo',true);
+      function observerLink(id,site,label) {
+        const a=P('observer','b'),b=P(site+'Dmon',site==='p'?dst:back), channel=nodes.get(site+'Dmon').x<450?444:636;
+        edge(id,'observer',site+'Dmon',[a,[a[0],70],[channel,70],[channel,430],[b[0]+(channel<500?12:-12),430],[b[0]+(channel<500?12:-12),b[1]],b],label,'control',true);
+      }
+      observerLink('observer-primary','p','Observer connectivity to the primary broker endpoint.');
+      observerLink('observer-standby','s','Observer connectivity to the fast-start failover target.');
+      return {nodes,edges,source,target};
+    }
+
+
+    const names = new Map(Object.entries(actorNames));
+    const el = id => document.getElementById(id);
+    let pos = 0;
+    const canvas = document.getElementById('dg-canvas');
+    const viewport = document.getElementById('dg-viewport');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const playToggle = document.querySelector('[data-arch-play]');
+    const speedSelect = document.querySelector('[data-arch-speed]');
+    let timer = null, inspected = null, drawn = null;
+    function inspectNode(id) {
+      const node = drawn.nodes.get(id);
+      if (!node) return;
+      inspected = id;
+      document.getElementById('inspect-title').textContent = node.title;
+      document.getElementById('inspect').textContent = node.info;
+      for(const g of canvas.querySelectorAll('.arch-node')) g.dataset.inspected=String(g.dataset.node===id);
+    }
+    function buildNode(n, active, scene, courseActors) {
+      const g=tag('g',{'class':'arch-node '+n.kind+(n.actor?' actor':'')+(active?' is-active':''),
+        'data-node':n.id,role:'button',tabindex:0,'aria-label':n.title+' — '+n.description,transform:'translate('+n.x+' '+n.y+')'});
+      if(n.actor) { g.dataset.actor=n.actor;g.setAttribute('aria-pressed',String(courseActors.includes(n.actor))); }
+      const isDown=n.id==='wan'&&/disconnect|no primary/i.test(scene.link||'') || n.kind==='site'&&/shut down|offline|unreachable|isolated/i.test(n.description);
+      if(isDown)g.classList.add('is-down');
+      g.append(tag('title',{},n.title+'. '+n.info));
+      g.append(tag('rect',{class:'shape',x:0,y:0,width:n.w,height:n.h,rx:n.kind==='site'?4:7}));
+      if(n.kind==='storage') {
+        g.append(tag('path',{class:'node-mark',d:'M9 14 Q16 11 23 14 Q16 17 9 14 M9 14 v12 q7 4 14 0 V14 M9 21 q7 4 14 0'}));
+      } else if(n.kind==='manage'){
+        g.append(tag('path',{class:'node-mark',d:'M10 18h10v9H10z M13 14h10v9 M8 30h11'}));
+      } else if(n.kind==='link'){
+        g.append(tag('path',{class:'node-mark',d:'M7 20h16m-5-5 5 5-5 5 M23 29H8m5-4-5 4 5 4'}));
+      }
+      const x=['storage','manage','link'].includes(n.kind)?29:11;
+      g.append(tag('text',{x,y:20},n.title),tag('text',{class:'detail',x,y:37},n.description));
+      g.addEventListener('click',()=>inspectNode(n.id));
+      g.addEventListener('keydown', e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectNode(n.id);}});
+      return g;
+    }
+    function drawDiagram(flow,i) {
+      const step=frames[flow.id][i];
+      const transportMode = flow.id==='dg-1' || ((flow.id==='dg-2' || flow.id==='dg-3') && i===0) ? 'ASYNC'
+        : flow.id==='dg-2' || flow.id==='dg-3' ? 'SYNC' : null;
+      const model=layoutDiagram({...step,transportMode});
+      drawn=model;
+      canvas.dataset.primary=model.source;
+      canvas.dataset.standby=step.offlineStandby||step.candidate?'pending':model.target;
+      const group=document.getElementById('dg-regions');
+      group.replaceChildren(tag('rect',{x:8,y:83,width:446,height:429,rx:10,class:'dg-site'}),tag('rect',{x:626,y:83,width:446,height:429,rx:10,class:'dg-site alt'}));
+      group.append(tag('text',{x:540,y:173,class:'dg-caption','text-anchor':'middle'},'SITE LINK'));
+      const active=new Set(step.nodes);
+      const edgeGroup=document.getElementById('dg-edges');
+      edgeGroup.replaceChildren();
+      const moving=[];
+      for(const edge of model.edges.values()) {
+        const live=step.edges.includes(edge.id),blocked=(step.blocked||[]).includes(edge.id);
+        if(live||blocked) {active.add(edge.from);active.add(edge.to);}
+        const g=tag('g',{class:'arch-edge '+edge.kind+(edge.optional?' optional':'')+(live?' is-active':'')+(blocked?' is-blocked':''),'data-edge':edge.id,'data-from':edge.from,'data-to':edge.to});
+        g.append(tag('title',{},edge.label),tag('path',{class:'line',d:edge.d}));
+        if(live&&!blocked&&!reduceMotion.matches) {
+          const packet=tag('circle',{class:'packet',r:3.3,opacity:0});
+          const duration=String(1.5/Number(speedSelect.value))+'s';
+          const mot=tag('animateMotion',{path:edge.d,dur:duration,begin:'indefinite',fill:'freeze'});
+          const fade=tag('animate',{attributeName:'opacity',values:'0;1;1;0',keyTimes:'0;0.08;0.88;1',dur:duration,begin:'indefinite',fill:'freeze'});
+          packet.append(mot,fade);g.append(packet);moving.push([mot,fade]);
+        }
+        edgeGroup.append(g);
+      }
+      const nodes=document.getElementById('dg-nodes');
+      nodes.replaceChildren(...Array.from(model.nodes.values(),n=>buildNode(n,active.has(n.id),step,flow.actors[i])));
+      document.getElementById('dg-focus').textContent=step.caption;
+      if(inspected) {
+        if(model.nodes.has(inspected))inspectNode(inspected);
+        else inspected=null;
+      }
+      if(!inspected) {
+        document.getElementById('inspect-title').textContent='Inspect a component';
+        document.getElementById('inspect').textContent='Select a process, file, or site to see its role.';
+      }
+      if(canvas.unpauseAnimations) canvas.unpauseAnimations();
+      for(const [motion,fade] of moving) {if(motion.beginElement){motion.beginElement();fade.beginElement();}}
+    }
+    function stopPlayback(freeze=false) {
+      if(timer!==null) clearInterval(timer);
+      timer=null;
+      playToggle.textContent='Play';
+      playToggle.setAttribute('aria-pressed','false');
+      if(freeze&&canvas.pauseAnimations)canvas.pauseAnimations();
+    }
+    function startPlayback() {
+      stopPlayback();
+      const flow=flows[select.selectedIndex];
+      if(pos===flow.steps.length-1) pos=0;
+      document.getElementById('answer').open=false;
+      paint();
+      playToggle.textContent='Pause';
+      playToggle.setAttribute('aria-pressed','true');
+      timer=setInterval(()=>{
+        pos++;
+        paint();
+        if(pos===flow.steps.length-1)stopPlayback();
+      },3800/Number(speedSelect.value));
+    }
+    playToggle.addEventListener('click',()=>{if(timer===null)startPlayback();else stopPlayback(true);});
+    speedSelect.addEventListener('change',()=>{if(timer!==null)startPlayback();});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden&&timer!==null)stopPlayback(true);});
+    reduceMotion.addEventListener('change',()=>{drawDiagram(flows[select.selectedIndex],pos);});
+    document.getElementById('dg-zoom').addEventListener('click',function(){
+      const fit=viewport.classList.toggle('fit');
+      this.setAttribute('aria-pressed',String(fit));this.textContent=fit?'Show detail':'Fit both sites';
+    });
+
+
+    function paint() {
+      const flow = flows[select.selectedIndex];
+      el('level').textContent = flow.level;
+      el('title').textContent = flow.title;
+      el('setup').textContent = flow.setup;
+      el('progress').textContent = 'Step ' + (pos + 1) + ' of ' + flow.steps.length;
+      el('step').textContent = flow.steps[pos];
+      el('focus').textContent = 'In focus · ' + flow.actors[pos].map(a => names.get(a)).join(' · ');
+      el('question').textContent = flow.question;
+      el('foundation').href = './index.html#lesson=' + flow.home;
+      el('foundation').textContent = 'Stand-Alone DB lesson · ' + flow.home.split('-').join(' ');
+      el('verdict').textContent = '';
+      el('decision').replaceChildren(...(flow.options || []).map((label, i) => {
+        const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+        button.addEventListener('click', () => { el('verdict').textContent = (i === flow.correct ? 'Correct. ' : 'Try again. ') + flow.answer; });
+        return button;
+      }));
+      el('answer').querySelector('p').textContent = flow.answer;
+      el('prev').disabled = pos === 0;
+      el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      drawDiagram(flow,pos);
+      el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
+    }
+    function readRoute() {
+      stopPlayback();inspected=null;
+      const requested = location.hash.slice(1);
+      select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
+      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+    }
+    select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
+    window.addEventListener('hashchange', readRoute);
+    el('next').addEventListener('click', () => {stopPlayback();pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {stopPlayback();if(pos>0) pos--; el('answer').open=false;paint();});
+    readRoute();
+  </script>
+</body></html>

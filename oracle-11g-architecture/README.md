@@ -8,13 +8,19 @@
 2. Try **First-Time SELECT / Hard Parse**, then **INSERT + COMMIT**. Watch which process handles the SQL and which process makes a normal commit durable.
 3. At the final step, answer the question in your own words and expand **Suggested answer** to compare. Use **Reset timeline** to replay the steps or the reset button beside the diagram to choose another workflow.
 
-To explore a component on its own, use the diagram search. Search for **LGWR**, for example, to read what the log writer does during a commit.
+## Use the controls in any tower
+
+1. Choose a tower at the top of the page. In the workflow explorer, filter by **operation category** or **difficulty**, or enter a workflow name in the search box.
+2. Choose **Manual Demo** to read the workflow guide. Press **Next step** in the bottom player to see the first step in the diagram. Choose **Auto Demo** on a workflow card to start playback immediately.
+3. Use **Play**, **Pause**, **Previous step**, and **Next step** to control the animation. Change the speed, turn **Loop Flow** on to repeat, or select a named step on the timeline to revisit it. You can also drag the slider to a step. On phones the active player stays at the bottom of the screen. **Reset timeline** takes you back to the start of the selected workflow.
+4. Search for a component beside the diagram, or select it in the drawing to inspect its role. On Stand-Alone DB, try **LGWR** during a commit. On RAC, try **SCAN listener** during a client connection.
+5. Use the diagram’s full-screen control for a closer look. Open **References** in the top toolbar to consult the Oracle documentation for that tower.
 
 ## Follow a change through the architecture
 
 The database examples use **Oracle Database 11g Release 2 (11.2.0.4)**. GoldenGate uses the 11.2.1 Classic architecture. Enterprise Manager uses Cloud Control 12.1 with an 11g database target.
 
-Choose a workflow, then use **Next step** or **Play** to follow its highlighted components and connections. Pause on a frame and select a component to inspect its role. With reduced motion enabled, the component and connection highlights still identify the current step.
+The links below open individual workflows. Look for the highlighted components and connections as you advance. With reduced motion enabled, these highlights still identify the current step.
 
 | Start here | Follow on the diagram |
 |---|---|

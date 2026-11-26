@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Offline Oracle Database 11g Release 2 (11.2.0.4) architecture and SQL execution trainer">
   <meta name="author" content="Cyril Jones S">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -713,9 +713,13 @@
       justify-content: flex-end;
     }
 
+    @media (min-width: 821px) {
+      .diagram-toolbar .search-box { min-width: 10rem; }
+    }
+
     .diagram-toolbar .operation-card {
       flex: 1 1 430px;
-      min-width: 280px;
+      min-width: 10rem;
       max-width: 720px;
       padding: 5px 8px;
       gap: 8px;
@@ -1727,6 +1731,15 @@
       gap: 5px;
     }
 
+    #timelineRange {
+      width: 100%;
+      min-height: 14px;
+      margin: 0;
+      accent-color: var(--cyan);
+    }
+
+    .app-shell:not(.workflow-active) #timelineRange { display: none; }
+
     .operation-card {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -2232,10 +2245,24 @@
       .explorer-controls { grid-template-columns: 1fr; }
       .workflow-card-grid { grid-auto-columns: minmax(240px, 86vw); }
       .diagram-toolbar { flex-direction: column; align-items: stretch; }
+      .diagram-toolbar .operation-card { flex: 0 0 auto; min-width: 0; }
       .diagram-toolbar-actions { justify-content: space-between; }
       .side-panel { grid-template-columns: 1fr; }
       .operation-card { grid-template-columns: 1fr; }
       .svg-wrap { min-height: 480px; }
+    }
+
+    @media screen and (max-width: 820px) {
+      .app-shell.workflow-active { padding-bottom: calc(200px + env(safe-area-inset-bottom)); }
+      .app-shell.workflow-active .timeline-panel {
+        position: fixed;
+        z-index: 30;
+        left: 10px;
+        right: 10px;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        background: var(--bg-2);
+      }
+      .app-shell.workflow-active .timeline-controls { row-gap: 3px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -2304,7 +2331,7 @@
         <p class="subtitle">11g Release 2 (11.2.0.4) | Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026"></p>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2339,7 +2366,7 @@
       <div class="workflow-explorer-head">
         <div>
           <h2 id="workflowExplorerTitle">Operations You Can Explain with Oracle 11g Architecture</h2>
-          <p class="subtitle">Choose a grouped workflow, start the demo, and use the existing timeline controls to scrub, pause, or replay the architecture path.</p>
+          <p class="subtitle">Choose Manual Demo to open the workflow guide, or Auto Demo to play it. The bottom player controls each tower.</p>
         </div>
         <div id="workflowCount" class="workflow-count" aria-live="polite">0 workflows</div>
       </div>
@@ -2743,11 +2770,12 @@
           <div id="timelineProgress" class="timeline-progress"></div>
         </div>
       </div>
+      <input type="range" id="timelineRange" min="0" max="0" value="0" step="1" aria-label="Scrub workflow timeline">
     </section>
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026.
   </div>
 
   <dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
@@ -2827,7 +2855,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;

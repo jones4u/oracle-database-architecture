@@ -1,11 +1,2326 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="copyright" content="Designer : Cyril Jones S | Version : v3 | Updated : 26-Nov-2026">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v4 | Updated : 26-Nov-2026">
 <title>Oracle GoldenGate · Oracle 11g Architecture</title>
 <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07080b;
+      --bg-2: #10131a;
+      --panel: rgba(18, 22, 31, 0.78);
+      --panel-strong: rgba(26, 31, 43, 0.92);
+      --line: rgba(185, 214, 255, 0.16);
+      --line-strong: rgba(126, 241, 255, 0.58);
+      --text: #eef5ff;
+      --muted: #a7b4c4;
+      --dim: #637181;
+      --oracle: #f1423d;
+      --oracle-deep: #8c171a;
+      --cyan: #63ecff;
+      --gold: #ffd166;
+      --violet: #b985ff;
+      --green: #7df2a8;
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.46);
+      --radius: 8px;
+      --fast: 160ms ease;
+      --slow: 520ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(241, 66, 61, 0.18), transparent 28rem),
+        radial-gradient(circle at 78% 8%, rgba(99, 236, 255, 0.13), transparent 24rem),
+        linear-gradient(135deg, #050609 0%, #10131a 48%, #07080b 100%);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 78%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.6;
+      background:
+        radial-gradient(circle at 26% 68%, rgba(255, 209, 102, 0.12), transparent 17rem),
+        radial-gradient(circle at 78% 78%, rgba(185, 133, 255, 0.11), transparent 15rem);
+      animation: atmosphere 9s ease-in-out infinite alternate;
+    }
+
+    @keyframes atmosphere {
+      from { transform: translate3d(0, 0, 0); opacity: .48; }
+      to { transform: translate3d(0, -10px, 0); opacity: .76; }
+    }
+
+    a { color: var(--cyan); }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      color: var(--text);
+      border: 1px solid rgba(136, 171, 206, 0.22);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025));
+      border-radius: var(--radius);
+      padding: 0.62rem 0.78rem;
+      cursor: pointer;
+      min-height: 40px;
+      transition: transform var(--fast), border-color var(--fast), box-shadow var(--fast), background var(--fast);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(99, 236, 255, 0.72);
+      box-shadow: 0 0 22px rgba(99, 236, 255, 0.19);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.active {
+      border-color: rgba(255, 209, 102, 0.92);
+      background: linear-gradient(180deg, rgba(241,66,61,0.26), rgba(255,209,102,0.09));
+      box-shadow: 0 0 26px rgba(255, 209, 102, 0.24), inset 0 0 18px rgba(241,66,61,0.12);
+    }
+
+    button:focus-visible,
+    .workflow-answer summary:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    .component:focus-visible,
+    .milestone:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      --adaptive-workflow-svg-height: clamp(540px, calc(100dvh - 254px), 700px);
+      --adaptive-workflow-panel-height: clamp(590px, calc(100dvh - 218px), 735px);
+      --adaptive-normal-svg-height: clamp(610px, calc(100dvh - 84px), 1010px);
+      --adaptive-normal-panel-height: clamp(640px, calc(100dvh - 24px), 1050px);
+      min-height: 100vh;
+      padding: 14px 20px 16px;
+      display: grid;
+      gap: 8px;
+      grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      align-content: start;
+    }
+
+    .app-shell:not(.workflow-active) {
+      padding-bottom: 38px;
+    }
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .trainer-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 18px 20px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: clamp(1.25rem, 1.55vw, 1.9rem);
+      line-height: 1.05;
+      font-weight: 750;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .source-note {
+      max-width: 460px;
+      margin: 0;
+      color: #c7d0dc;
+      font-size: 0.82rem;
+      text-align: right;
+    }
+
+    .source-note.credit-lock {
+      user-select: none;
+    }
+
+    .source-note.credit-lock::before {
+      content: attr(data-credit);
+    }
+
+    .header-side {
+      display: grid;
+      gap: 8px;
+      justify-items: end;
+    }
+
+    .scroll-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: .36rem .58rem;
+      color: #eaf9ff;
+      border-color: rgba(99, 236, 255, .42);
+      background: linear-gradient(180deg, rgba(99,236,255,.12), rgba(255,209,102,.06));
+      font-size: .78rem;
+      white-space: nowrap;
+      box-shadow: 0 0 18px rgba(99, 236, 255, .1);
+    }
+
+    .scroll-cue .cue-arrow {
+      display: inline-grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      color: #ffd166;
+      background: rgba(255, 209, 102, .13);
+      animation: scrollCueBounce 1500ms ease-in-out infinite;
+    }
+
+    @keyframes scrollCueBounce {
+      0%, 100% { transform: translateY(-1px); }
+      50% { transform: translateY(3px); }
+    }
+
+    .tamper-banner {
+      position: fixed;
+      z-index: 50;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      max-width: min(820px, calc(100vw - 32px));
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 209, 102, .82);
+      border-radius: var(--radius);
+      background: rgba(50, 18, 18, .94);
+      color: #fff5c8;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .42);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    .tamper-banner[hidden] {
+      display: none;
+    }
+
+    .button-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 12px;
+      align-items: center;
+    }
+
+    .workflow-explorer {
+      padding: 10px 12px 8px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .app-shell.workflow-active {
+      grid-template-rows: auto auto auto auto;
+      align-content: start;
+      gap: 7px;
+      padding-bottom: 16px;
+    }
+
+    .app-shell.workflow-active .workflow-explorer {
+      display: none;
+    }
+
+    .app-shell.workflow-active .trainer-workspace {
+      min-height: 0;
+      align-items: start;
+    }
+
+    .app-shell.workflow-active .side-panel {
+      height: var(--adaptive-workflow-panel-height);
+      max-height: var(--adaptive-workflow-panel-height);
+      align-self: start;
+    }
+
+    .app-shell.workflow-active .svg-wrap {
+      height: var(--adaptive-workflow-svg-height);
+    }
+
+    .app-shell:not(.workflow-active) .side-panel {
+      height: var(--adaptive-normal-panel-height);
+      max-height: none;
+      align-self: stretch;
+    }
+
+    .app-shell:not(.workflow-active) .svg-wrap {
+      height: var(--adaptive-normal-svg-height);
+    }
+
+    .app-shell:not(.workflow-active) .timeline-panel {
+      position: fixed;
+      left: clamp(8px, 1vw, 16px);
+      bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 30;
+      width: max-content;
+      max-width: min(700px, calc(100vw - 32px));
+      min-height: 0;
+      padding: 5px 7px;
+      transition: opacity var(--fast), border-color var(--fast), max-width var(--fast);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, .38);
+    }
+
+    .app-shell:not(.workflow-active) .timeline-panel .operation-card,
+    .app-shell:not(.workflow-active) .timeline-track-wrap {
+      display: none;
+    }
+
+    .app-shell:not(.workflow-active) .timeline-controls {
+      flex-wrap: nowrap;
+      gap: 4px;
+      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .app-shell:not(.workflow-active) .timeline-controls .switch {
+      white-space: nowrap;
+      font-size: .72rem;
+    }
+
+    .app-shell:not(.workflow-active) .timeline-controls select {
+      width: 58px;
+      min-height: 26px;
+      padding: 0 .32rem;
+      font-size: .72rem;
+    }
+
+    .app-shell.component-active {
+      grid-template-rows: auto auto auto auto auto;
+      align-content: start;
+      gap: 5px;
+    }
+
+    .app-shell.component-active .trainer-workspace {
+      min-height: 0;
+      align-items: start;
+    }
+
+    .app-shell.component-active .side-panel {
+      height: max(680px, var(--adaptive-normal-panel-height));
+      max-height: none;
+      align-self: start;
+    }
+
+    .app-shell.component-active .svg-wrap {
+      height: var(--adaptive-normal-svg-height);
+    }
+
+    .app-shell.component-active .timeline-panel {
+      padding: 5px 7px 11px;
+      min-height: 0;
+    }
+
+    .app-shell.component-active .timeline-track-wrap,
+    .app-shell.component-active .timeline-panel .operation-card {
+      display: none;
+    }
+
+    .app-shell.component-active .timeline-controls {
+      justify-content: flex-start;
+      gap: 4px;
+    }
+
+    .app-shell.workflow-active,
+    .app-shell.component-active {
+      align-content: start !important;
+    }
+
+    .app-shell.workflow-active {
+      grid-template-rows: auto auto auto auto !important;
+    }
+
+    .app-shell.component-active:not(.workflow-active) {
+      grid-template-rows: auto auto auto auto auto !important;
+    }
+
+    .app-shell.workflow-active .trainer-workspace,
+    .app-shell.workflow-active .timeline-panel {
+      align-self: start;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    @supports not (height: 100dvh) {
+      .app-shell {
+        --adaptive-workflow-svg-height: clamp(540px, calc(100vh - 254px), 700px);
+        --adaptive-workflow-panel-height: clamp(590px, calc(100vh - 218px), 735px);
+        --adaptive-normal-svg-height: clamp(610px, calc(100vh - 84px), 1010px);
+        --adaptive-normal-panel-height: clamp(640px, calc(100vh - 24px), 1050px);
+      }
+
+      .app-shell.workflow-active .side-panel {
+        height: var(--adaptive-workflow-panel-height);
+        max-height: var(--adaptive-workflow-panel-height);
+      }
+
+      .app-shell.workflow-active .svg-wrap {
+        height: var(--adaptive-workflow-svg-height);
+      }
+    }
+
+    .workflow-explorer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .workflow-explorer h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .workflow-explorer .subtitle {
+      font-size: 0.84rem;
+      max-width: 780px;
+      margin-top: 4px;
+    }
+
+    .workflow-count {
+      white-space: nowrap;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid rgba(255, 209, 102, .28);
+      border-radius: 999px;
+      background: rgba(255, 209, 102, .08);
+    }
+
+    .explorer-controls {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.6fr) minmax(220px, 1.2fr) auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .explorer-controls select,
+    .explorer-controls input[type="search"] {
+      width: 100%;
+      color: var(--text);
+      background: rgba(4, 7, 11, 0.72);
+      border: 1px solid rgba(136, 171, 206, 0.24);
+      border-radius: var(--radius);
+      min-height: 38px;
+      padding: 0 0.7rem;
+    }
+
+    .workflow-card-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(292px, 360px);
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 0;
+      scroll-snap-type: x proximity;
+    }
+
+    .workflow-card {
+      scroll-snap-align: start;
+      border: 1px solid rgba(136, 171, 206, .18);
+      border-radius: var(--radius);
+      background: rgba(8, 13, 20, .78);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      min-height: 238px;
+    }
+
+    .workflow-card.active {
+      border-color: rgba(255, 209, 102, .86);
+      box-shadow: 0 0 22px rgba(255, 209, 102, .16);
+      background: linear-gradient(180deg, rgba(255,209,102,.10), rgba(8,13,20,.82));
+    }
+
+    .workflow-card h3 {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.2;
+    }
+
+    .failure-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      justify-self: start;
+      box-sizing: border-box;
+      min-height: 24px;
+      border: 1px solid rgba(255, 122, 122, .54);
+      border-radius: 999px;
+      color: #ffb3b3;
+      background: rgba(154, 34, 49, .22);
+      padding: .28rem .58rem .25rem;
+      font-size: .67rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .workflow-card p {
+      margin: 0;
+      color: #c9d4e2;
+      font-size: 0.82rem;
+      line-height: 1.38;
+    }
+
+    .workflow-card code {
+      display: block;
+      color: #ffe8a6;
+      font-size: 0.76rem;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      padding: 7px;
+      max-height: 58px;
+      overflow: auto;
+    }
+
+    .workflow-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: auto;
+    }
+
+    .workflow-card-actions button {
+      min-height: 34px;
+      padding: 0.42rem 0.58rem;
+      font-size: 0.78rem;
+    }
+
+    .difficulty {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 82px;
+      min-height: 28px;
+      color: #eaf5ff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.12;
+      white-space: normal;
+      text-align: center;
+      padding: 0.18rem 0.5rem;
+      border: 1px solid rgba(99,236,255,.26);
+      border-radius: 999px;
+      background: rgba(99,236,255,.10);
+    }
+
+    .workflow-card .meta-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      align-items: start;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .workflow-card .tag {
+      min-width: 0;
+      min-height: 28px;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.12;
+    }
+
+    .trainer-workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(760px, 1.08fr) minmax(380px, 480px);
+      gap: 16px;
+      scroll-margin-top: 0;
+      transition: grid-template-columns var(--slow), gap var(--slow);
+    }
+
+    .trainer-workspace.side-panel-locked {
+      grid-template-columns: minmax(0, 1fr) 28px;
+      gap: 8px;
+    }
+
+    .trainer-workspace.side-panel-locked .diagram-panel {
+      min-width: 0;
+    }
+
+    .trainer-workspace.side-panel-locked .side-panel {
+      position: relative;
+      min-width: 0;
+      overflow: visible;
+      max-height: clamp(500px, calc(100vh - 300px), 650px);
+    }
+
+    .trainer-workspace.side-panel-locked .side-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(99, 236, 255, .18);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(99,236,255,.08), rgba(241,66,61,.08));
+    }
+
+    .trainer-workspace.side-panel-locked .explanation-panel {
+      display: none;
+    }
+
+    .side-panel-locker {
+      position: absolute;
+      left: -14px;
+      top: 50%;
+      z-index: 12;
+      width: 24px;
+      height: 62px;
+      min-height: 0;
+      padding: 0;
+      border-radius: 10px 0 0 10px;
+      display: grid;
+      place-items: center;
+      color: #dffbff;
+      background: linear-gradient(180deg, rgba(99,236,255,.18), rgba(255,209,102,.12));
+      border-color: rgba(99, 236, 255, .5);
+      box-shadow: 0 0 24px rgba(99, 236, 255, .2);
+      transform: translateY(-50%);
+      transition: border-color var(--fast), box-shadow var(--fast), background var(--fast);
+    }
+
+    .side-panel-locker:hover,
+    .side-panel-locker:active {
+      transform: translateY(-50%);
+    }
+
+    .side-panel-locker .locker-icon {
+      display: inline-block;
+      font-size: .88rem;
+      line-height: 1;
+      transition: transform var(--fast);
+    }
+
+    .trainer-workspace.side-panel-locked .side-panel-locker {
+      left: -4px;
+      border-radius: 10px 0 0 10px;
+      background: linear-gradient(180deg, rgba(255,209,102,.24), rgba(99,236,255,.12));
+    }
+
+    .trainer-workspace.side-panel-locked .side-panel-locker .locker-icon {
+      transform: rotate(180deg);
+    }
+
+    .diagram-panel {
+      min-width: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .diagram-panel:fullscreen,
+    .diagram-panel.architecture-fullscreen-fallback {
+      width: 100vw;
+      height: 100vh;
+      padding: 12px;
+      background:
+        radial-gradient(circle at 50% 28%, rgba(99,236,255,0.14), transparent 34rem),
+        linear-gradient(140deg, #070b12 0%, #11151f 48%, #160d13 100%);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .diagram-panel.architecture-fullscreen-fallback {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+    }
+
+    .diagram-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 5px 7px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .diagram-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    @media (min-width: 821px) {
+      .diagram-toolbar .search-box { min-width: 10rem; }
+    }
+
+    .diagram-toolbar .operation-card {
+      flex: 1 1 430px;
+      min-width: 10rem;
+      max-width: 720px;
+      padding: 5px 8px;
+      gap: 8px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .diagram-toolbar .operation-card h2 {
+      margin-bottom: 2px;
+      font-size: .86rem;
+    }
+
+    .diagram-toolbar .operation-card p {
+      font-size: .76rem;
+      line-height: 1.24;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .diagram-panel:fullscreen .diagram-toolbar,
+    .diagram-panel.architecture-fullscreen-fallback .diagram-toolbar {
+      justify-content: flex-end;
+    }
+
+    .diagram-panel:fullscreen .search-box,
+    .diagram-panel.architecture-fullscreen-fallback .search-box {
+      display: none;
+    }
+
+    .icon-control {
+      width: 36px;
+      min-height: 34px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+    }
+
+    .status-pill {
+      border: 1px solid rgba(99, 236, 255, 0.3);
+      color: #dffbff;
+      background: rgba(99, 236, 255, 0.08);
+      padding: 0.34rem 0.52rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 0.76rem;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 520px;
+    }
+
+    .search-box input {
+      width: 100%;
+      color: var(--text);
+      background: rgba(4, 7, 11, 0.72);
+      border: 1px solid rgba(136, 171, 206, 0.24);
+      border-radius: var(--radius);
+      min-height: 34px;
+      padding: 0 0.68rem;
+    }
+
+    .search-results {
+      position: absolute;
+      z-index: 10;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      max-height: 280px;
+      overflow: auto;
+      background: rgba(9, 12, 18, 0.98);
+      border: 1px solid rgba(99, 236, 255, 0.28);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.46);
+      padding: 6px;
+    }
+
+    .search-results[hidden] { display: none; }
+
+    .search-result {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      min-height: auto;
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
+
+    .search-result small {
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .svg-wrap {
+      min-height: 0;
+      height: var(--adaptive-workflow-svg-height);
+      overflow: hidden;
+      padding: 1px 5px;
+      display: grid;
+      place-items: stretch;
+      position: relative;
+    }
+
+    .diagram-panel:fullscreen .svg-wrap,
+    .diagram-panel.architecture-fullscreen-fallback .svg-wrap {
+      min-height: 0;
+      height: calc(100vh - 76px);
+      overflow: hidden;
+      display: grid;
+      place-items: stretch;
+      padding: 8px;
+    }
+
+    .architecture-svg {
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(99,236,255,0.10), transparent 28rem),
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+      border: 1px solid rgba(136, 171, 206, 0.12);
+      border-radius: var(--radius);
+    }
+
+    .diagram-panel:fullscreen .architecture-svg,
+    .diagram-panel.architecture-fullscreen-fallback .architecture-svg {
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .architecture-svg.wide-fit {
+      border-color: rgba(99, 236, 255, 0.22);
+      background:
+        radial-gradient(circle at 50% 30%, rgba(99,236,255,0.11), transparent 32rem),
+        linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.006));
+    }
+
+    .architecture-svg.wide-fit .component rect,
+    .architecture-svg.wide-fit .component path,
+    .architecture-svg.wide-fit .component ellipse,
+    .architecture-svg.wide-fit .flow-arrow {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .component {
+      cursor: pointer;
+      transition: opacity var(--slow), filter var(--slow);
+    }
+
+    .component rect,
+    .component path,
+    .component ellipse {
+      transition: stroke var(--slow), fill var(--slow), filter var(--slow), opacity var(--slow);
+    }
+
+    .component text {
+      fill: #ecf6ff;
+      pointer-events: none;
+      font-weight: 540;
+      font-size: 13px;
+    }
+
+    .component .minor {
+      fill: #b7c4d5;
+      font-size: 10.5px;
+      font-weight: 560;
+    }
+
+    .memory-shape { fill: rgba(35, 57, 85, .72); stroke: rgba(99, 236, 255, .52); }
+    .process-shape { fill: rgba(72, 35, 43, .78); stroke: rgba(241, 66, 61, .65); }
+    .storage-shape { fill: rgba(47, 61, 62, .86); stroke: rgba(125, 242, 168, .48); }
+    .concept-shape { fill: rgba(62, 49, 82, .8); stroke: rgba(185, 133, 255, .68); }
+    .network-shape { fill: rgba(48, 55, 30, .8); stroke: rgba(255, 209, 102, .7); }
+    .category-frame { fill: rgba(8, 12, 17, .34); stroke: rgba(214, 226, 241, .26); stroke-dasharray: 4 5; }
+    .category-label { fill: #dbe6f3; font-size: 14px; font-weight: 760; }
+    .diagram-label { fill: #9db0c4; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .diagram-label.sentence-case { text-transform: none; }
+    .component:hover rect,
+    .component:hover path,
+    .component:hover ellipse {
+      filter: url(#softGlow);
+      stroke: var(--cyan);
+    }
+
+    .component.active rect,
+    .component.active path,
+    .component.active ellipse {
+      stroke: #fff0a8;
+      stroke-width: 2.5;
+      filter: url(#strongGlow);
+      fill-opacity: 0.96;
+    }
+
+    .component.related rect,
+    .component.related path,
+    .component.related ellipse {
+      stroke: var(--cyan);
+      filter: url(#softGlow);
+    }
+
+    .component.memory-zone-pga rect,
+    .component.memory-zone-pga path,
+    .component.memory-zone-pga ellipse {
+      stroke: rgba(99, 236, 255, .72);
+      fill: rgba(30, 78, 96, .72);
+    }
+
+    .component.memory-zone-shared-pool rect,
+    .component.memory-zone-shared-pool path,
+    .component.memory-zone-shared-pool ellipse {
+      stroke: rgba(185, 133, 255, .78);
+      fill: rgba(67, 47, 96, .78);
+    }
+
+    .component.memory-zone-dictionary rect,
+    .component.memory-zone-dictionary path,
+    .component.memory-zone-dictionary ellipse {
+      stroke: rgba(255, 240, 168, .82);
+      fill: rgba(87, 76, 42, .76);
+    }
+
+    .component.memory-zone-buffer-cache rect,
+    .component.memory-zone-buffer-cache path,
+    .component.memory-zone-buffer-cache ellipse {
+      stroke: rgba(125, 242, 168, .72);
+      fill: rgba(35, 82, 66, .74);
+    }
+
+    .component.memory-zone-redo rect,
+    .component.memory-zone-redo path,
+    .component.memory-zone-redo ellipse {
+      stroke: rgba(255, 138, 112, .78);
+      fill: rgba(84, 44, 45, .78);
+    }
+
+    .component.dimmed {
+      opacity: 0.22;
+      filter: grayscale(0.55);
+    }
+
+    .flow-arrow {
+      fill: none;
+      opacity: 0;
+      stroke: rgba(131, 157, 185, 0);
+      stroke-width: 0.9;
+      marker-end: url(#arrowHeadIdle);
+      transition: stroke var(--fast), opacity var(--fast), filter var(--fast), stroke-width var(--fast);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .flow-arrow.completed {
+      opacity: 0.22;
+      stroke: rgba(99, 236, 255, 0.28);
+      stroke-width: 0.85;
+      stroke-dasharray: 3 8;
+      marker-end: none;
+    }
+
+    .flow-arrow.active-arrow {
+      opacity: .36;
+      stroke: rgba(143, 246, 255, .54);
+      stroke-width: 1;
+      stroke-dasharray: 6 10;
+      marker-end: none;
+      filter: drop-shadow(0 0 4px rgba(99, 236, 255, .52));
+      animation: arrowPulse 1250ms linear infinite;
+    }
+
+    .dynamic-flow-arrow {
+      fill: none;
+      opacity: .9;
+      stroke: #7ff6ff;
+      stroke-width: 1.45;
+      stroke-dasharray: var(--flow-path-length, 900) var(--flow-path-length, 900);
+      stroke-dashoffset: var(--flow-path-length, 900);
+      marker-end: none;
+      filter: drop-shadow(0 0 6px rgba(99, 236, 255, .84)) drop-shadow(0 0 11px rgba(255, 90, 122, .38));
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: opacity 160ms ease-out;
+    }
+
+    .flow-cue-step {
+      opacity: 0;
+      transition: opacity 280ms ease-out, filter 280ms ease-out;
+      will-change: opacity;
+    }
+
+    .flow-cue-step.active {
+      opacity: 1;
+    }
+
+    .flow-cue-step.exiting {
+      opacity: 0;
+      filter: blur(.2px);
+    }
+
+    .flow-bead {
+      pointer-events: none;
+      fill: #fff27a;
+      stroke: rgba(255, 90, 122, .96);
+      stroke-width: .45;
+      filter: drop-shadow(0 0 5px rgba(255, 242, 122, .82)) drop-shadow(0 0 8px rgba(99, 236, 255, .58));
+      animation: cuePulse 1050ms ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .flow-end-pulse {
+      pointer-events: none;
+      fill: rgba(255, 209, 102, .22);
+      stroke: rgba(255, 240, 168, .92);
+      stroke-width: .9;
+      filter: drop-shadow(0 0 7px rgba(255, 209, 102, .72));
+      animation: endPulse 1150ms ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .flow-tracer-line {
+      pointer-events: none;
+      fill: none;
+      opacity: .22;
+      stroke: #9efcff;
+      stroke-width: 1.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: var(--flow-path-length, 900) var(--flow-path-length, 900);
+      stroke-dashoffset: var(--flow-path-length, 900);
+      marker-end: none;
+      filter: drop-shadow(0 0 4px rgba(99, 236, 255, .5));
+      transition: opacity 160ms ease-out;
+    }
+
+    .flow-tracer-line.reverse {
+      marker-start: none;
+      marker-end: none;
+    }
+
+    .flow-stream-line {
+      pointer-events: none;
+      fill: none;
+      opacity: .96;
+      stroke: #fff27a;
+      stroke-width: 2.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: .2 10.5;
+      stroke-dashoffset: 0;
+      filter: drop-shadow(0 0 6px rgba(255, 242, 122, .9)) drop-shadow(0 0 10px rgba(99, 236, 255, .62));
+      animation: flowStreamForward 900ms linear infinite, flowStreamBlink 920ms ease-in-out infinite;
+    }
+
+    .flow-blinker-line {
+      pointer-events: none;
+      fill: none;
+      stroke: #fff7a8;
+      stroke-width: 4.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: .2 13;
+      stroke-dashoffset: 0;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, .95)) drop-shadow(0 0 18px rgba(255, 242, 122, .82)) drop-shadow(0 0 22px rgba(255, 49, 95, .44));
+      opacity: .24;
+      animation: routeBlinkFlash 720ms steps(2, end) infinite, flowStreamForward 900ms linear infinite;
+    }
+
+    .flow-stream-mask-path {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: var(--flow-path-length, 900) var(--flow-path-length, 900);
+      stroke-dashoffset: var(--flow-path-length, 900);
+    }
+
+    body.trainer-paused .flow-arrow.active-arrow {
+      animation-play-state: paused;
+    }
+
+    .flow-arrow.reverse-arrow {
+      animation-direction: reverse;
+      marker-start: url(#arrowHeadActive);
+      marker-end: none;
+    }
+
+    .flow-direction-cue {
+      pointer-events: none;
+      opacity: .9;
+      filter: drop-shadow(0 0 5px rgba(99, 236, 255, .72));
+      animation: cuePulse 1050ms ease-in-out infinite;
+    }
+
+    .flow-direction-cue .flow-cue-head {
+      fill: #ff5a7a;
+      stroke: rgba(255, 242, 122, .98);
+      stroke-width: .42;
+      stroke-linejoin: round;
+    }
+
+    .flow-direction-cue .flow-cue-tail {
+      fill: none;
+      stroke: rgba(255, 240, 168, .88);
+      stroke-width: .72;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .flow-travel-head {
+      pointer-events: none;
+      filter: drop-shadow(0 0 7px rgba(255, 242, 122, .95)) drop-shadow(0 0 12px rgba(45, 220, 255, .72));
+      opacity: 1;
+    }
+
+    .flow-travel-head path {
+      fill: #fff27a;
+      stroke: #ff315f;
+      stroke-width: .72;
+      stroke-linejoin: round;
+    }
+
+    .flow-destination-blink {
+      pointer-events: none;
+      fill: rgba(255, 242, 122, .08);
+      stroke: #fff27a;
+      stroke-width: 1.7;
+      stroke-dasharray: 7 5;
+      filter: drop-shadow(0 0 8px rgba(255, 242, 122, .82)) drop-shadow(0 0 14px rgba(99, 236, 255, .46));
+      animation: destinationBlink 920ms ease-in-out infinite;
+    }
+
+    .step-effect-halo {
+      pointer-events: none;
+      fill: rgba(125, 242, 168, .08);
+      stroke: rgba(125, 242, 168, .95);
+      stroke-width: 1.4;
+      stroke-dasharray: 6 5;
+      filter: drop-shadow(0 0 8px rgba(125, 242, 168, .65));
+      animation: stepEffectPulse 1100ms ease-in-out infinite;
+    }
+
+    .step-effect-label {
+      pointer-events: none;
+      fill: #d8ffe5;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .03em;
+      text-anchor: middle;
+      paint-order: stroke;
+      stroke: rgba(2, 5, 9, .92);
+      stroke-width: 4px;
+      filter: drop-shadow(0 0 7px rgba(125, 242, 168, .52));
+    }
+
+    body.trainer-paused .flow-direction-cue,
+    body.trainer-paused .dynamic-flow-arrow,
+    body.trainer-paused .flow-tracer-line,
+    body.trainer-paused .flow-stream-line,
+    body.trainer-paused .flow-blinker-line,
+    body.trainer-paused .flow-travel-head,
+    body.trainer-paused .flow-destination-blink {
+      animation-play-state: paused;
+    }
+
+    body.trainer-paused .flow-bead,
+    body.trainer-paused .flow-end-pulse {
+      animation-play-state: paused;
+    }
+
+    @keyframes arrowPulse {
+      to { stroke-dashoffset: -37; }
+    }
+
+    @keyframes flowLineDraw {
+      from { stroke-dashoffset: var(--flow-path-length, 900); }
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes flowStreamForward {
+      to { stroke-dashoffset: -52; }
+    }
+
+    @keyframes flowRouteBlink {
+      0%, 100% {
+        opacity: .62;
+        stroke-width: 1.45;
+        filter: drop-shadow(0 0 5px rgba(99, 236, 255, .66)) drop-shadow(0 0 8px rgba(255, 90, 122, .25));
+      }
+      48% {
+        opacity: 1;
+        stroke-width: 2.3;
+        filter: drop-shadow(0 0 9px rgba(99, 236, 255, .96)) drop-shadow(0 0 15px rgba(255, 242, 122, .56));
+      }
+    }
+
+    @keyframes flowStreamBlink {
+      0%, 100% { opacity: .48; }
+      48% { opacity: 1; }
+    }
+
+    @keyframes routeBlinkFlash {
+      0%, 42% { opacity: .06; }
+      43%, 72% { opacity: 1; }
+      73%, 100% { opacity: .08; }
+    }
+
+    @keyframes destinationBlink {
+      0%, 100% {
+        opacity: .42;
+        stroke-width: 1.2;
+      }
+      50% {
+        opacity: 1;
+        stroke-width: 2.4;
+      }
+    }
+
+    @keyframes cuePulse {
+      0%, 100% { opacity: .5; transform: scale(.94); }
+      45% { opacity: 1; transform: scale(1.04); }
+    }
+
+    @keyframes endPulse {
+      0%, 100% { opacity: .38; transform: scale(.78); }
+      45% { opacity: .95; transform: scale(1.14); }
+    }
+
+    @keyframes stepEffectPulse {
+      0%, 100% { opacity: .46; stroke-width: 1.1; }
+      45% { opacity: 1; stroke-width: 2; }
+    }
+
+    .side-panel {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr);
+      max-height: clamp(500px, calc(100vh - 300px), 650px);
+      transition: opacity var(--slow), transform var(--slow);
+    }
+
+    .explanation-panel,
+    .notes-panel {
+      padding: 16px;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .panel-kicker {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .72rem;
+      margin-bottom: 8px;
+    }
+
+    .explanation-panel h2 {
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(136, 171, 206, 0.22);
+      background: rgba(255,255,255,0.045);
+      border-radius: 999px;
+      color: #dbe7f6;
+      padding: .25rem .48rem;
+      font-size: .76rem;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-block {
+      border: 1px solid rgba(136, 171, 206, 0.14);
+      border-left: 3px solid rgba(99, 236, 255, 0.48);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .info-block.primary {
+      border-left-color: var(--gold);
+      background: rgba(255, 209, 102, 0.07);
+    }
+
+    .info-block.end-workflow {
+      border-color: rgba(255, 209, 102, 0.46);
+      border-left-color: #7ff6ff;
+      background:
+        linear-gradient(135deg, rgba(255, 209, 102, 0.17), rgba(99, 236, 255, 0.11)),
+        rgba(255,255,255,0.035);
+      box-shadow: 0 0 24px rgba(255, 209, 102, 0.12);
+    }
+
+    .info-block.end-workflow h3 {
+      color: #ffe59d;
+    }
+
+    .workflow-answer summary {
+      cursor: pointer;
+      width: fit-content;
+      padding: .4rem .15rem;
+      margin-top: .35rem;
+      font-weight: 700;
+    }
+
+    .workflow-answer + p {
+      margin-top: .75rem;
+    }
+
+    .info-block h3 {
+      color: #f7fbff;
+      font-size: .86rem;
+      margin-bottom: 6px;
+    }
+
+    .info-block p,
+    .notes-panel p {
+      color: #cbd7e5;
+      line-height: 1.56;
+      margin-bottom: 0;
+      font-size: .92rem;
+    }
+
+    .info-block p {
+      white-space: pre-line;
+    }
+
+    .diagnostic-event-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .diagnostic-event {
+      border: 1px solid rgba(99, 236, 255, 0.20);
+      border-radius: 7px;
+      padding: 10px;
+      background: rgba(9, 19, 31, 0.46);
+    }
+
+    .diagnostic-event-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+
+    .diagnostic-event-name {
+      color: #8ff6ff;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .diagnostic-event-class {
+      border: 1px solid rgba(255, 209, 102, 0.34);
+      border-radius: 999px;
+      color: #ffe59d;
+      padding: .16rem .4rem;
+      font-size: .7rem;
+      white-space: nowrap;
+    }
+
+    .diagnostic-event p {
+      margin: 3px 0 0;
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+
+    .diagnostic-event strong {
+      color: #f7fbff;
+    }
+
+    .failure-rca-grid {
+      display: grid;
+      gap: 9px;
+    }
+
+    .failure-rca-item {
+      border: 1px solid rgba(255, 122, 122, .20);
+      border-radius: 7px;
+      padding: 10px;
+      background: rgba(52, 13, 22, .24);
+    }
+
+    .failure-rca-item h4 {
+      margin: 0 0 5px;
+      color: #ffb3b3;
+      font-size: .82rem;
+    }
+
+    .failure-rca-item p {
+      margin: 0;
+      color: #d9e2ec;
+      font-size: .84rem;
+      line-height: 1.48;
+      white-space: pre-line;
+    }
+
+    .oracle-error-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .oracle-error-list li {
+      display: grid;
+      grid-template-columns: minmax(108px, max-content) 1fr;
+      gap: 5px 9px;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255, 122, 122, .15);
+      padding: 0 0 7px;
+    }
+
+    .oracle-error-list li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .oracle-error-code {
+      color: #ffd166;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: .78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .oracle-error-message {
+      color: #f1f5f9;
+      font-size: .82rem;
+      line-height: 1.42;
+    }
+
+    .oracle-error-context {
+      grid-column: 2;
+      color: #aebccc;
+      font-size: .75rem;
+      line-height: 1.4;
+    }
+
+    .oracle-error-source-note {
+      margin-top: 8px !important;
+      color: #aebccc !important;
+      font-size: .74rem !important;
+    }
+
+    @media (max-width: 520px) {
+      .oracle-error-list li {
+        grid-template-columns: 1fr;
+      }
+
+      .oracle-error-context {
+        grid-column: 1;
+      }
+    }
+
+    .license-note {
+      margin-top: 8px;
+      border-top: 1px solid rgba(255, 209, 102, 0.20);
+      padding-top: 8px;
+      color: #ffe59d;
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+
+    .abbreviation-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .abbreviation-row {
+      display: grid;
+      grid-template-columns: minmax(62px, .35fr) 1fr;
+      gap: 10px;
+      align-items: start;
+      color: #dbe7f6;
+      line-height: 1.35;
+      font-size: .9rem;
+    }
+
+    .abbr-key {
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: .02em;
+      white-space: nowrap;
+    }
+
+    .abbr-value {
+      color: #dbe7f6;
+    }
+
+    .student-summary {
+      border: 1px solid rgba(255, 209, 102, 0.24);
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.12), rgba(99, 236, 255, 0.055));
+      border-radius: 10px;
+      padding: 12px;
+      color: #eef7ff;
+      line-height: 1.55;
+      margin: 10px 0 12px;
+    }
+
+    .workflow-focus-drawer {
+      border: 1px solid rgba(255, 209, 102, 0.24);
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.12), rgba(99, 236, 255, 0.055));
+      border-radius: 10px;
+      margin: 10px 0 12px;
+      overflow: hidden;
+    }
+
+    .workflow-focus-toggle {
+      width: 100%;
+      min-height: 36px;
+      border: 0;
+      border-radius: 0;
+      background: rgba(4, 7, 11, 0.2);
+      color: #f7fbff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .workflow-focus-toggle strong {
+      color: var(--gold);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .76rem;
+    }
+
+    .workflow-focus-toggle .drawer-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 209, 102, .38);
+      color: var(--gold);
+      flex: 0 0 auto;
+    }
+
+    .workflow-focus-body {
+      padding: 0 12px 12px;
+      color: #eef7ff;
+      line-height: 1.55;
+    }
+
+    .workflow-focus-drawer.collapsed .workflow-focus-body {
+      display: none;
+    }
+
+    .step-path {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      margin: 10px 0 14px;
+      color: #dbe7f6;
+    }
+
+    .path-node {
+      border: 1px solid rgba(99, 236, 255, 0.24);
+      background: rgba(99, 236, 255, 0.07);
+      border-radius: 8px;
+      padding: 8px;
+      min-width: 0;
+    }
+
+    .path-node small,
+    .component-work-list small {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      margin-bottom: 3px;
+    }
+
+    .path-arrow {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .component-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .component-chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(136, 171, 206, 0.22);
+      background: rgba(255,255,255,0.045);
+      border-radius: 999px;
+      color: #dbe7f6;
+      padding: .22rem .46rem;
+      font-size: .75rem;
+    }
+
+    .memory-placement-list,
+    .memory-overview-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .memory-placement-card,
+    .memory-overview-card {
+      border: 1px solid rgba(136, 171, 206, .16);
+      border-left-width: 4px;
+      border-radius: 8px;
+      background: rgba(4, 7, 11, .26);
+      padding: 8px 10px;
+      color: #d6e2f1;
+      line-height: 1.38;
+    }
+
+    .memory-placement-card strong,
+    .memory-overview-card strong {
+      display: block;
+      color: #f7fbff;
+      margin-bottom: 3px;
+    }
+
+    .memory-placement-card small,
+    .memory-overview-card small {
+      display: block;
+      color: #aebdce;
+      margin-top: 3px;
+    }
+
+    .memory-zone-badge {
+      display: inline-flex;
+      width: .72rem;
+      height: .72rem;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: -1px;
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    .zone-pga { border-left-color: rgba(99, 236, 255, .8); }
+    .zone-pga .memory-zone-badge { background: #63ecff; color: #63ecff; }
+    .zone-shared-pool { border-left-color: rgba(185, 133, 255, .82); }
+    .zone-shared-pool .memory-zone-badge { background: #b985ff; color: #b985ff; }
+    .zone-dictionary { border-left-color: rgba(255, 240, 168, .88); }
+    .zone-dictionary .memory-zone-badge { background: #fff0a8; color: #fff0a8; }
+    .zone-buffer-cache { border-left-color: rgba(125, 242, 168, .82); }
+    .zone-buffer-cache .memory-zone-badge { background: #7df2a8; color: #7df2a8; }
+    .zone-redo { border-left-color: rgba(255, 138, 112, .86); }
+    .zone-redo .memory-zone-badge { background: #ff8a70; color: #ff8a70; }
+
+    .component-work-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .component-work-list li {
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: rgba(4, 7, 11, 0.24);
+      border: 1px solid rgba(136, 171, 206, 0.12);
+      color: #cbd7e5;
+      line-height: 1.45;
+    }
+
+    .component-work-list strong {
+      color: #f7fbff;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .notes-panel h2 {
+      font-size: 1.02rem;
+      margin-bottom: 10px;
+    }
+
+    .timeline-panel {
+      padding: 5px 8px 7px;
+      display: grid;
+      gap: 5px;
+    }
+
+    #timelineRange {
+      width: 100%;
+      min-height: 14px;
+      margin: 0;
+      accent-color: var(--cyan);
+    }
+
+    .app-shell:not(.workflow-active) #timelineRange { display: none; }
+
+    .operation-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(136, 171, 206, 0.14);
+      border-radius: var(--radius);
+    }
+
+    .operation-card h2 {
+      margin-bottom: 2px;
+      font-size: .88rem;
+    }
+
+    .operation-card p {
+      color: #c9d5e3;
+      margin-bottom: 0;
+      line-height: 1.28;
+      font-size: .8rem;
+    }
+
+    .continue-button[hidden] { display: none; }
+
+    .timeline-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .transport-button {
+      width: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      font-size: .78rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .timeline-controls select {
+      color: var(--text);
+      background: rgba(4, 7, 11, 0.72);
+      border: 1px solid rgba(136, 171, 206, 0.24);
+      border-radius: var(--radius);
+      min-height: 28px;
+      padding: 0 .42rem;
+      font-size: .76rem;
+    }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #d7e2ef;
+      font-size: .72rem;
+      padding: 0 4px;
+    }
+
+    .switch input {
+      accent-color: var(--cyan);
+    }
+
+    .timeline-track-wrap {
+      position: relative;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 3px 2px 5px;
+      scroll-behavior: smooth;
+    }
+
+    .timeline-track {
+      min-width: max-content;
+      display: flex;
+      gap: 7px;
+      position: relative;
+      padding-top: 10px;
+    }
+
+    .timeline-track::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 18px;
+      height: 2px;
+      background: rgba(136, 171, 206, 0.18);
+      border-radius: 999px;
+    }
+
+    .timeline-progress {
+      position: absolute;
+      left: 4px;
+      top: 18px;
+      height: 2px;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      box-shadow: 0 0 18px rgba(99, 236, 255, 0.5);
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .milestone {
+      position: relative;
+      z-index: 2;
+      width: 248px;
+      min-height: 56px;
+      padding: 12px 10px 7px;
+      color: var(--muted);
+      background: rgba(5, 8, 13, .76);
+      border: 1px solid rgba(136, 171, 206, 0.18);
+      border-radius: var(--radius);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .milestone::before {
+      content: attr(data-step);
+      position: absolute;
+      top: -6px;
+      left: 10px;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      color: #081016;
+      font-weight: 800;
+      font-size: .66rem;
+      border-radius: 50%;
+      background: #596779;
+      border: 2px solid #0b0f15;
+    }
+
+    .milestone strong {
+      display: block;
+      color: #edf6ff;
+      font-size: .72rem;
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .milestone span {
+      display: block;
+      font-size: .63rem;
+      line-height: 1.1;
+    }
+
+    .milestone.completed {
+      border-color: rgba(99, 236, 255, .42);
+      box-shadow: inset 0 0 22px rgba(99, 236, 255, .07);
+    }
+
+    .milestone.completed::before {
+      background: var(--cyan);
+      box-shadow: 0 0 14px rgba(99, 236, 255, .62);
+    }
+
+    .milestone.active {
+      color: #f7fbff;
+      border-color: rgba(255, 209, 102, .84);
+      background: linear-gradient(180deg, rgba(255, 209, 102, .13), rgba(241, 66, 61, .08));
+      box-shadow: 0 0 26px rgba(255, 209, 102, .18);
+      transform: translateY(-2px);
+    }
+
+    .milestone.active::before {
+      background: var(--gold);
+      box-shadow: 0 0 20px rgba(255, 209, 102, .78);
+    }
+
+    .scrubber-row {
+      display: grid;
+      grid-template-columns: auto minmax(180px, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+    }
+
+    .modal {
+      margin: 0;
+      border: 0;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      color: inherit;
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.68);
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal:not([open]) { display: none; }
+    .modal::backdrop { background: transparent; }
+
+    .modal-card {
+      width: min(840px, 100%);
+      max-height: min(82vh, 720px);
+      overflow: auto;
+      padding: 18px;
+      background: rgba(10, 14, 21, .98);
+      border: 1px solid rgba(99, 236, 255, .26);
+      border-radius: var(--radius);
+      box-shadow: 0 30px 90px rgba(0,0,0,.65);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-card li {
+      margin: 8px 0;
+      color: #d6e2f1;
+    }
+
+    body.page-light-mode {
+      color-scheme: light;
+      --bg: #eef5ff;
+      --bg-2: #dfeafa;
+      --panel: rgba(255, 255, 255, 0.84);
+      --panel-strong: rgba(255, 255, 255, 0.94);
+      --line: rgba(37, 67, 96, 0.22);
+      --line-strong: rgba(0, 120, 150, 0.52);
+      --text: #101826;
+      --muted: #44546a;
+      --dim: #68778b;
+      background:
+        radial-gradient(circle at 18% 4%, rgba(255, 209, 102, 0.24), transparent 28rem),
+        radial-gradient(circle at 82% 10%, rgba(99, 236, 255, 0.28), transparent 28rem),
+        linear-gradient(135deg, #f8fbff 0%, #e6f0ff 46%, #fbfdff 100%);
+      color: var(--text);
+    }
+
+    body.page-light-mode::before {
+      opacity: .42;
+      background-image:
+        linear-gradient(rgba(30, 55, 82, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 55, 82, 0.07) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.78), transparent 84%);
+    }
+
+    body.page-light-mode::after {
+      opacity: .34;
+      background:
+        radial-gradient(circle at 28% 70%, rgba(255, 209, 102, 0.20), transparent 18rem),
+        radial-gradient(circle at 78% 76%, rgba(185, 133, 255, 0.18), transparent 17rem);
+    }
+
+    body.page-light-mode .glass,
+    body.page-light-mode .workflow-card,
+    body.page-light-mode .operation-card,
+    body.page-light-mode .timeline-panel,
+    body.page-light-mode .side-panel,
+    body.page-light-mode .modal-card,
+    body.page-light-mode .info-block,
+    body.page-light-mode .student-summary,
+    body.page-light-mode .workflow-focus-drawer,
+    body.page-light-mode .memory-zone-card {
+      background: var(--panel);
+      color: var(--text);
+      border-color: rgba(37, 67, 96, 0.22);
+      box-shadow: 0 18px 48px rgba(53, 74, 96, 0.16);
+    }
+
+    body.page-light-mode .trainer-header,
+    body.page-light-mode .button-bar,
+    body.page-light-mode .workflow-explorer {
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(242,247,255,.82));
+    }
+
+    body.page-light-mode button,
+    body.page-light-mode .icon-control {
+      color: #101826;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(228,238,252,.9));
+      border-color: rgba(37, 67, 96, 0.28);
+    }
+
+    body.page-light-mode button.active {
+      color: #101826;
+      border-color: rgba(177, 109, 0, 0.78);
+      background: linear-gradient(180deg, rgba(255, 218, 115, .72), rgba(255, 248, 214, .94));
+      box-shadow: 0 0 24px rgba(255, 174, 0, .24), inset 0 0 14px rgba(255, 255, 255, .5);
+    }
+
+    body.page-light-mode input,
+    body.page-light-mode select,
+    body.page-light-mode .search-box input,
+    body.page-light-mode .explorer-controls select,
+    body.page-light-mode .explorer-controls input[type="search"] {
+      color: #101826;
+      background: rgba(255, 255, 255, .9);
+      border-color: rgba(37, 67, 96, .26);
+    }
+
+    body.page-light-mode input::placeholder {
+      color: #6a7788;
+    }
+
+    body.page-light-mode .subtitle,
+    body.page-light-mode .source-note,
+    body.page-light-mode h1,
+    body.page-light-mode h2,
+    body.page-light-mode h3,
+    body.page-light-mode strong,
+    body.page-light-mode label,
+    body.page-light-mode .switch,
+    body.page-light-mode .workflow-card p,
+    body.page-light-mode .workflow-card h3,
+    body.page-light-mode .workflow-card strong,
+    body.page-light-mode .operation-card p,
+    body.page-light-mode .operation-card h2,
+    body.page-light-mode .diagram-toolbar .operation-card h2,
+    body.page-light-mode .diagram-toolbar .operation-card p,
+    body.page-light-mode .panel-kicker,
+    body.page-light-mode .info-block h3,
+    body.page-light-mode .info-block p,
+    body.page-light-mode .notes-panel p,
+    body.page-light-mode .notes-panel h2,
+    body.page-light-mode .student-summary,
+    body.page-light-mode .workflow-focus-toggle,
+    body.page-light-mode .workflow-focus-body,
+    body.page-light-mode .abbreviation-row,
+    body.page-light-mode .abbr-value,
+    body.page-light-mode .diagnostic-event,
+    body.page-light-mode .diagnostic-event p,
+    body.page-light-mode .diagnostic-event strong,
+    body.page-light-mode .failure-rca-item,
+    body.page-light-mode .failure-rca-item p,
+    body.page-light-mode .oracle-error-message,
+    body.page-light-mode .oracle-error-context,
+    body.page-light-mode .oracle-error-source-note,
+    body.page-light-mode .step-path,
+    body.page-light-mode .path-node,
+    body.page-light-mode .component-chip,
+    body.page-light-mode .memory-placement-card,
+    body.page-light-mode .memory-overview-card,
+    body.page-light-mode .memory-placement-card strong,
+    body.page-light-mode .memory-overview-card strong,
+    body.page-light-mode .memory-placement-card small,
+    body.page-light-mode .memory-overview-card small,
+    body.page-light-mode .component-work-list li,
+    body.page-light-mode .component-work-list strong,
+    body.page-light-mode .search-result,
+    body.page-light-mode .search-result small,
+    body.page-light-mode .modal-card li,
+    body.page-light-mode .tag,
+    body.page-light-mode .status-pill {
+      color: #26374c;
+    }
+
+    body.page-light-mode .failure-label,
+    body.page-light-mode .failure-rca-item h4,
+    body.page-light-mode .oracle-error-code {
+      color: #8f2432;
+    }
+
+    body.page-light-mode .failure-rca-item {
+      border-color: rgba(143, 36, 50, .22);
+      background: rgba(255, 238, 240, .82);
+    }
+
+    body.page-light-mode .diagnostic-event {
+      background: rgba(240, 248, 255, .84);
+      border-color: rgba(0, 120, 150, .26);
+    }
+
+    body.page-light-mode .diagnostic-event-name {
+      color: #00677d;
+    }
+
+    body.page-light-mode .diagnostic-event-class,
+    body.page-light-mode .license-note {
+      color: #765000;
+    }
+
+    body.page-light-mode .panel-kicker {
+      color: #8a5a00;
+    }
+
+    body.page-light-mode .abbr-key {
+      color: #8a5a00;
+    }
+
+    body.page-light-mode .info-block.end-workflow h3 {
+      color: #6f4b00;
+    }
+
+    body.page-light-mode .path-arrow {
+      color: #9a6500;
+    }
+
+    body.page-light-mode .difficulty,
+    body.page-light-mode .tag,
+    body.page-light-mode .status-pill,
+    body.page-light-mode .component-chip,
+    body.page-light-mode .path-node {
+      background: rgba(0, 150, 190, .10);
+      border-color: rgba(0, 120, 150, .26);
+    }
+
+    body.page-light-mode .difficulty {
+      color: #173047;
+    }
+
+    body.page-light-mode .search-results {
+      background: rgba(255, 255, 255, .98);
+      border-color: rgba(0, 120, 150, .26);
+      box-shadow: 0 16px 44px rgba(54, 78, 104, .20);
+    }
+
+    body.page-light-mode .workflow-card code {
+      color: #5b3f00;
+      background: rgba(255, 209, 102, .18);
+      border-color: rgba(132, 90, 0, .18);
+    }
+
+    body.page-light-mode .component-work-list li,
+    body.page-light-mode .memory-placement-card,
+    body.page-light-mode .memory-overview-card,
+    body.page-light-mode .operation-card {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(37, 67, 96, .18);
+    }
+
+    body.page-light-mode .timeline-track::before {
+      background: rgba(37, 67, 96, .22);
+    }
+
+    body.page-light-mode .milestone {
+      color: #233044;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(235,245,255,.94)) !important;
+      border-color: rgba(37, 67, 96, .24);
+      box-shadow: 0 8px 22px rgba(54, 78, 104, .10);
+    }
+
+    body.page-light-mode .milestone.completed {
+      color: #1b2d41;
+      background: linear-gradient(180deg, rgba(235,252,255,.98), rgba(221,244,251,.94)) !important;
+      border-color: rgba(0, 120, 150, .30);
+    }
+
+    body.page-light-mode .milestone strong {
+      color: #101826;
+    }
+
+    body.page-light-mode .milestone span {
+      color: #26374c;
+    }
+
+    body.page-light-mode .milestone.active {
+      background: linear-gradient(180deg, rgba(255, 230, 145, .92), rgba(255,255,255,.98)) !important;
+      border-color: rgba(154, 101, 0, .46);
+    }
+
+    body.page-light-mode .architecture-svg {
+      background:
+        radial-gradient(circle at 50% 30%, rgba(99,236,255,0.16), transparent 29rem),
+        linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.05));
+      border-color: rgba(37, 67, 96, .20);
+    }
+
+    @media (max-width: 1180px) {
+      .explorer-controls {
+        grid-template-columns: minmax(180px, 1fr) minmax(150px, .7fr);
+      }
+
+      .trainer-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app-shell { padding: 10px; }
+      .trainer-header { flex-direction: column; }
+      .header-side { justify-items: start; }
+      .source-note { text-align: left; }
+      .scroll-cue { width: 100%; justify-content: space-between; }
+      .workflow-explorer-head { flex-direction: column; }
+      .workflow-count { white-space: normal; }
+      .explorer-controls { grid-template-columns: 1fr; }
+      .workflow-card-grid { grid-auto-columns: minmax(240px, 86vw); }
+      .diagram-toolbar { flex-direction: column; align-items: stretch; }
+      .diagram-toolbar .operation-card { flex: 0 0 auto; min-width: 0; }
+      .diagram-toolbar-actions { justify-content: space-between; }
+      .side-panel { grid-template-columns: 1fr; }
+      .operation-card { grid-template-columns: 1fr; }
+      .svg-wrap { min-height: 480px; }
+    }
+
+    @media screen and (max-width: 820px) {
+      .app-shell.workflow-active { padding-bottom: calc(200px + env(safe-area-inset-bottom)); }
+      .app-shell.workflow-active .timeline-panel {
+        position: fixed;
+        z-index: 30;
+        left: 10px;
+        right: 10px;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        background: var(--bg-2);
+      }
+      .app-shell.workflow-active .timeline-controls { row-gap: 3px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+
+      .app-shell {
+        display: block;
+        padding: 0;
+      }
+
+      .button-bar,
+      .workflow-explorer,
+      .diagram-toolbar,
+      .timeline-controls,
+      .scrubber-row,
+      .scroll-cue,
+      .modal {
+        display: none !important;
+      }
+
+      .glass {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #111;
+        break-inside: avoid;
+        margin-bottom: 14px;
+      }
+
+      .trainer-workspace,
+      .side-panel {
+        display: block;
+      }
+
+      .architecture-svg {
+        min-width: 0;
+        border: 1px solid #888;
+        background: #fff;
+      }
+
+      .source-note { color: #111; }
+      .component text { fill: #111; }
+      .info-block p, .notes-panel p, .subtitle, .tag { color: #111; }
+    }
+    .tower-nav{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 14px}.tower-nav a{color:var(--text);text-underline-offset:3px}.tower-nav a[aria-current]{color:var(--gold);font-weight:700;text-decoration:none}.answer-choices{display:flex;flex-wrap:wrap;gap:6px}.answer-choices button{text-align:left;white-space:normal}.answer-choices [aria-pressed=true]{outline:2px solid currentColor}.graded-check{border-top:1px solid var(--line);padding-top:.7rem}.graded-check [role=status]{min-height:1.3em}@media print{.tower-nav{display:none}}
+    .topology-compare{padding:10px 14px}.topology-compare summary{cursor:pointer;color:var(--text);font-weight:650}.topology-inner{padding:10px 0}.topology-inner label{display:block}.topology-inner select{max-width:100%}.topology-inner a{color:var(--text);text-decoration:underline}.topology-table{overflow:auto}.topology-table table{border-collapse:collapse;width:100%;margin-top:8px}.topology-table caption{text-align:left;margin:8px 0;font-weight:600}.topology-table th,.topology-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:8px;white-space:normal}.topology-table th[scope=row]{min-width:7em}.topology-table td:nth-child(3){min-width:13em}
+  </style>
+<style>.tower-art{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#ffd166}
+@scope (.tower-art){
+
 :root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#ffd166}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 "Segoe UI",Arial,sans-serif}a{color:var(--accent)}button,a,summary{touch-action:manipulation}button,summary{cursor:pointer}button{font:inherit}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:3px}header,main,footer{max-width:1180px;margin:auto;padding:0 clamp(16px,3vw,38px)}header{padding-top:22px}nav{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;padding-bottom:14px;border-bottom:1px solid var(--line)}nav a{display:inline-block;text-decoration:none;border-radius:6px;padding:5px 9px;color:var(--muted);font-size:.92rem}nav a:first-child{color:var(--text);font-weight:650}nav a[aria-current]{background:var(--accent);color:#10151b;font-weight:650}nav a:hover,.menu a:hover{background:#263442;color:#fff}h1,h2,h3,p{margin:0}h1{font-size:clamp(1.9rem,4vw,3rem);line-height:1.12;margin:25px 0 8px;letter-spacing:-.027em}h2{font-size:1.22rem}h3{font-size:1.12rem}.sub{font-size:1.08rem}.scope,.muted,footer{color:var(--muted)}.scope{font-size:.92rem;margin-top:3px}.layout{display:grid;grid-template-columns:minmax(210px,275px) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:start;margin:25px auto}.menu a{display:block;color:var(--text);text-decoration:none;line-height:1.35;padding:11px 12px;border:1px solid var(--line);border-radius:7px;margin-top:8px}.menu small{display:block;color:var(--muted);margin-bottom:3px}.menu a[aria-current]{border-color:var(--accent);background:#222c34}.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(14px,2.2vw,24px)}.setup{margin:6px 0 14px;color:var(--muted)}.map{list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 15px}.map li{padding:8px 9px;background:#10151b;border:1px solid var(--line);border-radius:6px;line-height:1.32}.map strong,.map small{display:block}.map small{margin-top:3px;color:var(--muted)}.map .active{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}.map .active strong,.state{color:var(--accent)}.state{font-size:.87rem;font-weight:650}.frame{border-top:1px solid var(--line);padding-top:13px;min-height:109px}.frame p{margin-top:4px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tools button{padding:6px 13px;color:var(--text);background:#28323e;border:1px solid var(--line);border-radius:6px}button.primary{background:var(--accent);color:#111820;font-weight:650}.tools button:disabled{opacity:.48;cursor:default}.check{border-top:1px solid var(--line);margin:17px 0 0;padding-top:13px}.check p{margin:4px 0}.check summary{color:var(--accent);font-weight:600}.refs{margin:17px 0 0}.refs ul{margin:5px 0 0;padding-left:20px}.refs a{font-size:.92rem}footer{padding-bottom:24px;font-size:.88rem}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:6px;background:#162532;padding:7px;z-index:9}[hidden]{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.menu h2{grid-column:1/-1}.menu a{margin:0;font-size:.93rem}.map{grid-template-columns:repeat(2,minmax(0,1fr))}.frame{min-height:0}}@media(max-width:390px){.map{grid-template-columns:1fr 1fr}.menu a{padding:8px}.tools button{padding:6px 11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
@@ -26,15 +2341,249 @@
 @media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}.arch-head{align-items:start}.arch-scroll{touch-action:pan-x pan-y}.arch-toolbar{gap:6px}.arch-toolbar button{padding:6px 9px}}
 @media(min-width:1150px){.fit-toggle{display:none}}
 @media print{.arch-scroll .architecture-svg{min-width:0}.arch-scroll{overflow:visible}.arch-toolbar,.fit-toggle{display:none}}
-</style>
-</head>
-<body>
-<a class="skip" href="#demo">Skip to walkthrough</a><header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a>
+
+}
+body { overflow-x: hidden; }
+.app-shell, .trainer-workspace, #diagramPanel, #sidePanel, #towerDiagram, #towerDiagramViewport, .timeline-panel { min-width:0; }
+#towerEngine, .tower-page [hidden] { display:none !important; }
+.tower-page .tower-art { color:var(--ink,#edf3fa); }
+#towerDiagram { display:flex; flex-direction:column; align-self:start; gap:8px; padding:5px 9px 10px; }
+#towerDiagramTitle h2, #towerDiagramTitle h3 { margin:0; font:600 .87rem/1.4 "Segoe UI",sans-serif; color:var(--ink,#edf3fa); }
+#towerDiagramViewport > div { width:100%; overflow-x:auto; }
+#towerDiagramViewport svg { display:block; width:100%; height:auto; border:0; background:transparent; max-height:none; }
+.tower-diagram-key { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 12px; }
+#towerLegend > div, #towerCaption > p { margin:0; }
+#towerFit button { display:inline-block; min-height:28px; padding:3px 9px; font-size:.79rem; }
+#towerFit { margin-left:auto; }
+#towerCaption p { font-size:.87rem; }
+.tower-page #explanationPanel { display:block; min-width:0; overflow:auto; overflow-wrap:anywhere; }
+#towerCheckpoint, #towerWorkflowReferences, #towerHomeLinks, #towerComponentInspection:not(:empty) { margin-top:.85rem; }
+#towerCheckpoint h3, #towerCheckpoint p, #towerWorkflowReferences h3 { margin:0 0 .4rem; }
+#towerCheckpoint, #towerWorkflowReferences, #towerHomeLinks { font-size:.87rem; line-height:1.45; }
+#towerCheckpoint #decision { display:flex; flex-wrap:wrap; gap:.35rem; margin:.35rem 0; }
+#towerCheckpoint button { text-align:left; white-space:normal; }
+#towerWorkflowReferences a, #towerHomeLinks a, .tower-footer a { color:var(--cyan,#8feaff); text-underline-offset:.15em; }
+#towerWorkflowReferences a + a { margin-inline-start:.65em; }
+#towerHomeLinks summary, #towerCheckpoint summary { cursor:pointer; }
+#towerHomeLinks #homeFoundations { margin:.6rem 0 !important; }
+#towerHomeLinks ul, #towerWorkflowReferences ul { padding-left:1.2rem; }
+#towerComponentInspection .inspection, #towerComponentInspection .arch-inspector, #towerComponentInspection .dg-inspection { color:#e7f2fa; }
+.tower-footer { grid-column:1/-1; padding:0 4px; font-size:.8rem; }
+.app-shell:not(.workflow-active) .tower-footer { padding-bottom:3.5rem; }
+.tower-ready #towerCaption, .tower-overview #towerCaption { display:none; }
+.tower-ready #towerDiagram .arch-edge.is-active, .tower-overview #towerDiagram .arch-edge.is-active { opacity:.26; }
+:is(.tower-ready,.tower-overview) #towerDiagram .traffic { opacity:0; animation:none; }
+:is(.tower-ready,.tower-overview) #towerDiagram .arch-node.is-active :is(.shape,.node-shell,.node-face) { stroke:#68808b; stroke-width:1.3; fill:#1b2d38; }
+:is(.tower-ready,.tower-overview) #towerDiagram .arch-node.is-active text { fill:#dce8ef; }
+:is(.tower-show-path,.tower-focus-mode):not(.tower-ready):not(.tower-overview) #towerDiagram .arch-node:not(.is-active):not(.is-inspected):not([data-inspected=true]):not(:focus) { opacity:.38; }
+:is(.tower-show-path,.tower-focus-mode):not(.tower-ready):not(.tower-overview) #towerDiagram .arch-edge:not(.is-active):not(.is-blocked) { opacity:.12; }
+.tower-no-motion #towerDiagram *, .tower-no-motion #towerDiagram *::before, .tower-no-motion #towerDiagram *::after { animation:none !important; transition:none !important; }
+:is(.tower-no-motion,.tower-overview,.tower-ready) #towerDiagram :is(.traffic,#packets,circle:has(> animateMotion)) { display:none !important; }
+.tower-page.page-light-mode :is(#towerHomeLinks,#towerWorkflowReferences,.tower-footer) a { color:#124f6c; }
+.tower-page.page-light-mode #towerDiagramTitle :is(h2,h3), .tower-page.page-light-mode #towerLegend, .tower-page.page-light-mode #towerCaption p { color:#183948; }
+#diagramPanel:fullscreen, #diagramPanel.architecture-fullscreen { display:flex; flex-direction:column; overflow:auto; background:#0f1926; }
+#diagramPanel.architecture-fullscreen:not(:fullscreen) { position:fixed; inset:0; z-index:1000; }
+:is(#diagramPanel:fullscreen,#diagramPanel.architecture-fullscreen) #towerDiagram { width:100%; flex:1; }
+:is(#diagramPanel:fullscreen,#diagramPanel.architecture-fullscreen) #towerDiagramViewport { display:grid; align-content:center; flex:1; }
+:is(#diagramPanel:fullscreen,#diagramPanel.architecture-fullscreen) #towerDiagramViewport svg { max-height:calc(100dvh - 200px); min-height:0; }
+@media(max-width:760px){#diagramPanel.is-fitted #towerDiagramViewport svg {min-width:0;} .tower-page #sidePanel{width:100%;} #towerDiagram{padding:4px 6px 8px;}}
+@media print { .tower-page #towerFit, .tower-footer, .tower-page #timelineRange {display:none;} .tower-page #towerDiagramViewport svg{min-width:0;width:100%;} .tower-page #sidePanel,.tower-page #explanationPanel{height:auto;max-height:none;overflow:visible;} }</style>
+</head><body class="tower-page tower-ready">
+<a class="visually-hidden" href="#workflowExplorerTitle">Skip to workflow explorer</a>
+<div class="app-shell">
+<header id="architecture-home" class="trainer-header glass">
+      <div>
+        <h1>Oracle GoldenGate</h1>
+        <p class="subtitle">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · Oracle Database 11g R2 (11.2.0.4) source and target</p>
+      </div>
+      <div class="header-side">
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v4 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v4 | Updated : 26-Nov-2026"></p>
+        <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
+          <span>Dynamic architecture diagram</span>
+          <span class="cue-arrow" aria-hidden="true">&#8595;</span>
+        </button>
+      </div>
+    </header>
+<nav class="tower-nav glass" aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a>
 <a href="./rac.html">RAC</a>
 <a href="./dataguard.html">Data Guard</a>
 <a href="./rac-dataguard.html">RAC + Data Guard</a>
 <a href="./goldengate.html" aria-current="page">GoldenGate</a>
-<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · Oracle Database 11g R2 (11.2.0.4) source and target · Trainer v3</p></header>
+<a href="./oem.html">Enterprise Manager (OEM)</a></nav>
+<nav class="button-bar glass" aria-label="Trainer controls">
+      <button id="resetButton" type="button">Reset</button>
+      <button id="focusModeButton" type="button" aria-pressed="false">Focus Mode</button>
+      <button id="pageLightButton" type="button" aria-pressed="false">Light Page</button>
+      <button id="printButton" type="button">Print / Save PDF</button>
+      <button id="referencesButton" type="button">References</button>
+    </nav>
+<details class="topology-compare glass" id="topologyMap">
+<summary>Compare a home workflow across the five towers</summary>
+<div class="topology-inner"><p>Direct follows the same operation. Adapted shows how the technology changes the path. Foundation identifies a shared database concept. Outside scope explains why the workflow does not carry over to that tower’s lessons.</p><label for="topologyLesson">11g Architecture workflow</label>
+<select id="topologyLesson"><option value="session-cleanup">Abnormal Disconnect / PMON Cleanup</option>
+<option value="alter-table-ddl">ALTER TABLE</option>
+<option value="archive-log-switch-pressure">Archive / Log Switch Pressure</option>
+<option value="archive-destination-failure-rca">Archive Destination Full / ORA-00257 RCA</option>
+<option value="buffer-contention">Buffer Contention / Hot Block</option>
+<option value="checkpoint-flow">Checkpoint</option>
+<option value="commit-durability">COMMIT Durability</option>
+<option value="connection-failure-rca">Connection Failure / Listener or Authentication RCA</option>
+<option value="create-table-ddl">CREATE TABLE</option>
+<option value="dbwn-dirty-write">DBWn Dirty Buffer Write</option>
+<option value="ddl-lock-failure-rca">DDL Failure / Object Lock and Timeout RCA</option>
+<option value="dedicated-server-session">Dedicated Server Session</option>
+<option value="dml-statement-failure-rca">DML Statement Failure / Constraint and Statement Rollback</option>
+<option value="select-first-execution">First-Time SELECT / Hard Parse</option>
+<option value="flashback-database">Flashback Database Concept</option>
+<option value="flashback-unavailable-rca">Flashback Database Unavailable / Retention RCA</option>
+<option value="free-buffer-pressure">Free Buffer / DBWn Pressure</option>
+<option value="shutdown-immediate">Graceful Shutdown / IMMEDIATE</option>
+<option value="shutdown-normal">Graceful Shutdown / NORMAL</option>
+<option value="shutdown-transactional">Graceful Shutdown / TRANSACTIONAL</option>
+<option value="insert-commit">INSERT + COMMIT</option>
+<option value="crash-recovery">Instance Crash Recovery</option>
+<option value="spike-window-diagnosis">Instance Spike Window Diagnosis</option>
+<option value="instance-startup">Instance Startup / NOMOUNT, MOUNT and OPEN</option>
+<option value="patch-rollback">Interim Patch Rollback / Restore Service</option>
+<option value="known-sql-slowness">Known SQL Slowness</option>
+<option value="multiblock-read-diagnosis">Multiblock Scan / db file scattered read</option>
+<option value="patch-one-off">One-Off Fix / Conflict and Merge Decision</option>
+<option value="snapshot-too-old-rca">ORA-01555 Snapshot Too Old / Undo RCA</option>
+<option value="patch-set-upgrade">Patch Set Upgrade / 11.2.0.3 to 11.2.0.4</option>
+<option value="patch-upgrade-mode-rca">Patch Set Upgrade Failure / ORA-39700</option>
+<option value="performance-incident-rca">Performance Incident RCA / Symptom to Cause</option>
+<option value="patch-windows-bundle">Platform Bundle / Windows Database Home</option>
+<option value="patch-quarterly-psu-spu">Quarterly Database Patching / PSU and SPU</option>
+<option value="read-consistency">Read Consistency</option>
+<option value="redo-commit-latency">Redo / Commit Latency Diagnosis</option>
+<option value="redo-log-switch">Redo Log Switch + Archiving</option>
+<option value="rman-backup-failure-rca">RMAN Backup Failure / Destination or Input RCA</option>
+<option value="rman-full-backup">RMAN Full Database Backup to Disk</option>
+<option value="rman-restore-recover">RMAN Restore and Recover Database</option>
+<option value="rollback-flow">ROLLBACK</option>
+<option value="row-lock-contention">Row Lock Contention</option>
+<option value="select-cache-hit">SELECT with Buffer Cache Hit</option>
+<option value="select-cache-miss">SELECT with Buffer Cache Miss</option>
+<option value="select-hard-parse">SELECT with Hard Parse</option>
+<option value="select-soft-parse">SELECT with Soft Parse</option>
+<option value="session-monitoring">Session and Process Monitoring</option>
+<option value="shared-pool-parse-pressure">Shared Pool Hard Parse Pressure</option>
+<option value="shutdown-abort">Shutdown ABORT / Recovery on Next Startup</option>
+<option value="single-block-read-diagnosis">Single-Block Read / db file sequential read</option>
+<option value="sort-temp-spill">Sort or Hash Operation Spilling to Temp</option>
+<option value="sql-parse-failure-rca">SQL Parse Failure / Syntax, Object, or Privilege RCA</option>
+<option value="startup-file-failure-rca">Startup Failure / Control or Data File RCA</option>
+<option value="temp-spill-diagnosis">Temp Spill Diagnosis</option>
+<option value="top-sql-discovery">Unknown SQL / Top SQL Discovery</option>
+<option value="update-commit">UPDATE + COMMIT</option>
+<option value="user-login">User Login / Session Creation</option></select> <a id="topologyHomeLesson" href="./index.html#lesson=instance-startup">Open this home lesson</a>
+<div class="topology-table"><table><caption>How the workflow applies in each topology</caption>
+<thead><tr><th scope="col">Tower</th><th scope="col">Use</th><th scope="col">Reason</th><th scope="col">Walkthrough</th></tr></thead>
+<tbody id="topologyRows"></tbody></table></div></div></details>
+<section class="workflow-explorer glass" aria-labelledby="workflowExplorerTitle">
+      <div class="workflow-explorer-head">
+        <div>
+          <h2 id="workflowExplorerTitle">Operations You Can Explain with Oracle GoldenGate</h2>
+          <p class="subtitle">Choose Manual Demo to open the workflow guide, or Auto Demo to play it. The bottom player controls each tower.</p>
+        </div>
+        <div id="workflowCount" class="workflow-count" aria-live="polite">0 workflows</div>
+      </div>
+      <div class="explorer-controls" aria-label="Workflow filters">
+        <label class="visually-hidden" for="workflowCategoryFilter">Workflow category</label>
+        <select id="workflowCategoryFilter" aria-label="Workflow category"></select>
+        <label class="visually-hidden" for="workflowDifficultyFilter">Workflow difficulty</label>
+        <select id="workflowDifficultyFilter" aria-label="Workflow difficulty">
+          <option value="all">All difficulties</option>
+          <option value="Basic">Basic</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+          <option value="Ultra-advanced">Ultra-advanced</option>
+        </select>
+        <label class="visually-hidden" for="workflowSearch">Search workflows</label>
+        <input id="workflowSearch" type="search" placeholder="Search workflows, commands, components..." aria-label="Search workflows">
+        <label class="switch"><input id="showPathOnlyToggle" type="checkbox"> Show path only</label>
+        <label class="switch"><input id="animateFullFlowToggle" type="checkbox" checked> Animate full flow</label>
+      </div>
+      <div id="workflowCards" class="workflow-card-grid" aria-live="polite"></div>
+    </section>
+<main class="trainer-workspace">
+      <section id="diagramPanel" class="diagram-panel glass" aria-label="Interactive Oracle architecture diagram">
+        <div class="diagram-toolbar">
+          <div class="search-box">
+            <label class="visually-hidden" for="componentSearch">Search architecture components</label>
+            <input id="componentSearch" type="search" placeholder="Search components, categories, processes...  /" autocomplete="off" aria-label="Search architecture components">
+            <div id="searchResults" class="search-results" hidden></div>
+          </div>
+          <div id="operationCard" class="operation-card">
+            <div>
+              <h2>No flow selected</h2>
+              <p>Choose a flow above or click an architecture component to begin.</p>
+            </div>
+          </div>
+          <div class="diagram-toolbar-actions">
+            <div id="statusPill" class="status-pill" aria-live="polite">Ready: select a flow or click a component.</div>
+            <button id="architectureResetButton" class="icon-control" type="button" aria-label="Reset trainer and return to Workflow Explorer" title="Reset and return to Workflow Explorer">&#x21BA;</button>
+            <button id="architectureFullscreenButton" class="icon-control" type="button" aria-pressed="false" aria-label="Open architecture fullscreen" title="Open architecture fullscreen">&#x26F6;</button>
+          </div>
+        </div>
+<div id="towerDiagram" class="tower-art">
+<div id="towerDiagramTitle"></div><div id="towerDiagramViewport"></div>
+<div class="tower-diagram-key"><div id="towerLegend"></div><div id="towerFit"></div></div>
+<div id="towerCaption"></div></div></section>
+<aside id="sidePanel" class="side-panel" aria-label="Training explanation panels">
+        <button id="panelLockerButton" class="side-panel-locker" type="button" aria-label="Collapse explanation panel" aria-pressed="false" title="Collapse explanation panel">
+          <span class="locker-icon" aria-hidden="true">&#9654;</span>
+        </button>
+        <section id="explanationPanel" class="explanation-panel glass" aria-live="polite"><div id="towerGuide"></div>
+<div id="towerComponentInspection" class="tower-art"></div>
+<section id="towerCheckpoint"><h3>Correctness check</h3></section>
+<section id="towerWorkflowReferences"><h3>Oracle references for this workflow</h3></section>
+<div id="towerHomeLinks"></div></section>
+      </aside>
+</main>
+<section class="timeline-panel glass" aria-label="Cinematic operation timeline">
+      <div class="timeline-controls">
+        <button id="playButton" class="transport-button" type="button" aria-label="Play flow" title="Play flow">▶</button>
+        <button id="pauseButton" class="transport-button" type="button" aria-label="Pause flow" title="Pause flow">❚❚</button>
+        <button id="previousButton" class="transport-button" type="button" aria-label="Previous step" title="Previous step">⏮</button>
+        <button id="nextButton" class="transport-button" type="button" aria-label="Next step" title="Next step">⏭</button>
+        <button id="timelineResetButton" class="transport-button" type="button" aria-label="Reset timeline" title="Reset timeline">↺</button>
+        <label class="switch" for="speedSelect">Speed
+          <select id="speedSelect" aria-label="Playback speed">
+            <option value="0.1">0.10x</option>
+            <option value="0.15">0.15x</option>
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </label>
+        <label class="switch"><input id="autoScrollToggle" type="checkbox" checked> Auto-scroll</label>
+        <label class="switch"><input id="loopToggle" type="checkbox"> Loop Flow</label>
+      </div>
+      <div id="timelineWrap" class="timeline-track-wrap" tabindex="0" aria-label="Timeline milestones">
+        <div id="timelineTrack" class="timeline-track">
+          <div id="timelineProgress" class="timeline-progress"></div>
+        </div>
+      </div>
+      <input type="range" id="timelineRange" min="0" max="0" value="0" step="1" aria-label="Scrub workflow timeline">
+    </section>
+<footer class="tower-footer"><p>Related Stand-Alone DB lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to Stand-Alone DB</a></footer>
+</div>
+<dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="referencesTitle">References</h2>
+        <button id="closeReferencesButton" type="button">Close</button>
+      </div>
+      <p>These links are listed for instructor reference. The trainer does not load them at runtime and remains fully offline after saving this file.</p>
+      <ul id="towerReferenceList"></ul>
+    </div>
+  </dialog>
+<div id="towerEngine" hidden inert>
+
+
 <main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#trace-a-commit" data-lesson="trace-a-commit"><small>Basic</small>Follow a committed row</a>
 <a href="#network-interruption" data-lesson="network-interruption"><small>Intermediate</small>Resume after a network interruption</a>
 <a href="#replicat-recovery" data-lesson="replicat-recovery"><small>Advanced</small>Recover a stopped Replicat</a>
@@ -114,6 +2663,40 @@
 <text class="node-title" text-anchor="middle" y="-2">Target Manager</text><text class="node-state" text-anchor="middle" y="14">Collector startup</text></g>
 </svg></div><p class="arch-focus" id="arch-focus"></p><p class="arch-inspector" aria-live="polite"><strong id="component-title"></strong><span id="component-detail"></span></p></section><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools arch-toolbar"><button id="play" data-arch-play type="button" aria-pressed="false">Play</button><label>Speed <select id="speed" data-arch-speed><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
 <details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
+
+<!-- /authored-home-crosslinks -->
+</main>
+
+
+
+
+
+</div>
+<script>(function mountSpecialistContent() {
+  const original = document.getElementById('towerEngine');
+  function place(selector, target, parent = false) {
+    const node = original.querySelector(selector);
+    if (node) document.getElementById(target).append(parent ? node.parentElement : node);
+  }
+  place('#arch-heading, #dg-architecture-title', 'towerDiagramTitle');
+  place('svg[data-architecture-diagram]', 'towerDiagramViewport', true);
+  place('.channel-key, .dg-legend, .arch-legend', 'towerLegend');
+  place('#fit-diagram, #dg-zoom, #fit', 'towerFit');
+  place('#arch-caption, #dg-focus, #arch-focus', 'towerCaption');
+  place('#inspection, .dg-inspection, .arch-inspector', 'towerComponentInspection');
+  const graded = original.querySelector('#checkpoint');
+  if (graded) {
+    document.getElementById('towerCheckpoint').replaceChildren(graded);
+  } else {
+    for (const selector of ['#question', '#decision', '#verdict', '#answer']) {
+      place(selector, 'towerCheckpoint');
+    }
+  }
+  place('#refs, #sources', 'towerWorkflowReferences');
+  place('#foundation', 'towerHomeLinks');
+  place('.related', 'towerHomeLinks');
+  place('#homeFoundations', 'towerHomeLinks');
+})();</script>
 <script>(function(){
 const related={"network-interruption":[["connection-failure-rca","Distinguish a broken pump-to-target trail connection from an application login failure."]],"trace-a-commit":[["insert-commit","Follow a committed source row through capture, trail and target apply."],["update-commit","Trace committed DML into the trail and then into a target transaction."],["commit-durability","Distinguish source commit success from later completion of target apply."]],"gg-startup":[["instance-startup","After the database is ready, start capture, pump and apply from their known positions."]],"gg-graceful-shutdown":[["shutdown-normal","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-transactional","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-immediate","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."]],"replicat-recovery":[["shutdown-abort","Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."],["crash-recovery","Separate the target database's crash recovery from restart of the trail consumer."]],"isolate-lag":[["redo-commit-latency","Separate source commit latency from time subsequently spent in capture, pump or apply."],["performance-incident-rca","Compare positions over time to find the pipeline stage accumulating delay."]],"gg-patching":[["patch-quarterly-psu-spu","Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."],["patch-one-off","Check capture and apply compatibility for the exact interim database or GoldenGate patch."],["patch-rollback","Check process compatibility and resume only from verified checkpoints after maintenance."]]};
 function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
@@ -124,9 +2707,6 @@ function showRelated(){const current=document.querySelector("[data-lesson][aria-
  block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
  const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
 window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
-<!-- /authored-home-crosslinks -->
-</main>
-<footer><p>Related Stand-Alone DB lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to Stand-Alone DB</a></footer>
 <script type="application/json" id="architecture-model">{
   "nodes": [
     {
@@ -1391,5 +3971,2107 @@ get('next').addEventListener('click',()=>{stopPlayback();if(frame<current[4].len
 get('reset').addEventListener('click',()=>{stopPlayback();frame=0;displayStep();});
 selectLesson();
 </script>
-</body>
-</html>
+<script type="application/json" id="topologyData">{
+  "user-login": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-5",
+      "reason": "Follow the SCAN redirect, local listener handoff and established dedicated session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A client connects to a service offered by the primary or an eligible standby."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-5",
+      "reason": "Follow a client reconnecting to its primary-role service after a planned site transition."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract and Replicat use configured database credentials; the published lesson concerns replicated changes."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#first-sample",
+      "reason": "Target discovery illustrates a management agent connecting with monitoring credentials."
+    }
+  ],
+  "dedicated-server-session": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-5",
+      "reason": "The node listener hands the client to a dedicated server on the selected instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dedicated server processes belong to the database instance handling the client session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "After site and instance selection the established session uses that instance's server process."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The pipeline diagram follows GoldenGate processes rather than a user session’s server-process lifecycle."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Monitoring credentials create database sessions; interactive dedicated-session behavior remains a database topic."
+    }
+  ],
+  "session-cleanup": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The owning instance's PMON handles a failed foreground. A whole-instance loss has a separate recovery path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An abandoned client session is cleaned up on its database instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the owning site and instance before diagnosing a departed foreground process."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A Replicat restart uses its checkpoint and trail. It is a different event from foreground session cleanup."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An agent's missing sample cannot establish that a user session needed PMON cleanup."
+    }
+  ],
+  "connection-failure-rca": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-6",
+      "reason": "Use the redirect and node listener state to identify which connection leg failed."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check endpoint, service registration and current role before treating a login failure as a transport problem."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-5",
+      "reason": "Verify that the primary-role service runs at the new site and the client can reach that endpoint."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#network-interruption",
+      "reason": "Distinguish a broken pump-to-target trail connection from an application login failure."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Check target reachability independently of an agent or OMS connectivity failure."
+    }
+  ],
+  "select-first-execution": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-5",
+      "reason": "Trace the first login and SQL handoff. The selected instance performs a first hard parse locally."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-soft-parse": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The selected RAC instance parses SQL using its local library cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-hard-parse": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The selected RAC instance parses SQL using its local library cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "select-cache-hit": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-7",
+      "reason": "Compare a local hit with a local miss that can be served by a peer cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A query runs against the buffer cache of its local primary or readable standby instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace an instance cache supplying a block inside one site before following redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An ordinary SELECT cache hit creates no replicated row change."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring examples do not reproduce individual consistent gets."
+    }
+  ],
+  "select-cache-miss": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-7",
+      "reason": "Compare a peer-cache block transfer with a global grant followed by a shared-storage read."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The database executing the SELECT resolves the missing block against its local database files."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "A primary instance obtains a block from its local RAC peer across the cluster interconnect."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "GoldenGate captures change records; it does not supply blocks to the source buffer cache."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A single database block read is outside the target discovery and incident examples."
+    }
+  ],
+  "sort-temp-spill": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A server process on the executing instance uses its PGA and the database TEMP tablespace."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side sort uses local work areas and temporary space. Redo Apply teaches a different path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The site and instance executing the statement own its work area."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail buffering and network backlog are separate from a database SQL sort spill."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A TEMP work-area or execution-plan drill-down is beyond the current monitoring lessons."
+    }
+  ],
+  "sql-parse-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Inspect the exact parse error, schema, privileges and SQL at the instance serving the session."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Resolve SQL name and access errors on the role serving the client."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check the session's service, site and schema before diagnosing SQL parsing."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A source statement that fails parsing does not produce a committed row change."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A target being up cannot establish that an individual SQL statement parsed."
+    }
+  ],
+  "insert-commit": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The hosting instance generates undo and writes commit redo to its own thread."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-1",
+      "reason": "Trace a locally committed row through transport, standby reception and physical apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace the primary instance’s redo thread and the separate intersite transport path."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Follow a committed source row through capture, trail and target apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A monitoring sample does not acknowledge an application commit."
+    }
+  ],
+  "update-commit": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-9",
+      "reason": "Repeated updates to rows in a shared hot block make current-block transfers visible."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-1",
+      "reason": "Follow an updated row’s redo from the primary to the physical standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Follow a remote block read, an update and the corresponding thread’s redo at the standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Trace committed DML into the trail and then into a target transaction."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The management stack observes target health rather than replaying a user update."
+    }
+  ],
+  "commit-durability": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary RAC instance uses its online redo thread for normal commit durability."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-2",
+      "reason": "Compare completion of an ASYNC commit with the remote durable acknowledgment in healthy SYNC/AFFIRM."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "The write belongs to the instance’s thread. Receipt at the other site is a separate milestone."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#trace-a-commit",
+      "reason": "Distinguish source commit success from later completion of target apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Agent upload and OMS acknowledgment do not establish whether a database commit is durable."
+    }
+  ],
+  "dml-statement-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An error rolls back the failed statement on its executing instance. Earlier transaction work needs separate examination."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Distinguish statement rollback on the primary from committing a transaction and applying its redo at the standby."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed statement on its originating instance before interpreting redo at the remote site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A failed source DML statement does not become a committed row operation for replication."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A target-level availability event does not diagnose a constraint violation in one statement."
+    }
+  ],
+  "create-table-ddl": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DDL changes the shared database dictionary; inter-instance locks and invalidations require a dedicated RAC DDL lesson."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A physical standby recovers logged dictionary changes by applying redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dictionary changes originate on a primary instance and physical recovery propagates their redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The GoldenGate examples teach row changes. DDL replication depends on separate configuration and supported objects."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM lessons cover target telemetry and maintenance status, not dictionary change execution."
+    }
+  ],
+  "alter-table-ddl": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DDL changes the shared database dictionary; inter-instance locks and invalidations require a dedicated RAC DDL lesson."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A physical standby recovers logged dictionary changes by applying redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Dictionary changes originate on a primary instance and physical recovery propagates their redo to the other site."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The GoldenGate examples teach row changes. DDL replication depends on separate configuration and supported objects."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM lessons cover target telemetry and maintenance status, not dictionary change execution."
+    }
+  ],
+  "ddl-lock-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the blocking session across instances and distinguish its locks from block-transfer waits."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side DDL lock wait is a concurrency problem at the executing database."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the primary service, instance and blocker identity to localize the DDL wait."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "DDL lock diagnostics and configured DDL replication need a separate GoldenGate scenario."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring examples do not expose a DDL blocking-session chain."
+    }
+  ],
+  "rollback-flow": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-8",
+      "reason": "Observe undo of incomplete work when a RAC instance fails and its client reconnects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Physical redo carries the changes needed for standby recovery, including changes involving undo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Keep a user-requested rollback on one instance distinct from instance recovery and site failover."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The capture/apply example publishes committed row changes; a rolled-back source transaction has no committed row outcome."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A sampled metric cannot establish whether a particular application transaction rolled back."
+    }
+  ],
+  "read-consistency": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-7",
+      "reason": "Trace the transfer of a suitable consistent-read image from a peer's cache."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Read consistency is enforced by the database serving the query. Standby apply progress determines which changes have reached it."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Identify a suitable block image on a peer within the primary site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Target query visibility follows target-side commit and can lag the source. The target has its own consistent reads."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Telemetry freshness and database statement read consistency use different mechanisms."
+    }
+  ],
+  "snapshot-too-old-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The reader still needs a suitable earlier block version and retained undo across the RAC database."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Diagnose the query’s snapshot and undo at the database serving it. Transport lag alone does not explain ORA-01555."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record the query site, instance, duration and undo evidence before attributing the failure to replication."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail retention measures a different history from undo needed for a consistent read."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not diagnose lost undo for an individual cursor."
+    }
+  ],
+  "dbwn-dirty-write": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "DBWn writes changed buffers to the shared data files. ASM manages their layout, while the database instance issues the write."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Primary DBWn and physical standby apply update separate sets of database files."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Within each RAC database, buffer writes reach that site's shared storage."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract obtains change information from redo rather than tracking DBWn data-file writes."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current monitoring lessons do not isolate DBWn I/O."
+    }
+  ],
+  "checkpoint-flow": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Associate checkpoint progress with the correct instance thread and shared file headers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Database checkpoint, redo receipt and standby apply position answer different recovery questions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Keep instance thread progress distinct from the standby apply position and the state of the other site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Database and GoldenGate checkpoints mark different kinds of progress. Trail positions govern process restart."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A successful agent upload does not measure checkpoint completion."
+    }
+  ],
+  "redo-log-switch": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Each RAC instance switches groups in its own online redo thread."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-4",
+      "reason": "Compare waiting for archival at the standby with reading its current standby redo log during real-time apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-2",
+      "reason": "Count online groups and standby log groups for each primary instance's thread."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Capture follows source redo across file boundaries and relies on access to the required retained logs."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM walkthroughs do not chart database redo group reuse."
+    }
+  ],
+  "archive-destination-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed archive destination for the affected instance and redo thread."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-5",
+      "reason": "Follow a missing archived sequence through transport restoration and gap resolution."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-3",
+      "reason": "Use both thread and sequence to identify redo missing from the receiving site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Capture may need retained archived redo after an interruption. Check log availability at its required position."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#threshold-incident",
+      "reason": "If the target exposes a relevant threshold, track the observed incident separately from repairing the destination."
+    }
+  ],
+  "instance-startup": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#startup",
+      "reason": "Bring cluster resources and local instances online according to configured dependencies."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#startup",
+      "reason": "Startup decisions depend on the primary or standby role and the required apply state."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#startup",
+      "reason": "Verify both clusters, database roles and the single 11g standby apply instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-startup",
+      "reason": "After the database is ready, start capture, pump and apply from their known positions."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-startup",
+      "reason": "Distinguish startup of the monitoring stack from startup of a monitored database."
+    }
+  ],
+  "shutdown-normal": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Wait for or drain user sessions on the intended RAC instance, then verify service placement on its peers."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "Account for the database role, outstanding transport and standby apply before a planned stop."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-transactional": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Trace the last transaction on the selected instance as the clustered service drains."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "A final primary transaction must finish before closing. Track its redo receipt and apply separately at the standby."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-immediate": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#graceful-shutdown",
+      "reason": "Drain or relocate cluster-managed services and distinguish stopping one instance from stopping the database."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#graceful-shutdown",
+      "reason": "Account for the database role, outstanding transport and standby apply before a planned stop."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#graceful-shutdown",
+      "reason": "Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-graceful-shutdown",
+      "reason": "Coordinate database maintenance with the Extract, pump and Replicat checkpoints."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-graceful-shutdown",
+      "reason": "Watch management-stack availability and distinguish its planned shutdown from the monitored database shutdown."
+    }
+  ],
+  "shutdown-abort": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-8",
+      "reason": "Observe the impact of losing one instance while a peer survives; recover incomplete transactions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An abrupt primary stop and a standby promotion are independent decisions. Evaluate redo availability and role policy."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Compare losing a single instance with isolation or failure of the primary site."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#replicat-recovery",
+      "reason": "Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify whether the target actually went down before interpreting a gap in telemetry as a crash."
+    }
+  ],
+  "crash-recovery": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-8",
+      "reason": "A surviving instance recovers the failed instance’s redo thread and rolls back incomplete work."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "A primary outage can raise a separate site failover decision. Inspect received redo and target readiness."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Determine whether local instance recovery or a site-level role transition applies."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#replicat-recovery",
+      "reason": "Separate the target database's crash recovery from restart of the trail consumer."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Use independent evidence to distinguish actual failure from stale monitoring data."
+    }
+  ],
+  "startup-file-failure-rca": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#startup",
+      "reason": "Locate an unavailable dependent resource such as an ASM disk group before diagnosing the database startup stage."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Test file availability and MOUNT/OPEN state against the intended role. A mounted standby can be healthy."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the site, instance, role and file type before treating a startup fault as a site failure."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A missing database control or data file is outside the logical capture and apply stack."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Validate the target independently when startup and the monitoring view disagree."
+    }
+  ],
+  "rman-full-backup": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "RMAN backs up the shared database files. A RAC channel also needs access to its backup device and required archived redo."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "RMAN backups taken in a Data Guard configuration require attention to the source role, redo and backup accessibility."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Recovery planning must identify the site, shared files, timelines and every required primary redo thread."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Extract checkpoints and trail files serve logical replication, not an RMAN database backup."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "An OEM backup job and its device configuration are outside this monitoring curriculum."
+    }
+  ],
+  "rman-restore-recover": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A restore targets the shared database files and recovery must have the required redo from all threads."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "After failover, review reinstating the former primary or rebuilding its standby. RMAN restore details remain on the home page."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Choose reinstatement or re-creation of the former primary after checking flashback eligibility."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A replication checkpoint does not restore Oracle data files or replace RMAN media recovery."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current OEM lessons do not schedule RMAN recovery or select restore pieces."
+    }
+  ],
+  "rman-backup-failure-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check which RAC channel, node, device and backup path failed."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the backup role, channel and archived redo availability independently of apply health."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the failed job by site, database role, instance and device before interpreting a protection gap."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "RMAN backup channel diagnostics are separate from trail and checkpoint retention."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The OEM workflows cover alerts and collection health, without a backup-job diagnostic example."
+    }
+  ],
+  "flashback-database": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Flashback acts on the shared database timeline and requires coordination of RAC instances."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "Flashback Database can permit the old primary to be reinstated after a role transition."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Evaluate flashback enablement and retained history before reinstating the former primary."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A source or target rewind can invalidate capture or apply positions. Replication resynchronization needs a separate plan."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Monitoring history does not provide flashback logs for database rewind."
+    }
+  ],
+  "flashback-unavailable-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check flashback configuration and retained logs for the shared RAC database."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-7",
+      "reason": "When the old primary cannot be reinstated, assess rebuilding it as a standby."
+    },
+    {
+      "kind": "Direct",
+      "target": "rac-dataguard.html#both-7",
+      "reason": "Choose standby re-creation if the former primary lacks sufficient flashback history."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Preserved trail files and checkpoints are independent of the database flashback window."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "OEM metric retention does not determine database flashback eligibility."
+    }
+  ],
+  "session-monitoring": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Include instance identifiers when comparing sessions, waits and services across RAC nodes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the role of the database hosting the observed sessions."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Track site, service and instance when sessions reconnect following a topology change."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Extract and Replicat database sessions can be identified, while replication progress also needs process and trail positions."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#first-sample",
+      "reason": "Establish which database target, credentials, collection interval and timestamp produced a metric sample."
+    }
+  ],
+  "known-sql-slowness": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect evidence on the instance that handled the affected session and include its instance ID."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect these measurements on the affected database role and record the sample time."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record site, database role and instance along with the incident interval."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A database performance symptom alone does not identify a logical replication bottleneck."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify collection freshness and target reachability before interpreting a missing or outdated sample."
+    }
+  ],
+  "top-sql-discovery": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Compare SQL evidence per instance before aggregating activity across the cluster."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Rank SQL at the role serving the workload and keep redo transport timing separate."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Preserve service, site and instance dimensions when ranking SQL across a clustered deployment."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Top SQL by database time is distinct from identifying a lagging replication stage."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The supplied OEM examples do not implement a Top SQL drill-down."
+    }
+  ],
+  "spike-window-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect evidence on the instance that handled the affected session and include its instance ID."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Collect these measurements on the affected database role and record the sample time."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Record site, database role and instance along with the incident interval."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A database performance symptom alone does not identify a logical replication bottleneck."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Verify collection freshness and target reachability before interpreting a missing or outdated sample."
+    }
+  ],
+  "single-block-read-diagnosis": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-7",
+      "reason": "Separate actual shared-disk I/O from a peer-cache block transfer."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute a foreground read to the instance serving that query before comparing standby apply I/O."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Trace an in-cluster block transfer independently from intersite redo transport."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A source foreground block read does not locate a delay in capture, pump or apply."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The supplied OEM examples do not resolve single-block I/O waits."
+    }
+  ],
+  "multiblock-read-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Examine the scan and underlying storage on the executing instance; verify shared-storage load across nodes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Observe the scan at the database where it executes, including a readable standby when configured."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute scan I/O to the correct site and instance before comparing shared-storage load."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A full scan performed for a user query is separate from GoldenGate redo capture."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "No current OEM walkthrough attributes multiblock reads to execution-plan operations."
+    }
+  ],
+  "redo-commit-latency": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Measure foreground commit waits and LGWR I/O on the instance owning the relevant redo thread."
+    },
+    {
+      "kind": "Direct",
+      "target": "dataguard.html#dg-2",
+      "reason": "Test how remote durable acknowledgment in SYNC/AFFIRM contributes to commit time."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Separate the primary instance's redo path from the intersite redo transport path."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#isolate-lag",
+      "reason": "Separate source commit latency from time subsequently spent in capture, pump or apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#stale-evidence",
+      "reason": "Check comparable sample times before using target metrics to investigate a latency spike."
+    }
+  ],
+  "temp-spill-diagnosis": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A server process on the executing instance uses its PGA and the database TEMP tablespace."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A primary-side sort uses local work areas and temporary space. Redo Apply teaches a different path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The site and instance executing the statement own its work area."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail buffering and network backlog are separate from a database SQL sort spill."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A TEMP work-area or execution-plan drill-down is beyond the current monitoring lessons."
+    }
+  ],
+  "row-lock-contention": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the waiting session, blocking instance and open transaction. A row-lock wait differs from a hot-block transfer."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Locate the live blocking transaction at the primary or other writable role being queried."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Correlate blocker and waiter at the same database while retaining both RAC instance identifiers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A target-side blocked apply session can delay replication. Confirm its blocking transaction separately."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The current OEM lessons do not display database lock graphs."
+    }
+  ],
+  "buffer-contention": [
+    {
+      "kind": "Direct",
+      "target": "rac.html#rac-9",
+      "reason": "Correlate a repeatedly modified block with inter-instance transfers, waits and workload placement."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Attribute a buffer wait to the primary or standby process and object before interpreting its impact."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-1",
+      "reason": "Identify which private interconnect carries a primary-site block before investigating intersite lag."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Trail congestion and Oracle buffer-cache contention affect different resources."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The target monitoring examples do not identify a hot Oracle block."
+    }
+  ],
+  "shared-pool-parse-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Each RAC instance has its own library cache; compare parse pressure per instance and service."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "An application query parses at the database to which the session connects."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "The chosen site and instance determine which library cache handles the parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The logical replication walkthroughs follow committed changes; they do not trace an application cursor parse."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The monitoring walkthroughs do not inspect cursor parsing or plan construction."
+    }
+  ],
+  "free-buffer-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Relate free-buffer waits to DBWn and file writes on the affected RAC instance."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check which role and process are waiting for reusable database buffers."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Separate pressure in one instance’s buffer cache from a site-wide transport backlog."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "A buffered trail or pump backlog is a different resource from a free database buffer."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "The available management walkthroughs do not diagnose DBWn free-buffer waits."
+    }
+  ],
+  "archive-log-switch-pressure": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check the thread that is attempting to reuse a group and its own checkpoint and archival progress."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Distinguish a local switch blocked by archival or checkpoint progress from remote transport and apply lag."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-2",
+      "reason": "Inspect online and standby log group counts by thread before attributing delayed reuse to the other site."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Check required source redo availability for capture separately from the reason a primary log group cannot be reused."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#threshold-incident",
+      "reason": "Investigate an observed storage threshold and close the incident after confirming the underlying cause."
+    }
+  ],
+  "performance-incident-rca": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#rac-9",
+      "reason": "Correlate workload, repeated block identity and global cache waits to diagnose one RAC-specific incident."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#dg-5",
+      "reason": "Use receive and apply positions to localize a specific redo continuity incident."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#both-6",
+      "reason": "Localize a disruption to one instance, the transport network or the entire site before escalation."
+    },
+    {
+      "kind": "Direct",
+      "target": "goldengate.html#isolate-lag",
+      "reason": "Compare positions over time to find the pipeline stage accumulating delay."
+    },
+    {
+      "kind": "Direct",
+      "target": "oem.html#threshold-incident",
+      "reason": "Trace a monitored condition through event creation, ownership and verification."
+    }
+  ],
+  "patch-quarterly-psu-spu": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Check both node homes, service placement and whether the exact patch supports rolling application."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Check patch-specific standby-first eligibility and role-specific work, then verify transport and apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Sequence maintenance by site, Oracle home and instance, then check both primary redo threads and standby apply."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Track component compatibility and post-maintenance health across the management stack."
+    }
+  ],
+  "patch-one-off": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Determine cluster eligibility and one-off conflicts separately for each affected home."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Confirm primary and standby eligibility for this specific interim patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Check conflicts and compatible mixed states for each home, site and instance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check capture and apply compatibility for the exact interim database or GoldenGate patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Scope the interim correction to the intended database target or management component."
+    }
+  ],
+  "patch-windows-bundle": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Choose the Windows bundle and installation instructions for the specific RAC and Grid homes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the platform-specific bundle README on both databases and verify their roles and transport state."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Validate four nodes' Windows home versions and role-transition compatibility against the bundle README."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Use the supported GoldenGate build for the Windows database home; database bundle installation is separate."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "Use a bounded monitoring blackout for the Windows target maintenance window."
+    }
+  ],
+  "patch-set-upgrade": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "A patch set is an upgrade. Use release-specific RAC and Grid upgrade sequencing before any node changes."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Plan database upgrade and standby compatibility using the exact upgrade guide and permitted transition path."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "A patch-set upgrade requires a verified cross-site, multi-instance upgrade design for the target release."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Confirm GoldenGate source and target compatibility and preserve positions during the database version transition."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#oem-patching",
+      "reason": "Check management stack, agent and plug-in compatibility before monitoring the upgraded target."
+    }
+  ],
+  "patch-rollback": [
+    {
+      "kind": "Adapted",
+      "target": "rac.html#patching",
+      "reason": "Coordinate rollback eligibility and verification by home and node according to the specific README."
+    },
+    {
+      "kind": "Adapted",
+      "target": "dataguard.html#patching",
+      "reason": "Restore supported versions on the affected sites and verify shipping and apply in the correct direction."
+    },
+    {
+      "kind": "Adapted",
+      "target": "rac-dataguard.html#patching",
+      "reason": "Verify version parity, role, service placement and redo continuity after a supported rollback."
+    },
+    {
+      "kind": "Adapted",
+      "target": "goldengate.html#gg-patching",
+      "reason": "Check process compatibility and resume only from verified checkpoints after maintenance."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "End the blackout only after the service and fresh target samples confirm the recovery."
+    }
+  ],
+  "patch-upgrade-mode-rca": [
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "If a cluster database needs upgrade mode, use its exact RAC upgrade guide and confirm allowed instance count."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the database role before interpreting upgrade-mode requirements in a postpatch SQL script."
+    },
+    {
+      "kind": "Foundation",
+      "target": null,
+      "reason": "Identify the affected database role, instance and home before resuming a failed postpatch SQL step."
+    },
+    {
+      "kind": "Outside scope",
+      "target": null,
+      "reason": "Database dictionary upgrade mode is separate from a GoldenGate process patch."
+    },
+    {
+      "kind": "Adapted",
+      "target": "oem.html#patch-blackout",
+      "reason": "Keep maintenance evidence and independently confirm the database’s open state before ending the monitoring blackout."
+    }
+  ]
+}</script>
+<script>(function activateComparison() {
+  const records = JSON.parse(document.getElementById('topologyData').textContent);
+  const select = document.getElementById('topologyLesson');
+  const rows = document.getElementById('topologyRows');
+  const towerLinks = Array.from(document.querySelectorAll('.tower-nav a')).slice(1);
+  function compare() {
+    document.getElementById('topologyHomeLesson').href = './index.html#lesson=' + encodeURIComponent(select.value);
+    rows.replaceChildren();
+    for (const [i, cell] of records[select.value].entries()) {
+      const row = rows.insertRow();
+      row.dataset.kind = cell.kind;
+      const label = document.createElement('th');
+      label.scope = 'row';
+      label.textContent = towerLinks[i].textContent;
+      row.append(label);
+      row.insertCell().textContent = cell.kind;
+      row.insertCell().textContent = cell.reason;
+      const destination = row.insertCell();
+      if (cell.target) {
+        const link = document.createElement('a');
+        link.href = './' + cell.target;
+        link.textContent = 'Open lesson';
+        destination.append(link);
+      } else {
+        destination.textContent = '—';
+      }
+    }
+  }
+  select.value = 'instance-startup';
+  select.addEventListener('change', compare);
+  document.getElementById('topologyMap').addEventListener('toggle', event => {
+    if (!event.target.open || !document.querySelector('.app-shell.workflow-active')) return;
+    const current = document.querySelector('#homeFoundations a[href*="#lesson="], #foundation[href*="#lesson="]');
+    if (current) {
+      const id = new URLSearchParams(current.hash.slice(1)).get('lesson');
+      if (records[id]) select.value = id;
+    }
+    compare();
+  });
+  compare();
+})();</script>
+<script type="application/json" id="tower-guide-data">{"trace-a-commit":{"category":"Capture & Delivery","objective":"Trace a committed change through the trail files to a visible row on the target.","stages":["A transaction changes the order","Extract recognizes the commit","The local trail holds the change","The data pump forwards the record","Collector receives the stream","Replicat maps the change","The reporting row becomes visible"]},"network-interruption":{"category":"Transport & Recovery","objective":"Identify what continues locally during a broken pump connection and prove that delivery caught up.","stages":["Capture continues locally","The target drains its backlog","The pump reconnects","Delivery resumes","Verify the catch-up"]},"replicat-recovery":{"category":"Transport & Recovery","objective":"Find a failed target operation and verify delivery after restarting from the checkpoint.","stages":["Locate the accumulated records","Identify the failing operation","Reconcile the affected data","Resume from the checkpoint","Verify row outcomes"]},"isolate-lag":{"category":"Transport & Recovery","objective":"Use progress at each stage to distinguish capture, transport and apply lag.","stages":["Check capture progress","Check transport independently","Find the stalled stage","Test the diagnosis"]},"gg-startup":{"category":"Startup / Shutdown / Recovery","objective":"Verify that a new committed marker travels through every group after startup.","stages":["Verify the database prerequisites","Start Manager at each installation","Resume capture from its checkpoint","Resume forwarding","Resume delivery","Verify a new committed change"]},"gg-graceful-shutdown":{"category":"Startup / Shutdown / Recovery","objective":"Drain each trail to an agreed position before stopping the groups and their Managers.","stages":["Establish a finish line","Finish capture","Drain the final local trail records","Finish the target trail","Stop Manager and preserve restart evidence"]},"gg-patching":{"category":"Patching & Maintenance","objective":"Check the GoldenGate installation and restart positions and prove correct delivery after maintenance.","stages":["Select the GoldenGate patch","Quiesce and drain","Protect the installation and apply","Verify the running builds","Make the release decision"]}}</script>
+<script>
+/* The shared player delegates diagram drawing, checkpoints and animation to each tower. */
+(() => {
+  'use strict';
+
+  function startTrainer() {
+    const byId = id => document.getElementById(id);
+    const all = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+    const diagram = document.querySelector('[data-architecture-diagram]');
+    const guide = byId('towerGuide');
+    if (!diagram || !guide) return;
+
+    const curriculum = JSON.parse(byId('tower-guide-data').textContent);
+    const model = byId('architecture-spec') || byId('architecture-model');
+    const diagramFrames = model ? JSON.parse(model.textContent).frames : {};
+    const compact = byId('lesson-data');
+    function readLessons() {
+      if (!compact) return JSON.parse(byId('data').textContent);
+      const data = JSON.parse(compact.textContent);
+      return data.flows.map(([id, level, title, setup, frames, question, answer, refs]) => ({
+        id, level, title, setup, question, answer,
+        steps: frames.map(frame => frame[2]),
+        actors: frames.map(frame => [frame[0]]),
+        refs: refs.map(index => data.sources[index])
+      }));
+    }
+
+    const lessons = readLessons().map(flow => ({...flow, ...curriculum[flow.id]}));
+    const byLessonId = new Map(lessons.map(flow => [flow.id, flow]));
+    const enginePlay = document.querySelector('[data-arch-play]');
+    const engineSpeed = document.querySelector('[data-arch-speed]');
+    const baseSpeed = Number(engineSpeed.value);
+    const engineNext = byId('next');
+    const enginePrevious = byId('prev') || byId('previous');
+    const engineProgress = byId('progress');
+    const cards = byId('workflowCards');
+    const categoryFilter = byId('workflowCategoryFilter');
+    const difficultyFilter = byId('workflowDifficultyFilter');
+    const workflowSearch = byId('workflowSearch');
+    const timeline = byId('timelineTrack');
+    const range = byId('timelineRange');
+    const search = byId('componentSearch');
+    const results = byId('searchResults');
+    const refsDialog = byId('referencesModal');
+    const workspace = document.querySelector('.trainer-workspace');
+    const shell = workspace.closest('.app-shell');
+    const h = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[c]);
+    const on = (id, type, listener) => byId(id)?.addEventListener(type, listener);
+    const nodeKey = node => node.dataset.key || node.dataset.node || node.id;
+    const nodes = () => all('.arch-node[role="button"]', diagram);
+    const nodeName = node => (node?.getAttribute('aria-label') || node?.querySelector('text')?.textContent || '').split(/:| — /)[0].trim();
+    const engineIsPlaying = () => enginePlay.getAttribute('aria-pressed') === 'true';
+    const engineIndex = () => Math.max(0, Number((engineProgress.textContent.match(/\d+/) || [1])[0]) - 1);
+    const stage = (flow, i) => flow.stages?.[i] || 'Step ' + (i + 1);
+    const info = (title, content) => '<div class="info-block"><h3>' + h(title) + '</h3><p>' + h(content) + '</p></div>';
+    function actors(flow, i) {
+      const parts = nodes();
+      return (flow.actors?.[i] || []).map(id => {
+        const part = parts.find(node => nodeKey(node) === id || node.dataset.actor === id);
+        const legacy = all('button[data-actor]', byId('towerEngine') || document).find(node => node.dataset.actor === id);
+        return legacy?.textContent.trim() || nodeName(part) || id;
+      });
+    }
+
+    let flow = null;
+    let overview = false;
+    let currentIndex = -1;
+    let wantsPlayback = false;
+    let loopTimer = null;
+    let sendingRoute = false;
+    let inspectedKey = '';
+    let referenceOpener = null;
+    let disclosureChoices = {};
+    let glossaryHtml = '';
+
+    // Use the same database terminology as the Stand-Alone DB glossary.
+    // Add the terms used by the 11g specialist diagrams and their scenarios.
+    const glossary = {
+      ASM: 'Automatic Storage Management', ASYNC: 'Asynchronous redo transport',
+      CPU: 'Central Processing Unit', CRSD: 'Oracle Cluster Ready Services daemon',
+      CSSD: 'Cluster Synchronization Services daemon', DBA: 'Database administrator',
+      DDL: 'Data Definition Language', DML: 'Data Manipulation Language',
+      DNS: 'Domain Name System', FSFO: 'Fast-start failover',
+      GCS: 'Global Cache Service', GI: 'Grid Infrastructure', 'I/O': 'Input/Output',
+      LGWR: 'Log Writer process', LMS: 'Global Cache Service process',
+      MRP0: 'Managed recovery process for physical standby Redo Apply',
+      OCR: 'Oracle Cluster Registry', OEM: 'Oracle Enterprise Manager',
+      OHASD: 'Oracle High Availability Services daemon', OMS: 'Oracle Management Service',
+      OS: 'Operating system', PMON: 'Process Monitor process', PSU: 'Patch Set Update',
+      RAC: 'Real Application Clusters', RFS: 'Remote file server process',
+      SCAN: 'Single Client Access Name', SGA: 'System Global Area',
+      SQL: 'Structured Query Language', SRL: 'Standby redo log',
+      SRVCTL: 'Server Control utility', SYNC: 'Synchronous redo transport',
+      VIP: 'Virtual IP address', WAN: 'Wide area network'
+    };
+    function workflowGlossary(item) {
+      const material = [item.title, item.setup, item.objective, item.question, item.answer, ...item.stages, ...item.steps];
+      const touched = new Set(item.actors.flat());
+      for (const frame of diagramFrames[item.id] || []) {
+        for (const id of frame.nodes) touched.add(id);
+        material.push(frame.caption || frame.label);
+      }
+      for (const i of item.steps.keys()) material.push(...actors(item, i));
+      for (const part of nodes()) {
+        if (touched.has(nodeKey(part)) || touched.has(part.dataset.actor)) {
+          material.push(nodeName(part), part.querySelector('title')?.textContent);
+        }
+      }
+      const text = material.join(' ');
+      const tokens = new Set((text.match(/\b(?:I\/O|[A-Z][A-Z0-9]+[ns]?)\b/g) || [])
+        .map(term => term.replace(/[ns]$/, '')));
+      const words = text.toLowerCase();
+      const rows = Object.entries(glossary).filter(([term, full]) => tokens.has(term) || words.includes(full.toLowerCase())).map(([term, full]) =>
+        '<div class="abbreviation-row"><span class="abbr-key">' + h(term) + '</span><span class="abbr-value">' + h(full) + '</span></div>');
+      return rows.length ? '<div class="abbreviation-list">' + rows.join('') + '</div>' :
+        '<p>This workflow uses the component and process names in full.</p>';
+    }
+    function disclosure(kind, title, body) {
+      const expanded = disclosureChoices[kind] ?? overview;
+      const css = 'workflow-focus-drawer' + (kind === 'abbreviations' ? ' abbreviation-drawer' : '') + (expanded ? '' : ' collapsed');
+      return '<div class="' + css + '"><button class="workflow-focus-toggle" type="button" data-toggle-workflow-' + kind +
+        ' aria-expanded="' + expanded + '"><strong>' + title + '</strong><span class="drawer-icon" aria-hidden="true">' +
+        (expanded ? '▴' : '▾') + '</span></button><div class="workflow-focus-body">' + body + '</div></div>';
+    }
+    function guideDisclosures() {
+      const focus = disclosure('focus', 'Workflow focus', h(flow.objective));
+      const terms = disclosure('abbreviations', 'Full forms used in this workflow', glossaryHtml);
+      return overview ? focus + terms : terms + focus;
+    }
+    guide.addEventListener('click', event => {
+      const button = event.target.closest('.workflow-focus-toggle');
+      if (!button) return;
+      const kind = button.hasAttribute('data-toggle-workflow-focus') ? 'focus' : 'abbreviations';
+      const expanded = button.getAttribute('aria-expanded') !== 'true';
+      disclosureChoices[kind] = expanded;
+      button.setAttribute('aria-expanded', String(expanded));
+      button.parentElement.classList.toggle('collapsed', !expanded);
+      button.querySelector('.drawer-icon').textContent = expanded ? '▴' : '▾';
+    });
+
+    const blankCategory = new Option('All operation categories', 'all');
+    categoryFilter.replaceChildren(blankCategory, ...Array.from(new Set(lessons.map(item => item.category)), category => new Option(category, category)));
+    const blankDifficulty = new Option('All difficulties', 'all');
+    difficultyFilter.replaceChildren(blankDifficulty, ...Array.from(new Set(lessons.map(item => item.level)), level => new Option(level, level)));
+    function renderCards() {
+      const query = workflowSearch.value.trim().toLowerCase();
+      const filtered = lessons.filter(item =>
+        (categoryFilter.value === 'all' || categoryFilter.value === item.category) &&
+        (difficultyFilter.value === 'all' || difficultyFilter.value === item.level) &&
+        (!query || [item.title, item.category, item.level, item.objective, item.setup, ...(item.stages || []), ...item.steps].join(' ').toLowerCase().includes(query)));
+      cards.innerHTML = filtered.map(item =>
+        '<article class="workflow-card' + (flow === item ? ' active' : '') + '" data-workflow-card="' + h(item.id) + '">' +
+        '<div class="meta-row"><span class="tag">' + h(item.category) + '</span><span class="difficulty">' + h(item.level) + '</span></div>' +
+        '<h3>' + h(item.title) + '</h3><p>' + h(item.objective || item.setup) + '</p>' +
+        '<div class="workflow-card-actions"><button type="button" data-start-workflow="' + h(item.id) + '">Auto Demo</button>' +
+        '<button type="button" data-explain-workflow="' + h(item.id) + '">Manual Demo</button></div></article>').join('') ||
+        '<p class="empty-state">No workflows match these filters. Change the search or select a different category.</p>';
+      byId('workflowCount').textContent = filtered.length + (filtered.length === 1 ? ' workflow' : ' workflows') + (filtered.length === lessons.length ? '' : ' of ' + lessons.length);
+    }
+
+    function drawTimeline() {
+      all('.milestone', timeline).forEach(node => node.remove());
+      if (range) {
+        range.min = '0';
+        range.max = String(Math.max(0, (flow?.steps.length || 1) - 1));
+        range.value = '0';
+        range.disabled = !flow;
+      }
+      if (!flow) return;
+      flow.steps.forEach((_, i) => {
+        const milestone = document.createElement('button');
+        milestone.type = 'button';
+        milestone.className = 'milestone';
+        milestone.dataset.index = String(i);
+        milestone.dataset.step = String(i + 1);
+        milestone.innerHTML = '<strong>' + h(stage(flow, i)) + '</strong><span>Step ' + (i + 1) + '</span><span>' + h(actors(flow, i).join(' · ')) + '</span>';
+        timeline.append(milestone);
+      });
+    }
+
+    function setPressed(id, value) {
+      const el = byId(id);
+      if (!el) return;
+      el.setAttribute('aria-pressed', String(value));
+      el.classList.toggle('active', value);
+    }
+
+    function scrollArea(element) {
+      element?.scrollIntoView({block: 'start', behavior: 'instant'});
+    }
+    function paintPosition() {
+      const index = flow && !overview ? engineIndex() : -1;
+      const moved = index !== currentIndex;
+      currentIndex = index;
+      const end = Boolean(flow && index === flow.steps.length - 1);
+      document.body.classList.toggle('tower-ready', !flow);
+      document.body.classList.toggle('tower-overview', overview);
+      document.body.classList.toggle('tower-playing', engineIsPlaying());
+      shell.classList.toggle('workflow-active',Boolean(flow));
+      shell.classList.toggle('component-active',Boolean(inspectedKey));
+      setPressed('playButton', engineIsPlaying());
+      for (const id of ['playButton','pauseButton','previousButton','nextButton','timelineResetButton']) byId(id).disabled = !flow;
+      const inspected = inspectedKey ? nodes().find(node => nodeKey(node) === inspectedKey) : null;
+      byId('statusPill').textContent = !flow ? (inspected ? 'Component: ' + nodeName(inspected) : 'Ready: select a flow or click a component.') :
+        overview ? 'Manual demo · Select Next step to begin.' : 'Step ' + (index + 1) + ' of ' + flow.steps.length + (engineIsPlaying() ? ' · Playing' : end ? ' · Complete' : '');
+      const operation = byId('operationCard');
+      operation.querySelector('h2').textContent = flow ? flow.title + (overview ? ' – Workflow intro' : '') : inspected ? nodeName(inspected) : 'No flow selected';
+      operation.querySelector('p').textContent = flow ? overview ? flow.objective : stage(flow, index) : inspected?.querySelector('title')?.textContent || 'Choose a flow above or click an architecture component to begin.';
+      const focusedDisclosure = guide.contains(document.activeElement) && document.activeElement.closest('.workflow-focus-toggle');
+      if (!flow) {
+        guide.innerHTML = inspected ? '<div class="panel-kicker">Component guide</div><h2>' + h(nodeName(inspected)) + '</h2>' :
+          '<div class="panel-kicker">Workflow Guide</div><h2>Choose a workflow</h2><div class="student-summary">Choose Manual Demo to step through the diagram, or Auto Demo to play the workflow.</div><p>Select an architecture component to inspect its role.</p>';
+      } else if (overview) {
+        guide.innerHTML = '<div class="panel-kicker">Workflow Guide · Overview</div><h2>' + h(flow.title) + '</h2><div class="student-summary">' + h(flow.setup) + '</div>' + guideDisclosures() + '<div class="info-grid"><div class="info-block"><h3>Workflow steps</h3><ol class="tower-guide-steps">' +
+          flow.steps.map((_, i) => '<li>' + h(stage(flow, i)) + '</li>').join('') + '</ol></div>' + info('Check your understanding', flow.question) + '</div><p>Select <strong>Next step</strong> in the bottom player to begin.</p>';
+      } else {
+        const components = actors(flow, index);
+        guide.innerHTML = '<div class="panel-kicker">Workflow Guide · Step ' + (index + 1) + ' of ' + flow.steps.length + '</div><h2>' + h(stage(flow, index)) + '</h2><div class="student-summary">' + h(flow.steps[index]) + '</div>' + guideDisclosures() +
+          (components.length ? '<div class="info-grid">' + info('Components in this step', components.join(' · ')) + '</div>' : '');
+      }
+      if (focusedDisclosure) {
+        const selector = focusedDisclosure.hasAttribute('data-toggle-workflow-focus') ? '[data-toggle-workflow-focus]' : '[data-toggle-workflow-abbreviations]';
+        guide.querySelector(selector)?.focus({preventScroll:true});
+      }
+      if (byId('towerCheckpoint')) byId('towerCheckpoint').hidden = !end;
+      if (byId('towerWorkflowReferences')) byId('towerWorkflowReferences').hidden = !flow;
+      if (byId('towerHomeLinks')) byId('towerHomeLinks').hidden = !flow;
+      for (const milestone of all('.milestone', timeline)) {
+        const i = Number(milestone.dataset.index);
+        milestone.classList.toggle('active', i === index);
+        milestone.classList.toggle('completed', i < index);
+        if (i === index) milestone.setAttribute('aria-current','step');
+        else milestone.removeAttribute('aria-current');
+        if (i === index && moved && byId('autoScrollToggle').checked) {
+          const wrap = byId('timelineWrap');
+          const offset = milestone.getBoundingClientRect().left - wrap.getBoundingClientRect().left;
+          if (offset < 0 || offset + milestone.offsetWidth > wrap.clientWidth) wrap.scrollLeft += offset - (wrap.clientWidth - milestone.offsetWidth) / 2;
+        }
+      }
+      if (range) {
+        range.value = String(Math.max(0, index));
+        range.setAttribute('aria-valuetext', index < 0 ? 'No step selected' : 'Step ' + (index + 1) + ' of ' + flow.steps.length);
+      }
+      byId('timelineProgress').style.width = flow && index > 0 ? (100 * index / Math.max(1, flow.steps.length - 1)) + '%' : '0%';
+      if (wantsPlayback && !engineIsPlaying()) {
+        if (end && byId('loopToggle').checked) {
+          if (loopTimer === null) loopTimer = setTimeout(() => {
+            loopTimer = null;
+            if (wantsPlayback && byId('loopToggle').checked) startPlayback();
+          }, 1000 / Number(byId('speedSelect').value));
+        } else wantsPlayback = false;
+      }
+    }
+
+    function pausePlayback() {
+      wantsPlayback = false;
+      clearTimeout(loopTimer);
+      loopTimer = null;
+      if (engineIsPlaying()) enginePlay.click();
+    }
+    function startPlayback() {
+      if (!flow) return;
+      overview = false;
+      wantsPlayback = true;
+      if (!engineIsPlaying()) enginePlay.click();
+      paintPosition();
+    }
+    function seek(index) {
+      if (!flow) return;
+      pausePlayback();
+      overview = false;
+      const target = Math.min(flow.steps.length - 1, Math.max(0, index));
+      const old = engineIndex();
+      const control = target < old ? enginePrevious : engineNext;
+      for (let count = Math.abs(target - old); count > 0; count--) control.click();
+      paintPosition();
+    }
+    function next() {
+      if (!flow) return;
+      const index = overview ? 0 : engineIndex() + 1;
+      seek(index === flow.steps.length && byId('loopToggle').checked ? 0 : index);
+    }
+    function previous() {
+      if (!flow) return;
+      const index = overview ? 0 : engineIndex() - 1;
+      seek(index < 0 && byId('loopToggle').checked ? flow.steps.length - 1 : index);
+    }
+    function updateSpeed() {
+      const ratio = Number(byId('speedSelect').value);
+      const value = String(baseSpeed > 10 ? Math.round(baseSpeed / ratio) : ratio);
+      if (!all('option',engineSpeed).some(option => option.value === value)) engineSpeed.add(new Option(ratio + '×',value));
+      engineSpeed.value = value;
+      engineSpeed.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+
+    function readRoute(mode = 'step') {
+      const id = location.hash.slice(1);
+      pausePlayback();
+      flow = byLessonId.get(id) || null;
+      overview = Boolean(flow && mode === 'manual');
+      disclosureChoices = {};
+      glossaryHtml = flow ? workflowGlossary(flow) : '';
+      currentIndex = -1;
+      inspectedKey = '';
+      byId('towerComponentInspection').hidden = true;
+      search.value = '';
+      results.hidden = true;
+      results.replaceChildren();
+      renderCards();
+      drawTimeline();
+      paintPosition();
+      if (flow && mode === 'auto' && byId('animateFullFlowToggle').checked) startPlayback();
+    }
+    function route(id, mode) {
+      if (location.hash.slice(1) !== id) {
+        const url = new URL(location.href);
+        url.hash = id;
+        history.pushState(null, '', url.href);
+      }
+      sendingRoute = true;
+      try { window.dispatchEvent(new Event('hashchange')); }
+      finally { sendingRoute = false; }
+      readRoute(mode);
+    }
+    window.addEventListener('hashchange', () => { if (!sendingRoute) readRoute(); });
+    cards.addEventListener('click', event => {
+      const button = event.target.closest('[data-start-workflow],[data-explain-workflow]');
+      if (!button) return;
+      route(button.dataset.explainWorkflow || button.dataset.startWorkflow, button.dataset.explainWorkflow ? 'manual' : 'auto');
+      scrollArea(byId('diagramPanel'));
+    });
+    const observer = new MutationObserver(paintPosition);
+    observer.observe(engineProgress, {childList:true,characterData:true,subtree:true});
+    observer.observe(enginePlay, {attributes:true,attributeFilter:['aria-pressed']});
+    for (const filter of [categoryFilter, difficultyFilter]) filter.addEventListener('change',renderCards);
+    workflowSearch.addEventListener('input',renderCards);
+    on('playButton','click',startPlayback);
+    on('pauseButton','click',() => {pausePlayback();paintPosition();});
+    on('previousButton','click',previous);
+    on('nextButton','click',next);
+    on('timelineResetButton','click',() => seek(0));
+    on('speedSelect','change',updateSpeed);
+    on('loopToggle','change',() => {if (!byId('loopToggle').checked && loopTimer !== null) pausePlayback();});
+    timeline.addEventListener('click',event => {
+      const button = event.target.closest('.milestone[data-index]');
+      if (button) seek(Number(button.dataset.index));
+    });
+    range?.addEventListener('input',() => seek(Number(range.value)));
+    range?.addEventListener('change',() => seek(Number(range.value)));
+
+    function setFocusMode(enabled) {
+      document.body.classList.toggle('tower-focus-mode',enabled);
+      setPressed('focusModeButton',enabled);
+    }
+    function setLightMode(enabled) {
+      document.body.classList.toggle('page-light-mode',enabled);
+      setPressed('pageLightButton',enabled);
+    }
+    function setPanelLocked(locked) {
+      workspace.classList.toggle('side-panel-locked',locked);
+      setPressed('panelLockerButton',locked);
+      byId('panelLockerButton').setAttribute('aria-label', locked ? 'Expand explanation panel' : 'Collapse explanation panel');
+      byId('panelLockerButton').title = byId('panelLockerButton').getAttribute('aria-label');
+      byId('panelLockerButton').querySelector('.locker-icon').textContent = locked ? '◀' : '▶';
+    }
+    function updateDisplayOptions() {
+      document.body.classList.toggle('tower-show-path',byId('showPathOnlyToggle').checked);
+      document.body.classList.toggle('tower-no-motion',!byId('animateFullFlowToggle').checked);
+    }
+    on('showPathOnlyToggle','change',updateDisplayOptions);
+    on('animateFullFlowToggle','change',() => {
+      updateDisplayOptions();
+      if (!byId('animateFullFlowToggle').checked) {pausePlayback();paintPosition();}
+    });
+    on('focusModeButton','click',() => setFocusMode(!document.body.classList.contains('tower-focus-mode')));
+    on('pageLightButton','click',() => setLightMode(!document.body.classList.contains('page-light-mode')));
+    on('panelLockerButton','click',() => setPanelLocked(!workspace.classList.contains('side-panel-locked')));
+    on('architectureScrollCue','click',() => scrollArea(byId('diagramPanel')));
+    on('printButton','click',() => window.print());
+
+    function reset() {
+      pausePlayback();
+      categoryFilter.value = difficultyFilter.value = 'all';
+      workflowSearch.value = '';
+      for (const id of ['showPathOnlyToggle','animateFullFlowToggle','autoScrollToggle','loopToggle']) byId(id).checked = byId(id).defaultChecked;
+      byId('speedSelect').value = '1';
+      updateSpeed();
+      updateDisplayOptions();
+      setFocusMode(false);
+      setLightMode(false);
+      setPanelLocked(false);
+      route('','ready');
+      scrollArea(cards.closest('section'));
+    }
+    on('resetButton','click',reset);
+    on('architectureResetButton','click',reset);
+
+    const panel = byId('diagramPanel');
+    function syncFullscreen() {
+      const active = document.fullscreenElement === panel || panel.classList.contains('architecture-fullscreen-fallback');
+      panel.classList.toggle('architecture-fullscreen-active',active);
+      panel.classList.toggle('architecture-fullscreen',active);
+      document.body.classList.toggle('architecture-fullscreen',active);
+      setPressed('architectureFullscreenButton',active);
+      const button = byId('architectureFullscreenButton');
+      button.setAttribute('aria-label',active ? 'Exit architecture fullscreen' : 'Open architecture fullscreen');
+      button.title = button.getAttribute('aria-label');
+      button.textContent = active ? '✕' : '⛶';
+    }
+    async function toggleFullscreen() {
+      if (document.fullscreenElement === panel) await document.exitFullscreen();
+      else if (panel.classList.contains('architecture-fullscreen-fallback')) panel.classList.remove('architecture-fullscreen-fallback');
+      else {
+        try { await panel.requestFullscreen(); }
+        catch { panel.classList.add('architecture-fullscreen-fallback'); }
+      }
+      syncFullscreen();
+    }
+    document.addEventListener('fullscreenchange',syncFullscreen);
+    on('architectureFullscreenButton','click',toggleFullscreen);
+
+    function hideResults() {
+      results.hidden = true;
+      results.replaceChildren();
+      search.setAttribute('aria-expanded','false');
+    }
+    function showResults() {
+      const q = search.value.trim().toLowerCase();
+      if (!q) return hideResults();
+      const matches = nodes().filter(node => [node.getAttribute('aria-label'),nodeKey(node),node.textContent].join(' ').toLowerCase().includes(q));
+      results.innerHTML = matches.map(node => '<button type="button" class="search-result" data-search-id="' + h(nodeKey(node)) + '">' + h(nodeName(node)) + '</button>').join('') || '<p>No matching components</p>';
+      results.hidden = false;
+      search.setAttribute('aria-expanded','true');
+    }
+    search.addEventListener('input',showResults);
+    search.addEventListener('keydown',event => {
+      if (event.key === 'ArrowDown') {event.preventDefault();results.querySelector('button')?.focus();}
+      if (event.key === 'Enter' && !results.hidden) { event.preventDefault();results.querySelector('button')?.click(); }
+    });
+    results.addEventListener('click',event => {
+      const button = event.target.closest('[data-search-id]');
+      if (!button) return;
+      const part = nodes().find(node => nodeKey(node) === button.dataset.searchId);
+      hideResults();
+      if (part) {
+        search.value = nodeName(part);
+        part.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+        part.focus({preventScroll:true});
+      }
+    });
+    function showInspection(event) {
+      const part = event.target.closest('.arch-node[role="button"]');
+      if (!part) return;
+      inspectedKey = nodeKey(part);
+      shell.classList.add('component-active');
+      setPanelLocked(false);
+      byId('towerComponentInspection').hidden = false;
+      hideResults();
+      if (!flow) paintPosition();
+    }
+    diagram.addEventListener('click',showInspection);
+    diagram.addEventListener('keydown',event => {
+      if (event.key === 'Enter' || event.key === ' ') showInspection(event);
+    });
+    byId('towerComponentInspection').addEventListener('click',event => {
+      if (!event.target.closest('button')) return;
+      inspectedKey = '';
+      byId('towerComponentInspection').hidden = true;
+      paintPosition();
+    });
+    document.addEventListener('click',event => {
+      if (!results.hidden && !event.target.closest('.search-box')) hideResults();
+    });
+    function showReferences() {
+      referenceOpener = document.activeElement;
+      const entries = new Map();
+      for (const lesson of (flow ? [flow] : lessons)) {
+        for (const ref of lesson.refs || []) if (ref?.[1]) entries.set(ref[1],ref[0]);
+      }
+      byId('towerReferenceList').innerHTML = Array.from(entries,([url,title]) => '<li><a href="' + h(url) + '" target="_blank" rel="noopener noreferrer">' + h(title) + '</a></li>').join('');
+      refsDialog.showModal();
+      byId('closeReferencesButton').focus();
+    }
+    on('referencesButton','click',showReferences);
+    on('closeReferencesButton','click',() => refsDialog.close());
+    refsDialog.addEventListener('close',() => referenceOpener?.focus({preventScroll:true}));
+    refsDialog.addEventListener('click',event => {if (event.target === refsDialog) refsDialog.close();});
+    document.addEventListener('keydown',event => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || refsDialog.open) return;
+      if (event.key === 'Escape') {
+        if (!results.hidden) {hideResults();search.focus();}
+        else if (panel.classList.contains('architecture-fullscreen-fallback')) toggleFullscreen();
+        else if (inspectedKey) {
+          byId('towerComponentInspection').hidden = true;
+          inspectedKey = '';
+          paintPosition();
+        }
+        return;
+      }
+      if (event.target.closest('input,select,textarea,[contenteditable="true"]')) return;
+      if (event.key === ' ' && event.target.closest('button,a,summary,[role="button"]')) return;
+      if (event.key === '/') {event.preventDefault();search.focus();return;}
+      if (!flow) return;
+      switch (event.key) {
+        case 'ArrowRight': event.preventDefault();next();break;
+        case 'ArrowLeft': event.preventDefault();previous();break;
+        case 'Home': event.preventDefault();seek(0);break;
+        case 'End': event.preventDefault();seek(flow.steps.length - 1);break;
+        case ' ': event.preventDefault();if (engineIsPlaying()) {pausePlayback();paintPosition();} else startPlayback();break;
+      }
+    });
+    document.addEventListener('visibilitychange',() => {if (document.hidden) {pausePlayback();paintPosition();}});
+    readRoute();
+    updateDisplayOptions();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',startTrainer,{once:true});
+  else startTrainer();
+})();
+
+</script>
+</body></html>
