@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Offline Oracle Database 11g Release 2 (11.2.0.4) architecture and SQL execution trainer">
   <meta name="author" content="Cyril Jones S">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v83 | Updated : 26-Nov-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -269,6 +269,31 @@
       display: grid;
       gap: 8px;
     }
+
+    .edition-link, .workflow-directory-group a {
+      color: var(--text);
+      text-decoration-color: var(--muted);
+      text-underline-offset: .18em;
+    }
+    .edition-link { font-size: .85rem; }
+    .workflow-directory {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: .55rem .75rem;
+    }
+    .workflow-directory summary { width: fit-content; cursor: pointer; font-weight: 650; }
+    .workflow-directory-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+      gap: 1.15rem 1.4rem;
+      padding: .6rem 0 .3rem;
+    }
+    .workflow-directory-group h3 { margin: 0 0 .25rem; font-size: .95rem; }
+    .workflow-directory-group ul { margin: 0; padding-left: 1.15rem; }
+    .workflow-directory-group li { padding: .2rem 0; font-size: .88rem; }
+    .workflow-directory-group a { overflow-wrap: anywhere; }
+    .workflow-directory summary:focus-visible, .workflow-directory-group a:focus-visible,
+    .edition-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
     .app-shell.workflow-active {
       grid-template-rows: auto auto auto auto;
@@ -2331,7 +2356,8 @@
         <p class="subtitle">11g Release 2 (11.2.0.4) | Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026"></p>
+        <a id="dedicatedEditionLink" class="edition-link" href="./stand-alone-db.html">Open the Stand-Alone DB single-file edition</a>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v83 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v83 | Updated : 26-Nov-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2366,10 +2392,15 @@
       <div class="workflow-explorer-head">
         <div>
           <h2 id="workflowExplorerTitle">Operations You Can Explain with Oracle 11g Architecture</h2>
-          <p class="subtitle">Choose Manual Demo to open the workflow guide, or Auto Demo to play it. The bottom player controls each tower.</p>
+          <p class="subtitle">Browse the complete workflow list, or choose Manual Demo or Auto Demo on a workflow card.</p>
         </div>
-        <div id="workflowCount" class="workflow-count" aria-live="polite">0 workflows</div>
+        <div id="workflowCount" class="workflow-count" aria-live="polite">57 workflows</div>
       </div>
+      <details id="workflowDirectory" class="workflow-directory">
+        <summary id="workflowDirectorySummary">Browse all 57 workflows</summary>
+        <p class="subtitle">Choose a workflow below to open its guide. The card filters apply only to the cards.</p>
+        <div id="workflowDirectoryGroups" class="workflow-directory-groups"></div>
+      </details>
       <div class="explorer-controls" aria-label="Workflow filters">
         <label class="visually-hidden" for="workflowCategoryFilter">Workflow category</label>
         <select id="workflowCategoryFilter" aria-label="Workflow category"></select>
@@ -2775,7 +2806,7 @@
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v83 | Updated : 26-Nov-2026.
   </div>
 
   <dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
@@ -2855,7 +2886,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v82 | Updated : 26-Nov-2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v83 | Updated : 26-Nov-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;
@@ -4199,6 +4230,7 @@
         bindKeyboardShortcuts();
         bindSearch();
         populateWorkflowFilters();
+        populateWorkflowDirectory();
         renderWorkflowExplorer();
         validateComponentMetadata();
         validateFlowDefinitions();
@@ -4423,6 +4455,27 @@
         return group ? group.workflows : [];
       }
 
+      function populateWorkflowDirectory() {
+        const directory = $("#workflowDirectory");
+        const groups = $("#workflowDirectoryGroups");
+        const total = workflowIdsForCategory("all").length;
+        $("#workflowDirectorySummary").textContent = `Browse all ${total} workflows`;
+        groups.innerHTML = operationGroups.map(group => {
+          const items = group.workflows.map(id => {
+            const title = escapeHtml(flows[id].title);
+            return `<li><a href="#lesson=${encodeURIComponent(id)}" data-directory-workflow="${escapeHtml(id)}">${title}</a></li>`;
+          }).join("");
+          return `<section class="workflow-directory-group"><h3>${escapeHtml(group.title)} (${group.workflows.length})</h3><ul>${items}</ul></section>`;
+        }).join("");
+        groups.addEventListener("click", event => {
+          const link = event.target.closest("[data-directory-workflow]");
+          if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          directory.open = false;
+          explainWorkflow(link.dataset.directoryWorkflow, true);
+        });
+      }
+
       function getVisibleWorkflowIds() {
         const terms = state.workflowSearch.split(/\s+/).filter(Boolean);
         return workflowIdsForCategory(state.workflowCategory).filter((flowId) => {
@@ -4464,7 +4517,8 @@
 
       function renderWorkflowExplorer() {
         const ids = getVisibleWorkflowIds();
-        $("#workflowCount").textContent = `${ids.length} workflow${ids.length === 1 ? "" : "s"}`;
+        const total = workflowIdsForCategory("all").length;
+        $("#workflowCount").textContent = ids.length === total ? `${total} workflows` : `${ids.length} of ${total} workflows`;
         const cards = $("#workflowCards");
         cards.innerHTML = ids.map((flowId) => workflowCardTemplate(flowId, flows[flowId])).join("") || '<p class="subtitle">No workflows match the current filters.</p>';
         $$(".workflow-card [data-start-workflow]").forEach((button) => {
@@ -4507,7 +4561,7 @@
         setStatus(`${flows[flowId].title}: workflow demo loaded.`);
       }
 
-      function explainWorkflow(flowId) {
+      function explainWorkflow(flowId, focusGuide = false) {
         const flow = flows[flowId];
         if (!flow) return;
         pauseFlow();
@@ -4526,7 +4580,14 @@
         updateWorkflowCardState();
         $("#explanationPanel").innerHTML = workflowOverviewTemplate(flowId, flow);
         setStatus(`${flow.title}: trainer notes loaded.`);
-        scrollPlayViewIntoPosition();
+        if (focusGuide) {
+          const heading = $("#explanationPanel h2");
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+          heading.scrollIntoView({ block: "start" });
+        } else {
+          scrollPlayViewIntoPosition();
+        }
       }
 
       function updateWorkflowCardState() {
@@ -6371,13 +6432,18 @@
     }
     document.addEventListener("DOMContentLoaded", openLinkedLesson);
     window.addEventListener("hashchange", openLinkedLesson);
+    /* tower-links:start */
     if (location.protocol === "file:" && /standalone-v\d+\.html$/i.test(location.pathname)) {
       for (const link of document.querySelectorAll("[data-tower-file]")) link.href = "./github-publish/oracle-11g-architecture/" + link.dataset.towerFile;
+      document.getElementById("dedicatedEditionLink").href = "./github-publish/oracle-11g-architecture/stand-alone-db.html";
     } else if (/\/old_versions\/index-v\d+\.html$/i.test(location.pathname)) {
       for (const link of document.querySelectorAll("[data-tower-file]")) link.href = "../" + link.dataset.towerFile;
+      document.getElementById("dedicatedEditionLink").href = "../stand-alone-db.html";
     }
+    /* tower-links:end */
     window.OracleTrainer = OracleTrainer;
   </script>
+<!-- tower-compare:start -->
 <script type="application/json" id="topologyData">{
   "user-login": [
     {
@@ -7947,5 +8013,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click",event=>{const b=event.target.closest("[data-compare-current]");if(!b)return;
     panel.open=true;select.value=OracleTrainer._state.activeFlowId;render();panel.scrollIntoView();select.focus({preventScroll:true});});
 });</script>
+<!-- tower-compare:end -->
 </body>
 </html>

@@ -1,6 +1,12 @@
 # Oracle Database 11g Architecture
 
-[Open the Stand-Alone DB page](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/). Start here for single-instance lessons or choose a tower from the navigation. Each tower links back to the Stand-Alone DB page.
+**For the single-instance course, open [Oracle Database 11g Stand-Alone Architecture](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/stand-alone-db.html).** It contains all **57 workflows** for Oracle Database 11g R2 (11.2.0.4) in one HTML file.
+
+1. Select **Browse all 57 workflows** near the top of the page to see every lesson title grouped into 11 operation categories. Select a title to open its manual guide, then choose **Next step** to begin.
+2. To save an offline copy, choose **Download this HTML** on the trainer page. Open the downloaded HTML file in your browser. The diagrams, playback controls, and checkpoints work offline. The Oracle documentation links open online.
+3. If you previously used v77, look under **Startup / Shutdown / Recovery** for shutdown NORMAL, TRANSACTIONAL, and ABORT with recovery. Under **Database Patching & Upgrades** you will find six lessons covering quarterly patching, one-offs, Windows bundles, patch-set upgrades, rollback, and upgrade-mode failure diagnosis.
+
+To move between Stand-Alone DB and the five specialist towers, use the [six-tower course home](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/).
 
 ## A first session
 
@@ -60,3 +66,4 @@ On **Stand-Alone DB**, use the **All operation categories** dropdown to find a w
 1. Open the GitHub file links below. On each file page, choose **Download raw file**.
 2. Save all six HTML files in one folder using the displayed filenames: [index.html](index.html), [rac.html](rac.html), [dataguard.html](dataguard.html), [rac-dataguard.html](rac-dataguard.html), [goldengate.html](goldengate.html), and [oem.html](oem.html).
 3. Open **index.html** in your browser. The tower links use these sibling filenames. External Oracle reference links need an internet connection.
+4. If you also want the course home's **Open the Stand-Alone DB single-file edition** link to work offline, save [stand-alone-db.html](stand-alone-db.html) beside **index.html** using the filename **stand-alone-db.html**.
