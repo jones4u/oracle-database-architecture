@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Offline Oracle Database 11g architecture and SQL execution trainer">
   <meta name="author" content="Cyril Jones S">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v79 | Updated : 25-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -2292,7 +2292,7 @@
       .component text { fill: #111; }
       .info-block p, .notes-panel p, .subtitle, .tag { color: #111; }
     }
-    .tower-nav,.operations-start{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 14px}.tower-nav a,.operations-start button{color:var(--text);text-underline-offset:3px}.tower-nav a[aria-current]{color:var(--gold);font-weight:700;text-decoration:none}.operations-start{padding:0 0 9px}.operations-start strong{font-size:.88rem}.answer-choices{display:flex;flex-wrap:wrap;gap:6px}.answer-choices button{text-align:left;white-space:normal}.answer-choices [aria-pressed=true]{outline:2px solid currentColor}.graded-check{border-top:1px solid var(--line);padding-top:.7rem}.graded-check [role=status]{min-height:1.3em}@media print{.tower-nav,.operations-start{display:none}}
+    .tower-nav{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 14px}.tower-nav a{color:var(--text);text-underline-offset:3px}.tower-nav a[aria-current]{color:var(--gold);font-weight:700;text-decoration:none}.answer-choices{display:flex;flex-wrap:wrap;gap:6px}.answer-choices button{text-align:left;white-space:normal}.answer-choices [aria-pressed=true]{outline:2px solid currentColor}.graded-check{border-top:1px solid var(--line);padding-top:.7rem}.graded-check [role=status]{min-height:1.3em}@media print{.tower-nav{display:none}}
     .topology-compare{padding:10px 14px}.topology-compare summary{cursor:pointer;color:var(--text);font-weight:650}.topology-inner{padding:10px 0}.topology-inner label{display:block}.topology-inner select{max-width:100%}.topology-inner a{color:var(--text);text-decoration:underline}.topology-table{overflow:auto}.topology-table table{border-collapse:collapse;width:100%;margin-top:8px}.topology-table caption{text-align:left;margin:8px 0;font-weight:600}.topology-table th,.topology-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:8px;white-space:normal}.topology-table th[scope=row]{min-width:7em}.topology-table td:nth-child(3){min-width:13em}
   </style>
 </head>
@@ -2304,7 +2304,7 @@
         <p class="subtitle">Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v79 | Updated : 25-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v79 | Updated : 25-Nov-2026"></p>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2342,11 +2342,6 @@
           <p class="subtitle">Choose a grouped workflow, start the demo, and use the existing timeline controls to scrub, pause, or replay the architecture path.</p>
         </div>
         <div id="workflowCount" class="workflow-count" aria-live="polite">0 workflows</div>
-      </div>
-      <div class="operations-start"><strong>Start with database operations</strong>
-        <button type="button" data-home-lesson="instance-startup">Startup sequence</button>
-        <button type="button" data-home-lesson="shutdown-normal">Graceful shutdown</button>
-        <button type="button" data-home-lesson="patch-quarterly-psu-spu">Database patching</button>
       </div>
       <div class="explorer-controls" aria-label="Workflow filters">
         <label class="visually-hidden" for="workflowCategoryFilter">Workflow category</label>
@@ -2752,7 +2747,7 @@
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v79 | Updated : 25-Nov-2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026.
   </div>
 
   <dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
@@ -2827,7 +2822,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v79 | Updated : 25-Nov-2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;
@@ -6343,9 +6338,6 @@
     }
     document.addEventListener("DOMContentLoaded", openLinkedLesson);
     window.addEventListener("hashchange", openLinkedLesson);
-    for (const button of document.querySelectorAll("[data-home-lesson]")) {
-      button.addEventListener("click", () => { OracleTrainer.selectFlow(button.dataset.homeLesson); OracleTrainer.goToStep(0); });
-    }
     if (location.protocol === "file:" && /standalone-v\d+\.html$/i.test(location.pathname)) {
       for (const link of document.querySelectorAll("[data-tower-file]")) link.href = "./github-publish/oracle-11g-architecture/" + link.dataset.towerFile;
     } else if (/\/old_versions\/index-v\d+\.html$/i.test(location.pathname)) {

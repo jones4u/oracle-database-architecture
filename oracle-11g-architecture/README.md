@@ -18,6 +18,8 @@ To explore a component on its own, use the diagram search. Search for **LGWR**, 
 
 ## Practice database operations on the home page
 
+On **Stand-Alone DB**, use the **All operation categories** dropdown to find a workflow. Select **Startup / Shutdown / Recovery** for startup and shutdown, or **Database Patching & Upgrades** for patching. On the workflow card, choose **Manual Demo**, then **Next step**.
+
 1. **Startup.** Open **Instance Startup / NOMOUNT, MOUNT and OPEN**. At each stage, identify which files Oracle has opened and what the administrator can verify.
 2. **Graceful shutdown.** Run **Graceful Shutdown / NORMAL**, **TRANSACTIONAL**, and **IMMEDIATE**. Compare what Oracle waits for, who disconnects sessions, and how the database closes. The separate **Shutdown ABORT / Recovery on Next Startup** lesson shows what recovery must do after an abrupt stop.
 3. **Patching.** Start with **Quarterly Database Patching / PSU and SPU**. Follow the selected Oracle home, inventory, required database SQL actions and application test. Continue with the one-off, Windows bundle, patch-set upgrade, rollback and upgrade-failure lessons.
