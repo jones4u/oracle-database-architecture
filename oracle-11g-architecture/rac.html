@@ -2,25 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v3 | Updated : 26-Nov-2026">
   <title>Real Application Clusters · Oracle 11g R2 Architecture</title>
   <style>
     :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
     a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
     @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+
+    .lesson-picker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 12px}.lesson-picker select{width:auto;max-width:100%;flex:1 1 310px;margin:0}.lesson-picker a{font-size:.85rem}.diagram-panel{padding:15px;background:#111d28}.diagram-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.diagram-head h2{font-size:1.16rem;margin:0}.diagram-head .note{margin:2px 0 8px}.diagram-head>a{font-size:.83rem;white-space:nowrap}.svg-scroll{background:#0b141e;border:1px solid #344653;border-radius:8px;overflow-x:auto;overscroll-behavior-x:contain}.architecture-svg{display:block;margin:auto;width:100%;max-height:65vh;min-height:310px}.arch-zone rect{fill:#112433;stroke:#446371;stroke-width:1.1}.arch-zone.secondary rect{fill:#182436;stroke:#48566d}.arch-zone.storage rect{fill:#122b28;stroke:#467465}.arch-zone.bridge rect{fill:#1d2632;stroke:#5e6973;stroke-dasharray:5 3}.arch-zone text{fill:#d3e7ef;font:650 13px "Segoe UI",sans-serif;letter-spacing:.2px}.arch-zone .zone-sub{font-size:10.8px;font-weight:450;fill:#b4c8d2}.arch-node{cursor:pointer}.node-shell{fill:#192d3b;stroke:#617a89;stroke-width:1.2}.node-key{fill:#7daec1}.arch-node.grid .node-key,.arch-node.cluster .node-key{fill:#bcadf3}.arch-node.storage .node-key{fill:#80d8ad}.arch-node.redo .node-key{fill:#f4c08b}.arch-node.wan .node-key{fill:#efad72}.arch-node .node-name{fill:#eef5f9;font:650 13px "Segoe UI",sans-serif}.arch-node .node-sub{fill:#b9cbd5;font:11px "Segoe UI",sans-serif}.arch-node.is-active .node-shell{stroke:#ffd482;stroke-width:2.8;fill:#34342e}.arch-node.is-active .node-name,.arch-node.is-active .node-key{fill:#ffe1a2}.arch-node.is-offline .node-shell{stroke:#ff9392;stroke-dasharray:5 3;fill:#38272a}.arch-node.is-offline .node-sub{fill:#ffb7ac}.arch-node:focus .node-shell,.arch-node.is-inspected .node-shell{stroke:#fff;stroke-width:3.2}.arch-edge{color:#a7becd;pointer-events:none}.arch-edge.client{color:#7eddeb}.arch-edge.cluster{color:#b7a3fa}.arch-edge.storage{color:#7ed5a6}.arch-edge.redo{color:#f8bc76}.arch-edge .wire{stroke:currentColor;stroke-opacity:.18;fill:none;stroke-width:1.8;stroke-linejoin:round}.arch-edge:not(.is-active) .wire{marker-end:none}.arch-edge .traffic{stroke:currentColor;fill:none;opacity:0;stroke-width:3;stroke-dasharray:2 12;stroke-linecap:round}.arch-edge.is-active .wire{stroke-opacity:.87;stroke-width:2.2}.arch-edge.is-active .traffic{opacity:1;animation:arch-travel .9s linear 2}.diagram-panel.is-playing .arch-edge.is-active .traffic{animation-iteration-count:infinite}.diagram-panel.is-paused .traffic{animation-play-state:paused}.channel-key{display:flex;gap:.3rem 1.1rem;flex-wrap:wrap;font-size:.84rem;margin:7px 0}.channel-key span:before{content:"";display:inline-block;width:18px;border-top:3px solid var(--swatch);vertical-align:middle;margin-right:5px}.arch-actions{align-items:center;margin:.65rem 0;gap:7px}.arch-actions select{width:auto;margin:0;padding:5px}.arch-actions label,.arch-actions strong{font-size:.88rem}.arch-actions strong{margin-left:auto}.arch-caption{border-left:3px solid var(--active);padding:3px 10px;color:#ffe1a5;font-size:.98rem}.inspection{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;background:#1e3240;padding:10px 12px;margin:.65rem 0;border-radius:5px}.inspection[hidden]{display:none}.inspection p{margin:.1em 0}.inventory{border-top:1px solid var(--line);padding:.55rem 0 0}.inventory h3{font-size:.92rem}.pan-help{display:none;font-size:.82rem;color:var(--muted)}@keyframes arch-travel{to{stroke-dashoffset:-28}}@media(prefers-reduced-motion:reduce){.arch-edge.is-active .traffic{animation:none!important;opacity:0}.arch-edge.is-active .wire{stroke-width:3.2}}@media(max-width:760px){.diagram-head{display:block}.diagram-head>a{display:inline-block;margin-bottom:6px}.architecture-svg{min-width:850px;max-height:none;min-height:0}.pan-help{display:flex;align-items:center;gap:8px;margin-top:6px}.pan-help button{font-size:.82rem;padding:3px 8px}.is-fitted .architecture-svg{width:100%;min-width:0}.arch-actions strong{margin-left:0}.lesson-picker select{flex-basis:100%}.diagram-panel{padding:10px}.arch-caption{font-size:.94rem}}
   </style>
 </head>
 <body>
   <a class="sr" href="#lesson">Skip to lesson</a>
-  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html" aria-current="page">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>Real Application Clusters</h1><p>Follow a client connection, a cached block, and a service across a two-node Oracle RAC database.</p><p class="ver">Oracle Database 11g Release 2 · Tower v2</p></header>
-  <main><div class="layout"><section id="lesson" class="panel"><label for="workflow">Workflow</label><select id="workflow"><option value="rac-1">Locate two instances and one database</option><option value="rac-2">Follow the Grid Infrastructure dependencies</option><option value="rac-3">Follow a data-file read through an ASM disk group</option><option value="rac-4">Advertise a database service to the listeners</option><option value="rac-5">Trace a client login through SCAN</option><option value="rac-6">Identify which listener a failed login reached</option><option value="rac-7">Retrieve a remote consistent-read block</option><option value="rac-8">Recover after one database instance fails</option><option value="rac-9">Diagnose a hot block across instances</option><option value="startup">Startup sequence · bring a two-node RAC service online</option><option value="graceful-shutdown">Graceful shutdown · one instance or the whole RAC database</option><option value="patching">Patching · decide whether two RAC homes can roll</option></select>
-    <p><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></p><p id="level" class="level"></p><h2 id="title"></h2><p id="setup"></p>
-    <h3 id="progress"></h3><p id="step" class="step" aria-live="polite"></p>
-    <p id="focus" class="focus"></p><div class="actions"><button id="prev" type="button">Previous</button><button id="next" class="next" type="button">Next step</button></div>
-    <h3>Correctness check</h3><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details>
-  </section><section class="panel" aria-label="Architecture"><h2>Architecture</h2><p class="note">Highlighted components take part in this step. Select any component to find its workflows.</p><section><h3>Clients and public network</h3><div class="actors"><button type="button" class="actor" data-actor="client" aria-pressed="false">Client</button><button type="button" class="actor" data-actor="scan" aria-pressed="false">SCAN listener</button><button type="button" class="actor" data-actor="node" aria-pressed="false">Node listener</button><button type="button" class="actor" data-actor="service" aria-pressed="false">SALES_APP service</button></div></section><section><h3>Cluster and database instances</h3><div class="actors"><button type="button" class="actor" data-actor="i1" aria-pressed="false">SALES1 / cache</button><button type="button" class="actor" data-actor="i2" aria-pressed="false">SALES2 / cache</button><button type="button" class="actor" data-actor="pmon" aria-pressed="false">PMON registration</button><button type="button" class="actor" data-actor="gcs" aria-pressed="false">GCS / LMS</button><button type="button" class="actor" data-actor="net" aria-pressed="false">Private interconnect</button></div></section><section><h3>Grid Infrastructure and storage</h3><div class="actors"><button type="button" class="actor" data-actor="gi" aria-pressed="false">OHASD / CSSD / CRSD</button><button type="button" class="actor" data-actor="ocr" aria-pressed="false">OCR / voting files</button><button type="button" class="actor" data-actor="asm" aria-pressed="false">ASM / +DATA</button><button type="button" class="actor" data-actor="disk" aria-pressed="false">Shared database files</button></div></section><p class="status" id="inspect" aria-live="polite"></p></section></div>
-  <div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Continue with <a href="./rac-dataguard.html#both-6">a RAC instance, transport link or site outage</a>.</p><!-- authored-home-crosslinks -->
+  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html" aria-current="page">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>Real Application Clusters</h1><p>Follow a client connection, a cached block, and a service across a two-node Oracle RAC database.</p><p class="ver">Oracle Database 11g Release 2 · 11.2.0.4 · Tower v3</p></header>
+  <main><section id="lesson" class="lesson-picker"><label for="workflow">Workflow</label><select id="workflow"><option value="rac-1">Locate two instances and one database</option><option value="rac-2">Follow the Grid Infrastructure dependencies</option><option value="rac-3">Follow a data-file read through an ASM disk group</option><option value="rac-4">Advertise a database service to the listeners</option><option value="rac-5">Trace a client login through SCAN</option><option value="rac-6">Identify which listener a failed login reached</option><option value="rac-7">Retrieve a remote consistent-read block</option><option value="rac-8">Recover after one database instance fails</option><option value="rac-9">Diagnose a hot block across instances</option><option value="startup">Startup sequence · bring a two-node RAC service online</option><option value="graceful-shutdown">Graceful shutdown · one instance or the whole RAC database</option><option value="patching">Patching · decide whether two RAC homes can roll</option></select><span id="level" class="level"></span><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></section>
+<section class="diagram-panel panel" aria-labelledby="arch-heading"><div class="diagram-head"><div><h2 id="arch-heading">Two instances · one shared database</h2><p class="note">Public client network, per-node Grid and database homes, the private interconnect, and one shared set of database files.</p></div><a href="#arch-controls">Playback controls ↓</a></div>
+<div class="svg-scroll" tabindex="0" aria-label="Architecture diagram, scroll horizontally for full detail"><svg data-architecture-diagram="" class="architecture-svg" viewBox="0 0 1060 558" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="arch-svg-title arch-svg-desc">
+<title id="arch-svg-title">Two instances · one shared database</title><desc id="arch-svg-desc">Public client network, per-node Grid and database homes, the private interconnect, and one shared set of database files. Select components to inspect them. The current step is repeated below the diagram.</desc>
+<defs>
+<marker id="arrow-client" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#7eddeb" stroke-width="2.3"/></marker>
+<marker id="arrow-cluster" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#b7a3fa" stroke-width="2.3"/></marker>
+<marker id="arrow-storage" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#7ed5a6" stroke-width="2.3"/></marker>
+<marker id="arrow-redo" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#f8bc76" stroke-width="2.3"/></marker>
+<marker id="arrow-control" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#9cbbcf" stroke-width="2.3"/></marker>
+</defs>
+<g class="arch-zone bridge"><rect x="10" y="8" width="1040" height="98" rx="12"/><text x="24" y="29">Public client network</text></g>
+<g class="arch-zone site"><rect x="10" y="119" width="422" height="315" rx="12"/><text x="24" y="140">Node 1 · SALES1</text></g>
+<g class="arch-zone site"><rect x="628" y="119" width="422" height="315" rx="12"/><text x="642" y="140">Node 2 · SALES2</text></g>
+<g class="arch-zone secondary"><rect x="18" y="151" width="406" height="97" rx="12"/><text x="32" y="172">Grid home · Clusterware and ASM</text></g>
+<g class="arch-zone secondary"><rect x="18" y="257" width="406" height="166" rx="12"/><text x="32" y="278">Database home · instance processes and SGA</text></g>
+<g class="arch-zone secondary"><rect x="636" y="151" width="406" height="97" rx="12"/><text x="650" y="172">Grid home · Clusterware and ASM</text></g>
+<g class="arch-zone secondary"><rect x="636" y="257" width="406" height="166" rx="12"/><text x="650" y="278">Database home · instance processes and SGA</text></g>
+<g class="arch-zone storage"><rect x="10" y="449" width="1040" height="100" rx="12"/><text x="24" y="470">Shared storage · accessible from both nodes</text></g>
+<g class="arch-edge client" data-edge="connect" data-from="client" data-to="scan"><title>Client connects to a SCAN listener</title><path class="wire" d="M178 62 H435" marker-end="url(#arrow-client)"/><path class="traffic" d="M178 62 H435"/></g>
+<g class="arch-edge client" data-edge="redirect" data-from="scan" data-to="client"><title>SCAN listener returns the address of the chosen node listener</title><path class="wire" d="M435 81 H178" marker-end="url(#arrow-client)"/><path class="traffic" d="M435 81 H178"/></g>
+<g class="arch-edge client" data-edge="local2" data-from="client" data-to="ln2"><title>Client connects to the node 2 listener</title><path class="wire" d="M104 92 V112 H701 V187" marker-end="url(#arrow-client)"/><path class="traffic" d="M104 92 V112 H701 V187"/></g>
+<g class="arch-edge client" data-edge="handoff" data-from="ln2" data-to="server2"><title>Node listener hands off to a dedicated server</title><path class="wire" d="M708 234 V248 H639 V388 H648" marker-end="url(#arrow-client)"/><path class="traffic" d="M708 234 V248 H639 V388 H648"/></g>
+<g class="arch-edge client" data-edge="sql2" data-from="client" data-to="server2"><title>Established client session sends SQL to server process 2</title><path class="wire" d="M65 92 V112 H615 V388 H648" marker-end="url(#arrow-client)"/><path class="traffic" d="M65 92 V112 H615 V388 H648"/></g>
+<g class="arch-edge client" data-edge="result1" data-from="server1" data-to="client"><title>Dedicated server returns query rows</title><path class="wire" d="M30 389 H16 V111 H53 V92" marker-end="url(#arrow-client)"/><path class="traffic" d="M30 389 H16 V111 H53 V92"/></g>
+<g class="arch-edge control" data-edge="regLocal1" data-from="pmon1" data-to="ln1"><title>PMON on SALES1 registers with its node listener</title><path class="wire" d="M218 365 V350 H209 V242 H89 V234" marker-end="url(#arrow-control)"/><path class="traffic" d="M218 365 V350 H209 V242 H89 V234"/></g>
+<g class="arch-edge control" data-edge="regLocal2" data-from="pmon2" data-to="ln2"><title>PMON on SALES2 registers with its node listener</title><path class="wire" d="M836 365 V350 H824 V242 H709 V234" marker-end="url(#arrow-control)"/><path class="traffic" d="M836 365 V350 H824 V242 H709 V234"/></g>
+<g class="arch-edge control" data-edge="regScan1" data-from="pmon1" data-to="scan"><title>SALES1 remote listener registration</title><path class="wire" d="M218 412 V422 H433 V113 H519 V92" marker-end="url(#arrow-control)"/><path class="traffic" d="M218 412 V422 H433 V113 H519 V92"/></g>
+<g class="arch-edge control" data-edge="regScan2" data-from="pmon2" data-to="scan"><title>SALES2 remote listener registration</title><path class="wire" d="M836 412 V422 H1045 V112 H556 V92" marker-end="url(#arrow-control)"/><path class="traffic" d="M836 412 V422 H1045 V112 H556 V92"/></g>
+<g class="arch-edge control" data-edge="crm" data-from="gi2" data-to="svc"><title>CRSD and its agents manage the database service</title><path class="wire" d="M842 187 V145 H832 V110 H933 V92" marker-end="url(#arrow-control)"/><path class="traffic" d="M842 187 V145 H832 V110 H933 V92"/></g>
+<g class="arch-edge control" data-edge="css1" data-from="gi1" data-to="ocr"><title>Node 1 checks voting information and cluster configuration</title><path class="wire" d="M225 234 V432 H481 V486" marker-end="url(#arrow-control)"/><path class="traffic" d="M225 234 V432 H481 V486"/></g>
+<g class="arch-edge control" data-edge="css2" data-from="gi2" data-to="ocr"><title>Node 2 checks voting information and cluster configuration</title><path class="wire" d="M841 234 V432 H524 V486" marker-end="url(#arrow-control)"/><path class="traffic" d="M841 234 V432 H524 V486"/></g>
+<g class="arch-edge storage" data-edge="asmDisk1" data-from="asm1" data-to="dg"><title>ASM1 accesses disk-group metadata</title><path class="wire" d="M414 211 H429 V439 H885 V486" marker-end="url(#arrow-storage)"/><path class="traffic" d="M414 211 H429 V439 H885 V486"/></g>
+<g class="arch-edge storage" data-edge="asmDisk2" data-from="asm2" data-to="dg"><title>ASM2 accesses disk-group metadata</title><path class="wire" d="M1034 211 H1044 V438 H953 V486" marker-end="url(#arrow-storage)"/><path class="traffic" d="M1034 211 H1044 V438 H953 V486"/></g>
+<g class="arch-edge storage" data-edge="map1" data-from="asm1" data-to="server1"><title>ASM file extent map supplied to database process</title><path class="wire" d="M353 234 V247 H208 V355 H138 V365" marker-end="url(#arrow-storage)"/><path class="traffic" d="M353 234 V247 H208 V355 H138 V365"/></g>
+<g class="arch-edge storage" data-edge="shared1" data-from="server1" data-to="data"><title>Node 1 issues database-file I/O</title><path class="wire" d="M107 412 V486" marker-end="url(#arrow-storage)"/><path class="traffic" d="M107 412 V486"/></g>
+<g class="arch-edge storage" data-edge="shared2" data-from="server2" data-to="data"><title>Node 2 issues database-file I/O</title><path class="wire" d="M722 412 V442 H178 V486" marker-end="url(#arrow-storage)"/><path class="traffic" d="M722 412 V442 H178 V486"/></g>
+<g class="arch-edge storage" data-edge="diskRead1" data-from="data" data-to="cache1"><title>Read from shared data file into SALES1 buffer cache</title><path class="wire" d="M61 486 V437 H22 V324 H30" marker-end="url(#arrow-storage)"/><path class="traffic" d="M61 486 V437 H22 V324 H30"/></g>
+<g class="arch-edge cluster" data-edge="request1" data-from="lms1" data-to="ic"><title>Global cache request issued over the interconnect</title><path class="wire" d="M401 313 H447" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M401 313 H447"/></g>
+<g class="arch-edge cluster" data-edge="request2" data-from="ic" data-to="lms2"><title>Global cache request reaches peer LMS</title><path class="wire" d="M613 312 H623 V286 H939 V300" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M613 312 H623 V286 H939 V300"/></g>
+<g class="arch-edge cluster" data-edge="source2" data-from="cache2" data-to="lms2"><title>LMS obtains the required block image from the peer buffer cache</title><path class="wire" d="M807 312 H860" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M807 312 H860"/></g>
+<g class="arch-edge cluster" data-edge="send2" data-from="lms2" data-to="ic"><title>Peer LMS sends the requested block over the private interconnect</title><path class="wire" d="M860 322 H830 V359 H624 V336 H613" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M860 322 H830 V359 H624 V336 H613"/></g>
+<g class="arch-edge cluster" data-edge="recv1" data-from="ic" data-to="cache1"><title>Remote block image received into the requesting cache</title><path class="wire" d="M447 336 H434 V355 H213 V335 H189" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M447 336 H434 V355 H213 V335 H189"/></g>
+<g class="arch-edge cluster" data-edge="send1" data-from="lms1" data-to="ic"><title>Node 1 sends a current block across the interconnect</title><path class="wire" d="M401 331 H447" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M401 331 H447"/></g>
+<g class="arch-edge cluster" data-edge="recv2" data-from="ic" data-to="cache2"><title>Node 2 obtains the current block in its cache</title><path class="wire" d="M613 331 H648" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M613 331 H648"/></g>
+<g class="arch-edge redo" data-edge="t1" data-from="lgwr1" data-to="thread1"><title>SALES1 LGWR writes to online redo thread 1</title><path class="wire" d="M343 412 V486" marker-end="url(#arrow-redo)"/><path class="traffic" d="M343 412 V486"/></g>
+<g class="arch-edge redo" data-edge="t2" data-from="lgwr2" data-to="thread2"><title>SALES2 LGWR writes to online redo thread 2</title><path class="wire" d="M961 412 V443 H684 V486" marker-end="url(#arrow-redo)"/><path class="traffic" d="M961 412 V443 H684 V486"/></g>
+<g class="arch-edge storage" data-edge="recover1" data-from="thread1" data-to="server2"><title>Surviving instance accesses the failed thread during recovery</title><path class="wire" d="M366 486 V445 H748 V412" marker-end="url(#arrow-storage)"/><path class="traffic" d="M366 486 V445 H748 V412"/></g>
+<g class="arch-node resource" data-key="client" tabindex="0" role="button" aria-label="Application: Dedicated client" transform="translate(30 45)"><title>An application resolves the SCAN and connects through a service. After listener handoff its SQL traffic uses the established server connection.</title><rect class="node-shell" width="148" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Application</text><text class="node-sub" x="13" y="36">Dedicated client</text></g>
+<g class="arch-node grid" data-key="scan" tabindex="0" role="button" aria-label="SCAN listener: on a SCAN VIP" transform="translate(435 45)"><title>The client connects to one SCAN listener. It returns the address of a node listener offering the requested service. A SCAN VIP and its listener can move between cluster nodes.</title><rect class="node-shell" width="189" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">SCAN listener</text><text class="node-sub" x="13" y="36">on a SCAN VIP</text></g>
+<g class="arch-node grid" data-key="svc" tabindex="0" role="button" aria-label="SALES_APP: Application service" transform="translate(846 45)"><title>A service identifies the workload. Clusterware controls its placement according to the configured policy. PMON registers the service with the listeners.</title><rect class="node-shell" width="181" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">SALES_APP</text><text class="node-sub" x="13" y="36">Application service</text></g>
+<g class="arch-node grid" data-key="ln1" tabindex="0" role="button" aria-label="Local listener: Node 1 VIP" transform="translate(29 187)"><title>The node listener accepts the client connection after the SCAN redirect and can hand it to a dedicated server process.</title><rect class="node-shell" width="121" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Local listener</text><text class="node-sub" x="13" y="36">Node 1 VIP</text></g>
+<g class="arch-node grid" data-key="gi1" tabindex="0" role="button" aria-label="Clusterware: OHASD · CSSD · CRSD" transform="translate(162 187)"><title>The local high availability stack, cluster membership services and resource agents manage this node and its resources. Dependencies determine startup ordering.</title><rect class="node-shell" width="123" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Clusterware</text><text class="node-sub" x="13" y="36">OHASD · CSSD · CRSD</text></g>
+<g class="arch-node grid" data-key="asm1" tabindex="0" role="button" aria-label="+ASM1: Disk-group maps" transform="translate(296 187)"><title>The local ASM instance manages disk-group metadata and supplies file extent information. Normal database-file reads and writes are performed by database processes.</title><rect class="node-shell" width="120" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">+ASM1</text><text class="node-sub" x="13" y="36">Disk-group maps</text></g>
+<g class="arch-node cluster" data-key="cache1" tabindex="0" role="button" aria-label="SALES1 buffer cache: Instance SGA" transform="translate(30 300)"><title>This cache belongs to SALES1. Cache Fusion can supply a suitable block from another instance over the private interconnect.</title><rect class="node-shell" width="159" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">SALES1 buffer cache</text><text class="node-sub" x="13" y="36">Instance SGA</text></g>
+<g class="arch-node cluster" data-key="lms1" tabindex="0" role="button" aria-label="GCS / LMSn: Block access" transform="translate(242 300)"><title>The Global Cache Service coordinates block access. LMS processes participate in transfer of current or consistent-read images.</title><rect class="node-shell" width="159" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">GCS / LMSn</text><text class="node-sub" x="13" y="36">Block access</text></g>
+<g class="arch-node resource" data-key="server1" tabindex="0" role="button" aria-label="Dedicated server: Database process" transform="translate(30 365)"><title>A dedicated server handles SQL for an established session, including buffer lookups and database-file reads.</title><rect class="node-shell" width="125" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Dedicated server</text><text class="node-sub" x="13" y="36">Database process</text></g>
+<g class="arch-node resource" data-key="pmon1" tabindex="0" role="button" aria-label="PMON: Registration" transform="translate(165 365)"><title>In 11gR2, PMON dynamically registers services and handlers with local and remote listeners.</title><rect class="node-shell" width="105" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">PMON</text><text class="node-sub" x="13" y="36">Registration</text></g>
+<g class="arch-node redo" data-key="lgwr1" tabindex="0" role="button" aria-label="LGWR: Log writer" transform="translate(280 365)"><title>LGWR flushes redo from the log buffer to the online redo logs for this instance’s thread. Undo records are kept in its undo tablespace.</title><rect class="node-shell" width="126" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">LGWR</text><text class="node-sub" x="13" y="36">Log writer</text></g>
+<g class="arch-node grid" data-key="ln2" tabindex="0" role="button" aria-label="Local listener: Node 2 VIP" transform="translate(647 187)"><title>The node listener accepts the client connection after the SCAN redirect and can hand it to a dedicated server process.</title><rect class="node-shell" width="121" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Local listener</text><text class="node-sub" x="13" y="36">Node 2 VIP</text></g>
+<g class="arch-node grid" data-key="gi2" tabindex="0" role="button" aria-label="Clusterware: OHASD · CSSD · CRSD" transform="translate(780 187)"><title>The local high availability stack, cluster membership services and resource agents manage this node and its resources. Dependencies determine startup ordering.</title><rect class="node-shell" width="123" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Clusterware</text><text class="node-sub" x="13" y="36">OHASD · CSSD · CRSD</text></g>
+<g class="arch-node grid" data-key="asm2" tabindex="0" role="button" aria-label="+ASM2: Disk-group maps" transform="translate(914 187)"><title>The local ASM instance manages disk-group metadata and supplies file extent information. Normal database-file reads and writes are performed by database processes.</title><rect class="node-shell" width="120" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">+ASM2</text><text class="node-sub" x="13" y="36">Disk-group maps</text></g>
+<g class="arch-node cluster" data-key="cache2" tabindex="0" role="button" aria-label="SALES2 buffer cache: Instance SGA" transform="translate(648 300)"><title>This cache belongs to SALES2. Cache Fusion can supply a suitable block from another instance over the private interconnect.</title><rect class="node-shell" width="159" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">SALES2 buffer cache</text><text class="node-sub" x="13" y="36">Instance SGA</text></g>
+<g class="arch-node cluster" data-key="lms2" tabindex="0" role="button" aria-label="GCS / LMSn: Block access" transform="translate(860 300)"><title>The Global Cache Service coordinates block access. LMS processes participate in transfer of current or consistent-read images.</title><rect class="node-shell" width="159" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">GCS / LMSn</text><text class="node-sub" x="13" y="36">Block access</text></g>
+<g class="arch-node resource" data-key="server2" tabindex="0" role="button" aria-label="Dedicated server: Database process" transform="translate(648 365)"><title>A dedicated server handles SQL for an established session, including buffer lookups and database-file reads.</title><rect class="node-shell" width="125" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Dedicated server</text><text class="node-sub" x="13" y="36">Database process</text></g>
+<g class="arch-node resource" data-key="pmon2" tabindex="0" role="button" aria-label="PMON: Registration" transform="translate(783 365)"><title>In 11gR2, PMON dynamically registers services and handlers with local and remote listeners.</title><rect class="node-shell" width="105" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">PMON</text><text class="node-sub" x="13" y="36">Registration</text></g>
+<g class="arch-node redo" data-key="lgwr2" tabindex="0" role="button" aria-label="LGWR: Log writer" transform="translate(898 365)"><title>LGWR flushes redo from the log buffer to the online redo logs for this instance’s thread. Undo records are kept in its undo tablespace.</title><rect class="node-shell" width="126" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">LGWR</text><text class="node-sub" x="13" y="36">Log writer</text></g>
+<g class="arch-node cluster" data-key="ic" tabindex="0" role="button" aria-label="Private interconnect: Cache Fusion traffic" transform="translate(447 300)"><title>This private network carries messages and blocks between instances, including Cache Fusion requests and responses.</title><rect class="node-shell" width="166" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Private interconnect</text><text class="node-sub" x="13" y="36">Cache Fusion traffic</text></g>
+<g class="arch-node storage" data-key="data" tabindex="0" role="button" aria-label="Database files: Data · control · UNDO1/2" transform="translate(30 486)"><title>Instances share the data and control files of one database. Each instance uses its own undo tablespace in shared data files. Database processes perform ordinary database I/O directly to storage.</title><rect class="node-shell" width="181" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Database files</text><text class="node-sub" x="13" y="36">Data · control · UNDO1/2</text></g>
+<g class="arch-node redo" data-key="thread1" tabindex="0" role="button" aria-label="Online redo thread 1: Written by LGWR 1" transform="translate(242 486)"><title>SALES1 generates its redo thread and uses its own undo tablespace; the files reside on shared storage. A peer can recover the failed instance.</title><rect class="node-shell" width="167" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Online redo thread 1</text><text class="node-sub" x="13" y="36">Written by LGWR 1</text></g>
+<g class="arch-node storage" data-key="ocr" tabindex="0" role="button" aria-label="OCR + voting: Cluster files" transform="translate(439 486)"><title>OCR stores cluster configuration. Voting files support node membership. These are distinct from database data files.</title><rect class="node-shell" width="124" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">OCR + voting</text><text class="node-sub" x="13" y="36">Cluster files</text></g>
+<g class="arch-node redo" data-key="thread2" tabindex="0" role="button" aria-label="Online redo thread 2: Written by LGWR 2" transform="translate(595 486)"><title>SALES2 generates a different redo thread and uses its own undo tablespace; these files are also on shared storage.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Online redo thread 2</text><text class="node-sub" x="13" y="36">Written by LGWR 2</text></g>
+<g class="arch-node storage" data-key="dg" tabindex="0" role="button" aria-label="+DATA disk group: Shared ASM storage" transform="translate(804 486)"><title>ASM manages shared disk-group extents. The database processes use their extent maps to read and write Oracle files directly.</title><rect class="node-shell" width="220" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">+DATA disk group</text><text class="node-sub" x="13" y="36">Shared ASM storage</text></g>
+</svg></div>
+<div class="pan-help"><button id="fit-diagram" type="button" aria-pressed="false">Fit entire diagram</button> <span>Scroll horizontally for full-size labels.</span></div>
+<div class="channel-key"><span style="--swatch:#7eddeb">Public connection</span><span style="--swatch:#b7a3fa">Cache Fusion</span><span style="--swatch:#7ed5a6">Storage I/O</span><span style="--swatch:#9cbbcf">Resource control</span></div>
+<div id="arch-controls" class="actions arch-actions"><button id="prev" type="button">Previous</button><button id="arch-play" data-arch-play="" type="button" aria-pressed="false">Play</button><button id="next" class="next" type="button">Next step</button><label for="arch-speed">Speed</label><select id="arch-speed" data-arch-speed=""><option value="8000">Slow</option><option value="5000" selected>Normal</option><option value="2600">Fast</option></select><strong id="progress"></strong></div>
+<p id="arch-caption" class="arch-caption"></p><aside class="inspection" id="inspection" hidden><div><b id="inspect-name"></b><p id="inspect"></p></div><button type="button" id="close-inspector" aria-label="Close component details">Close</button></aside>
+<details class="inventory"><summary>Browse component groups</summary><section><h3>Clients and public network</h3><div class="actors"><button type="button" class="actor" data-actor="client" aria-pressed="false">Client</button><button type="button" class="actor" data-actor="scan" aria-pressed="false">SCAN listener</button><button type="button" class="actor" data-actor="node" aria-pressed="false">Node listener</button><button type="button" class="actor" data-actor="service" aria-pressed="false">SALES_APP service</button></div></section><section><h3>Cluster and database instances</h3><div class="actors"><button type="button" class="actor" data-actor="i1" aria-pressed="false">SALES1 / cache</button><button type="button" class="actor" data-actor="i2" aria-pressed="false">SALES2 / cache</button><button type="button" class="actor" data-actor="pmon" aria-pressed="false">PMON registration</button><button type="button" class="actor" data-actor="gcs" aria-pressed="false">GCS / LMS</button><button type="button" class="actor" data-actor="net" aria-pressed="false">Private interconnect</button></div></section><section><h3>Grid Infrastructure and storage</h3><div class="actors"><button type="button" class="actor" data-actor="gi" aria-pressed="false">OHASD / CSSD / CRSD</button><button type="button" class="actor" data-actor="ocr" aria-pressed="false">OCR / voting files</button><button type="button" class="actor" data-actor="asm" aria-pressed="false">ASM / +DATA</button><button type="button" class="actor" data-actor="disk" aria-pressed="false">Shared database files</button></div></section></details></section>
+<div class="layout"><section class="panel"><h2 id="title"></h2><p id="setup"></p><p id="step" class="step" aria-live="polite"></p><p class="focus" id="focus"></p></section>
+<section class="panel"><h2>Correctness check</h2><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section></div>
+<div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Continue with <a href="./rac-dataguard.html#both-6">a RAC instance, transport link or site outage</a>.</p><!-- authored-home-crosslinks -->
 <details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
 <script>(function(){
 const related={"rac-5":[["user-login","Follow the SCAN redirect, local listener handoff and established dedicated session."],["dedicated-server-session","The node listener hands the client to a dedicated server on the selected instance."],["select-first-execution","Trace the first login and SQL handoff. The selected instance performs a first hard parse locally."]],"rac-6":[["connection-failure-rca","Use the redirect and node listener state to identify which connection leg failed."]],"rac-7":[["select-cache-hit","Compare a local hit with a local miss that can be served by a peer cache."],["select-cache-miss","Compare a peer-cache block transfer with a global grant followed by a shared-storage read."],["read-consistency","Trace the transfer of a suitable consistent-read image from a peer's cache."],["single-block-read-diagnosis","Separate actual shared-disk I/O from a peer-cache block transfer."]],"rac-9":[["update-commit","Repeated updates to rows in a shared hot block make current-block transfers visible."],["buffer-contention","Correlate a repeatedly modified block with inter-instance transfers, waits and workload placement."],["performance-incident-rca","Correlate workload, repeated block identity and global cache waits to diagnose one RAC-specific incident."]],"rac-8":[["rollback-flow","Observe undo of incomplete work when a RAC instance fails and its client reconnects."],["shutdown-abort","Observe the impact of losing one instance while a peer survives; recover incomplete transactions."],["crash-recovery","A surviving instance recovers the failed instance’s redo thread and rolls back incomplete work."]],"startup":[["instance-startup","Bring cluster resources and local instances online according to configured dependencies."],["startup-file-failure-rca","Locate an unavailable dependent resource such as an ASM disk group before diagnosing the database startup stage."]],"graceful-shutdown":[["shutdown-normal","Wait for or drain user sessions on the intended RAC instance, then verify service placement on its peers."],["shutdown-transactional","Trace the last transaction on the selected instance as the clustered service drains."],["shutdown-immediate","Drain or relocate cluster-managed services and distinguish stopping one instance from stopping the database."]],"patching":[["patch-quarterly-psu-spu","Check both node homes, service placement and whether the exact patch supports rolling application."],["patch-one-off","Determine cluster eligibility and one-off conflicts separately for each affected home."],["patch-set-upgrade","A patch set is an upgrade. Use release-specific RAC and Grid upgrade sequencing before any node changes."],["patch-rollback","Coordinate rollback eligibility and verification by home and node according to the specific README."]]};
@@ -34,6 +111,721 @@ function showRelated(){const current=document.querySelector("[data-lesson][aria-
 window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
 <!-- /authored-home-crosslinks -->
 </main><footer><a href="./index.html">Return to Stand-Alone DB</a></footer>
+  <script type="application/json" id="architecture-spec">{
+  "frames": {
+    "rac-1": [
+      {
+        "nodes": [
+          "cache1",
+          "lms1",
+          "pmon1",
+          "server1",
+          "lgwr1"
+        ],
+        "edges": [],
+        "caption": "SALES1 owns its SGA and database processes."
+      },
+      {
+        "nodes": [
+          "cache2",
+          "lms2",
+          "pmon2",
+          "server2",
+          "lgwr2",
+          "thread2"
+        ],
+        "edges": [],
+        "caption": "SALES2 owns a separate cache and redo thread."
+      },
+      {
+        "nodes": [
+          "cache1",
+          "cache2",
+          "data"
+        ],
+        "edges": [
+          "shared1",
+          "shared2"
+        ],
+        "caption": "Both instances can access the same data and control files."
+      }
+    ],
+    "rac-2": [
+      {
+        "nodes": [
+          "gi1",
+          "asm1",
+          "gi2",
+          "asm2",
+          "cache1",
+          "cache2"
+        ],
+        "edges": [],
+        "caption": "Identify the Grid and database homes on each node."
+      },
+      {
+        "nodes": [
+          "gi1",
+          "gi2"
+        ],
+        "edges": [],
+        "caption": "CSSD participates in cluster membership on both nodes."
+      },
+      {
+        "nodes": [
+          "gi1",
+          "gi2",
+          "ocr"
+        ],
+        "edges": [
+          "css1",
+          "css2"
+        ],
+        "caption": "Inspect the cluster configuration and membership storage."
+      },
+      {
+        "nodes": [
+          "svc",
+          "gi2",
+          "cache2"
+        ],
+        "edges": [
+          "crm"
+        ],
+        "caption": "The service resource can come online after its dependencies are available.",
+        "states": {
+          "svc": "Online · SALES2"
+        }
+      }
+    ],
+    "rac-3": [
+      {
+        "nodes": [
+          "asm1",
+          "dg"
+        ],
+        "edges": [
+          "asmDisk1"
+        ],
+        "caption": "The local ASM instance manages the mounted +DATA disk group."
+      },
+      {
+        "nodes": [
+          "asm1",
+          "server1"
+        ],
+        "edges": [
+          "map1"
+        ],
+        "caption": "ASM supplies file layout information to the requesting database process."
+      },
+      {
+        "nodes": [
+          "lms1",
+          "data",
+          "cache1"
+        ],
+        "edges": [
+          "diskRead1"
+        ],
+        "caption": "After the global grant, a database process reads the block from shared storage."
+      }
+    ],
+    "rac-4": [
+      {
+        "nodes": [
+          "pmon1",
+          "ln1"
+        ],
+        "edges": [
+          "regLocal1"
+        ],
+        "caption": "PMON on SALES1 registers its local services and handlers."
+      },
+      {
+        "nodes": [
+          "pmon1",
+          "scan"
+        ],
+        "edges": [
+          "regScan1"
+        ],
+        "caption": "The remote listener receives service registration independently of a user login."
+      },
+      {
+        "nodes": [
+          "pmon2",
+          "scan",
+          "ln2",
+          "svc"
+        ],
+        "edges": [
+          "regLocal2",
+          "regScan2"
+        ],
+        "caption": "SALES2 also advertises SALES_APP to its listeners."
+      }
+    ],
+    "rac-5": [
+      {
+        "nodes": [
+          "client",
+          "scan"
+        ],
+        "edges": [
+          "connect"
+        ],
+        "caption": "A new client connects to the SCAN listener using the service name."
+      },
+      {
+        "nodes": [
+          "scan",
+          "client",
+          "ln2"
+        ],
+        "edges": [
+          "redirect"
+        ],
+        "caption": "The SCAN listener returns the node 2 listener address to the client."
+      },
+      {
+        "nodes": [
+          "client",
+          "ln2",
+          "server2"
+        ],
+        "edges": [
+          "local2",
+          "handoff"
+        ],
+        "caption": "The client contacts node 2; its listener hands off the connection."
+      },
+      {
+        "nodes": [
+          "client",
+          "server2"
+        ],
+        "edges": [
+          "sql2"
+        ],
+        "caption": "SQL now passes between the client and the dedicated server."
+      }
+    ],
+    "rac-6": [
+      {
+        "nodes": [
+          "client",
+          "scan",
+          "ln2"
+        ],
+        "edges": [
+          "redirect"
+        ],
+        "caption": "The client received the second endpoint in the redirect."
+      },
+      {
+        "nodes": [
+          "gi2",
+          "scan",
+          "ln2"
+        ],
+        "edges": [],
+        "caption": "Check the two distinct listener resources.",
+        "states": {
+          "ln2": "Offline · node VIP"
+        }
+      },
+      {
+        "nodes": [
+          "ln2"
+        ],
+        "edges": [],
+        "caption": "The node listener is unavailable for the redirected connection.",
+        "states": {
+          "ln2": "Offline · node VIP"
+        }
+      },
+      {
+        "nodes": [
+          "client",
+          "ln2",
+          "server2"
+        ],
+        "edges": [
+          "local2",
+          "handoff"
+        ],
+        "caption": "With the node listener back online, a new connection succeeds.",
+        "states": {
+          "ln2": "Online · node VIP"
+        }
+      }
+    ],
+    "rac-7": [
+      {
+        "nodes": [
+          "server1",
+          "cache1"
+        ],
+        "edges": [],
+        "caption": "The required consistent image is absent from the local cache.",
+        "states": {
+          "cache1": "Local miss"
+        }
+      },
+      {
+        "nodes": [
+          "lms1",
+          "lms2",
+          "ic",
+          "cache2",
+          "cache1"
+        ],
+        "edges": [
+          "source2",
+          "send2",
+          "recv1"
+        ],
+        "caption": "LMS on SALES2 sends the consistent-read block to SALES1 over the private network."
+      },
+      {
+        "nodes": [
+          "server1",
+          "cache1",
+          "client"
+        ],
+        "edges": [
+          "result1"
+        ],
+        "caption": "The requesting server returns rows using the block in its local cache.",
+        "states": {
+          "cache1": "CR image present"
+        }
+      },
+      {
+        "nodes": [
+          "data",
+          "cache1",
+          "lms1"
+        ],
+        "edges": [
+          "diskRead1"
+        ],
+        "caption": "Alternate case: both caches miss. After a grant the read comes from storage."
+      }
+    ],
+    "rac-8": [
+      {
+        "nodes": [
+          "cache1",
+          "cache2",
+          "gi1"
+        ],
+        "edges": [],
+        "caption": "SALES1 failed while node 1 and its Grid stack stayed online.",
+        "states": {
+          "cache1": "Offline · instance lost"
+        }
+      },
+      {
+        "nodes": [
+          "thread1",
+          "cache2",
+          "server2",
+          "data"
+        ],
+        "edges": [
+          "recover1"
+        ],
+        "caption": "The surviving instance recovers the failed thread and resolves uncommitted work.",
+        "states": {
+          "cache1": "Offline · instance lost"
+        }
+      },
+      {
+        "nodes": [
+          "client",
+          "svc",
+          "cache2"
+        ],
+        "edges": [
+          "local2",
+          "handoff"
+        ],
+        "caption": "The client reconnects through a service on SALES2.",
+        "states": {
+          "cache1": "Offline · instance lost",
+          "svc": "Available · SALES2"
+        }
+      }
+    ],
+    "rac-9": [
+      {
+        "nodes": [
+          "cache1",
+          "cache2",
+          "lms1",
+          "lms2",
+          "ic"
+        ],
+        "edges": [
+          "send1",
+          "recv2"
+        ],
+        "caption": "Illustrated transfer: the current block moves from SALES1 to SALES2. It may move back on the next update."
+      },
+      {
+        "nodes": [
+          "lms1",
+          "lms2",
+          "ic"
+        ],
+        "edges": [],
+        "caption": "Compare the completed transfer with a delayed transfer of the same block."
+      },
+      {
+        "nodes": [
+          "cache1",
+          "cache2",
+          "lms1",
+          "lms2"
+        ],
+        "edges": [],
+        "caption": "Correlate block identity, access patterns and service times before diagnosing latency."
+      },
+      {
+        "nodes": [
+          "cache1",
+          "server1"
+        ],
+        "edges": [],
+        "caption": "After concentrating the writes on SALES1, compare transfer counts and response time."
+      }
+    ],
+    "startup": [
+      {
+        "nodes": [
+          "gi1",
+          "gi2",
+          "ocr"
+        ],
+        "edges": [
+          "css1",
+          "css2"
+        ],
+        "caption": "Both Grid stacks establish membership and verify cluster configuration."
+      },
+      {
+        "nodes": [
+          "asm1",
+          "asm2",
+          "dg"
+        ],
+        "edges": [
+          "asmDisk1",
+          "asmDisk2"
+        ],
+        "caption": "Check both local ASM instances and the shared disk group."
+      },
+      {
+        "nodes": [
+          "cache1",
+          "cache2",
+          "thread1",
+          "thread2",
+          "data"
+        ],
+        "edges": [
+          "shared1",
+          "shared2"
+        ],
+        "caption": "Each instance mounts and opens the same database; each retains its own thread.",
+        "states": {
+          "cache1": "OPEN · thread 1",
+          "cache2": "OPEN · thread 2"
+        }
+      },
+      {
+        "nodes": [
+          "client",
+          "ln2",
+          "scan",
+          "svc",
+          "pmon1",
+          "pmon2"
+        ],
+        "edges": [
+          "connect",
+          "redirect"
+        ],
+        "caption": "A new connection tests the registered service after the primary instances are open.",
+        "states": {
+          "svc": "Online · SALES_APP"
+        }
+      }
+    ],
+    "graceful-shutdown": [
+      {
+        "nodes": [
+          "svc",
+          "client",
+          "server2",
+          "gi2"
+        ],
+        "edges": [
+          "crm"
+        ],
+        "caption": "Prepare application work for the maintenance boundary.",
+        "states": {
+          "svc": "Serving on SALES2"
+        }
+      },
+      {
+        "nodes": [
+          "cache1",
+          "data",
+          "thread1"
+        ],
+        "edges": [
+          "t1"
+        ],
+        "caption": "The local shutdown closes and dismounts SALES1 consistently.",
+        "states": {
+          "cache1": "Stopped · clean close",
+          "svc": "Serving on SALES2"
+        }
+      },
+      {
+        "nodes": [
+          "cache2",
+          "server2",
+          "client",
+          "svc"
+        ],
+        "edges": [
+          "sql2",
+          "t2"
+        ],
+        "caption": "A fresh session works on SALES2 while SALES1 is stopped.",
+        "states": {
+          "cache1": "Stopped · clean close",
+          "svc": "Serving on SALES2"
+        }
+      },
+      {
+        "nodes": [
+          "gi1",
+          "gi2",
+          "cache1",
+          "cache2"
+        ],
+        "edges": [],
+        "caption": "Whole-database alternative: both database instances stop; shared Grid resources may stay online.",
+        "states": {
+          "cache1": "Stopped",
+          "cache2": "Stopped",
+          "svc": "Stopped"
+        }
+      }
+    ],
+    "patching": [
+      {
+        "nodes": [
+          "gi1",
+          "gi2",
+          "cache1",
+          "cache2"
+        ],
+        "edges": [],
+        "caption": "Inventory the targeted database homes and the separate Grid homes."
+      },
+      {
+        "nodes": [
+          "gi1",
+          "cache1",
+          "svc",
+          "cache2"
+        ],
+        "edges": [
+          "crm"
+        ],
+        "caption": "Rolling example: eligible service capacity remains on SALES2 while the first home is patched.",
+        "states": {
+          "cache1": "Stopped · maintenance",
+          "svc": "Serving on SALES2"
+        }
+      },
+      {
+        "nodes": [
+          "cache1",
+          "server1",
+          "cache2"
+        ],
+        "edges": [],
+        "caption": "Validate the first home and instance before the second node enters maintenance.",
+        "states": {
+          "cache1": "OPEN · verified"
+        }
+      },
+      {
+        "nodes": [
+          "data",
+          "cache1",
+          "cache2",
+          "svc"
+        ],
+        "edges": [],
+        "caption": "Verify all inventories, required database SQL work and service paths.",
+        "states": {
+          "cache1": "OPEN · checked",
+          "cache2": "OPEN · checked"
+        }
+      }
+    ]
+  },
+  "parts": {
+    "client": {
+      "name": "Application",
+      "sub": "Dedicated client",
+      "detail": "An application resolves the SCAN and connects through a service. After listener handoff its SQL traffic uses the established server connection."
+    },
+    "scan": {
+      "name": "SCAN listener",
+      "sub": "on a SCAN VIP",
+      "detail": "The client connects to one SCAN listener. It returns the address of a node listener offering the requested service. A SCAN VIP and its listener can move between cluster nodes."
+    },
+    "svc": {
+      "name": "SALES_APP",
+      "sub": "Application service",
+      "detail": "A service identifies the workload. Clusterware controls its placement according to the configured policy. PMON registers the service with the listeners."
+    },
+    "ln1": {
+      "name": "Local listener",
+      "sub": "Node 1 VIP",
+      "detail": "The node listener accepts the client connection after the SCAN redirect and can hand it to a dedicated server process."
+    },
+    "gi1": {
+      "name": "Clusterware",
+      "sub": "OHASD · CSSD · CRSD",
+      "detail": "The local high availability stack, cluster membership services and resource agents manage this node and its resources. Dependencies determine startup ordering."
+    },
+    "asm1": {
+      "name": "+ASM1",
+      "sub": "Disk-group maps",
+      "detail": "The local ASM instance manages disk-group metadata and supplies file extent information. Normal database-file reads and writes are performed by database processes."
+    },
+    "cache1": {
+      "name": "SALES1 buffer cache",
+      "sub": "Instance SGA",
+      "detail": "This cache belongs to SALES1. Cache Fusion can supply a suitable block from another instance over the private interconnect."
+    },
+    "lms1": {
+      "name": "GCS / LMSn",
+      "sub": "Block access",
+      "detail": "The Global Cache Service coordinates block access. LMS processes participate in transfer of current or consistent-read images."
+    },
+    "server1": {
+      "name": "Dedicated server",
+      "sub": "Database process",
+      "detail": "A dedicated server handles SQL for an established session, including buffer lookups and database-file reads."
+    },
+    "pmon1": {
+      "name": "PMON",
+      "sub": "Registration",
+      "detail": "In 11gR2, PMON dynamically registers services and handlers with local and remote listeners."
+    },
+    "lgwr1": {
+      "name": "LGWR",
+      "sub": "Log writer",
+      "detail": "LGWR flushes redo from the log buffer to the online redo logs for this instance’s thread. Undo records are kept in its undo tablespace."
+    },
+    "ln2": {
+      "name": "Local listener",
+      "sub": "Node 2 VIP",
+      "detail": "The node listener accepts the client connection after the SCAN redirect and can hand it to a dedicated server process."
+    },
+    "gi2": {
+      "name": "Clusterware",
+      "sub": "OHASD · CSSD · CRSD",
+      "detail": "The local high availability stack, cluster membership services and resource agents manage this node and its resources. Dependencies determine startup ordering."
+    },
+    "asm2": {
+      "name": "+ASM2",
+      "sub": "Disk-group maps",
+      "detail": "The local ASM instance manages disk-group metadata and supplies file extent information. Normal database-file reads and writes are performed by database processes."
+    },
+    "cache2": {
+      "name": "SALES2 buffer cache",
+      "sub": "Instance SGA",
+      "detail": "This cache belongs to SALES2. Cache Fusion can supply a suitable block from another instance over the private interconnect."
+    },
+    "lms2": {
+      "name": "GCS / LMSn",
+      "sub": "Block access",
+      "detail": "The Global Cache Service coordinates block access. LMS processes participate in transfer of current or consistent-read images."
+    },
+    "server2": {
+      "name": "Dedicated server",
+      "sub": "Database process",
+      "detail": "A dedicated server handles SQL for an established session, including buffer lookups and database-file reads."
+    },
+    "pmon2": {
+      "name": "PMON",
+      "sub": "Registration",
+      "detail": "In 11gR2, PMON dynamically registers services and handlers with local and remote listeners."
+    },
+    "lgwr2": {
+      "name": "LGWR",
+      "sub": "Log writer",
+      "detail": "LGWR flushes redo from the log buffer to the online redo logs for this instance’s thread. Undo records are kept in its undo tablespace."
+    },
+    "ic": {
+      "name": "Private interconnect",
+      "sub": "Cache Fusion traffic",
+      "detail": "This private network carries messages and blocks between instances, including Cache Fusion requests and responses."
+    },
+    "data": {
+      "name": "Database files",
+      "sub": "Data · control · UNDO1/2",
+      "detail": "Instances share the data and control files of one database. Each instance uses its own undo tablespace in shared data files. Database processes perform ordinary database I/O directly to storage."
+    },
+    "thread1": {
+      "name": "Online redo thread 1",
+      "sub": "Written by LGWR 1",
+      "detail": "SALES1 generates its redo thread and uses its own undo tablespace; the files reside on shared storage. A peer can recover the failed instance."
+    },
+    "ocr": {
+      "name": "OCR + voting",
+      "sub": "Cluster files",
+      "detail": "OCR stores cluster configuration. Voting files support node membership. These are distinct from database data files."
+    },
+    "thread2": {
+      "name": "Online redo thread 2",
+      "sub": "Written by LGWR 2",
+      "detail": "SALES2 generates a different redo thread and uses its own undo tablespace; these files are also on shared storage."
+    },
+    "dg": {
+      "name": "+DATA disk group",
+      "sub": "Shared ASM storage",
+      "detail": "ASM manages shared disk-group extents. The database processes use their extent maps to read and write Oracle files directly."
+    }
+  },
+  "alias": {
+    "client": "client",
+    "scan": "scan",
+    "node": "ln2",
+    "service": "svc",
+    "i1": "cache1",
+    "i2": "cache2",
+    "pmon": "pmon1",
+    "gcs": "lms1",
+    "net": "ic",
+    "gi": "gi1",
+    "ocr": "ocr",
+    "asm": "asm1",
+    "disk": "data"
+  }
+}</script>
   <script type="application/json" id="data">[
   {
     "id": "rac-1",
@@ -581,22 +1373,97 @@ window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener(
       el('answer').querySelector('p').textContent = flow.answer;
       el('prev').disabled = pos === 0;
       el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      renderArchitecture(flow.id, pos);
       for (const b of document.querySelectorAll('.actor')) b.setAttribute('aria-pressed', String(flow.actors[pos].includes(b.dataset.actor)));
       el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
     }
     function readRoute() {
       const requested = location.hash.slice(1);
       select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
-      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+      stopAnimation(); pos=0; inspected=null; parts.forEach(node=>node.classList.remove('is-inspected')); el('answer').open=false;el('inspection').hidden=true;paint();
     }
     select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
     window.addEventListener('hashchange', readRoute);
-    el('next').addEventListener('click', () => {pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
-    el('prev').addEventListener('click', () => {if(pos>0) pos--; el('answer').open=false;paint();});
-    for (const b of document.querySelectorAll('.actor')) b.addEventListener('click', () => {
-      const related=flows.filter(flow=>flow.actors.some(step=>step.includes(b.dataset.actor)));
-      el('inspect').textContent=b.textContent+' appears in '+related.map(flow=>flow.title).join(' · ')+'.';
+    el('next').addEventListener('click', () => {stopAnimation();pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {stopAnimation();if(pos>0) pos--; el('answer').open=false;paint();});
+
+    // Every frame chooses its own active connections. Inspection never changes a workflow step.
+    const blueprint=JSON.parse(el('architecture-spec').textContent);
+    const diagram=el('arch-heading').closest('.diagram-panel');
+    const parts=[...diagram.querySelectorAll('.arch-node')];
+    const paths=[...diagram.querySelectorAll('.arch-edge')];
+    let advanceTimer=null, inspected=null;
+    el('fit-diagram').addEventListener('click',()=>{
+      const fitted=diagram.classList.toggle('is-fitted');el('fit-diagram').setAttribute('aria-pressed',String(fitted));el('fit-diagram').textContent=fitted?'Full-size labels':'Fit entire diagram';
     });
+    function renderArchitecture(flowId,index) {
+      const frame=blueprint.frames[flowId][index];
+      const states=frame.states || {};
+      const active=new Set(frame.nodes);
+      for (const edge of paths) {
+        const enabled=frame.edges.includes(edge.dataset.edge);
+        edge.classList.toggle('is-active',enabled);
+        if (enabled) {active.add(edge.dataset.from);active.add(edge.dataset.to);}
+      }
+      for (const part of parts) {
+        const id=part.dataset.key, model=blueprint.parts[id];
+        const state=states[id] || model.sub;
+        part.classList.toggle('is-active',active.has(id));
+        part.classList.toggle('is-offline',/^(offline|stopped|isolated|paused|unavailable|gap)/i.test(state));
+        part.querySelector('.node-sub').textContent=state;
+        part.setAttribute('aria-label',model.name+', '+state);
+      }
+      el('arch-caption').textContent=frame.caption;
+      if (inspected && !el('inspection').hidden) inspectPart(inspected);
+    }
+    function inspectPart(id) {
+      const model=blueprint.parts[id];if(!model)return;
+      inspected=id;
+      const selected=parts.find(part=>part.dataset.key===id);
+      for(const part of parts) part.classList.toggle('is-inspected',part===selected);
+      el('inspect-name').textContent=model.name+' · '+selected.querySelector('.node-sub').textContent;
+      el('inspect').textContent=model.detail;
+      el('inspection').hidden=false;
+    }
+    for (const part of parts) {
+      part.addEventListener('click',()=>inspectPart(part.dataset.key));
+      part.addEventListener('keydown',event=>{
+        if(event.key===' ' || event.key==='Enter'){event.preventDefault();inspectPart(part.dataset.key);}
+      });
+    }
+    for (const button of document.querySelectorAll('.actor')) {
+      button.addEventListener('click',()=>inspectPart(blueprint.alias[button.dataset.actor]));
+    }
+    el('close-inspector').addEventListener('click',()=>{
+      el('inspection').hidden=true;
+      const part=parts.find(node=>node.dataset.key===inspected);
+      if(part){part.classList.remove('is-inspected');part.focus({preventScroll:true});}
+      inspected=null;
+    });
+    function stopAnimation(){
+      clearTimeout(advanceTimer); advanceTimer=null;
+      diagram.classList.remove('is-playing');
+      el('arch-play').textContent='Play';el('arch-play').setAttribute('aria-pressed','false');
+    }
+    function scheduleStep(){
+      clearTimeout(advanceTimer);
+      advanceTimer=setTimeout(()=>{
+        if(pos>=flows[select.selectedIndex].steps.length-1){stopAnimation();return;}
+        pos++;el('answer').open=false;paint();
+        if(pos===flows[select.selectedIndex].steps.length-1)stopAnimation();else scheduleStep();
+      },Number(el('arch-speed').value));
+    }
+    el('arch-play').addEventListener('click',()=>{
+      if(advanceTimer!==null){stopAnimation();diagram.classList.add('is-paused');return;}
+      diagram.classList.remove('is-paused');
+      if(pos===flows[select.selectedIndex].steps.length-1){pos=0;el('answer').open=false;paint();}
+      diagram.classList.add('is-playing');el('arch-play').textContent='Pause';el('arch-play').setAttribute('aria-pressed','true');scheduleStep();
+    });
+    el('arch-speed').addEventListener('change',()=>{if(advanceTimer!==null)scheduleStep();});
+    for(const control of [select,el('next'),el('prev')]) control.addEventListener('click',()=>diagram.classList.remove('is-paused'));
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)stopAnimation();});
+    window.addEventListener('pagehide',stopAnimation);
+
     readRoute();
   </script>
 </body></html>

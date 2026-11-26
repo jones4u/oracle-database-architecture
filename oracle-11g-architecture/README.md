@@ -10,6 +10,20 @@
 
 To explore a component on its own, use the diagram search. Search for **LGWR**, for example, to read what the log writer does during a commit.
 
+## Follow a change through the architecture
+
+The database examples use **Oracle Database 11g Release 2 (11.2.0.4)**. GoldenGate uses the 11.2.1 Classic architecture. Enterprise Manager uses Cloud Control 12.1 with an 11g database target.
+
+Choose a workflow, then use **Next step** or **Play** to follow its highlighted components and connections. Pause on a frame and select a component to inspect its role. With reduced motion enabled, the component and connection highlights still identify the current step.
+
+| Start here | Follow on the diagram |
+|---|---|
+| [RAC · retrieve a remote consistent-read block](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/rac.html#rac-7) | Follow a block from the peer cache across the private interconnect. Replay the shared-storage case. |
+| [Data Guard · follow one commit](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/dataguard.html#dg-1) | Identify local redo durability, receipt in the standby redo log, and application to standby data files. |
+| [RAC + Data Guard · follow a block and redo](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/rac-dataguard.html#both-1) | Locate the block transfer inside the cluster and the separate redo path to the other site. |
+| [GoldenGate · trace a committed change](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/goldengate.html#trace-a-commit) | Follow Extract, the local trail, the data pump, the remote trail and Replicat into the target database. |
+| [Enterprise Manager · follow the first sample](https://jones4u.github.io/oracle-database-architecture/oracle-11g-architecture/oem.html#first-sample) | Follow a target observation through the Management Agent and OMS to the repository and console. |
+
 ## Compare a workflow across technologies
 
 1. On the home page, expand **Compare a home workflow across the five towers** and choose any workflow. Each row explains whether the lesson carries over directly, changes with the topology, supplies background, or falls outside that tower’s lessons.

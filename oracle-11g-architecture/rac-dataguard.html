@@ -2,25 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v3 | Updated : 26-Nov-2026">
   <title>RAC + Data Guard · Oracle 11g R2 Architecture</title>
   <style>
     :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
     a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
     @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+
+    .lesson-picker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 12px}.lesson-picker select{width:auto;max-width:100%;flex:1 1 310px;margin:0}.lesson-picker a{font-size:.85rem}.diagram-panel{padding:15px;background:#111d28}.diagram-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.diagram-head h2{font-size:1.16rem;margin:0}.diagram-head .note{margin:2px 0 8px}.diagram-head>a{font-size:.83rem;white-space:nowrap}.svg-scroll{background:#0b141e;border:1px solid #344653;border-radius:8px;overflow-x:auto;overscroll-behavior-x:contain}.architecture-svg{display:block;margin:auto;width:100%;max-height:65vh;min-height:310px}.arch-zone rect{fill:#112433;stroke:#446371;stroke-width:1.1}.arch-zone.secondary rect{fill:#182436;stroke:#48566d}.arch-zone.storage rect{fill:#122b28;stroke:#467465}.arch-zone.bridge rect{fill:#1d2632;stroke:#5e6973;stroke-dasharray:5 3}.arch-zone text{fill:#d3e7ef;font:650 13px "Segoe UI",sans-serif;letter-spacing:.2px}.arch-zone .zone-sub{font-size:10.8px;font-weight:450;fill:#b4c8d2}.arch-node{cursor:pointer}.node-shell{fill:#192d3b;stroke:#617a89;stroke-width:1.2}.node-key{fill:#7daec1}.arch-node.grid .node-key,.arch-node.cluster .node-key{fill:#bcadf3}.arch-node.storage .node-key{fill:#80d8ad}.arch-node.redo .node-key{fill:#f4c08b}.arch-node.wan .node-key{fill:#efad72}.arch-node .node-name{fill:#eef5f9;font:650 13px "Segoe UI",sans-serif}.arch-node .node-sub{fill:#b9cbd5;font:11px "Segoe UI",sans-serif}.arch-node.is-active .node-shell{stroke:#ffd482;stroke-width:2.8;fill:#34342e}.arch-node.is-active .node-name,.arch-node.is-active .node-key{fill:#ffe1a2}.arch-node.is-offline .node-shell{stroke:#ff9392;stroke-dasharray:5 3;fill:#38272a}.arch-node.is-offline .node-sub{fill:#ffb7ac}.arch-node:focus .node-shell,.arch-node.is-inspected .node-shell{stroke:#fff;stroke-width:3.2}.arch-edge{color:#a7becd;pointer-events:none}.arch-edge.client{color:#7eddeb}.arch-edge.cluster{color:#b7a3fa}.arch-edge.storage{color:#7ed5a6}.arch-edge.redo{color:#f8bc76}.arch-edge .wire{stroke:currentColor;stroke-opacity:.18;fill:none;stroke-width:1.8;stroke-linejoin:round}.arch-edge:not(.is-active) .wire{marker-end:none}.arch-edge .traffic{stroke:currentColor;fill:none;opacity:0;stroke-width:3;stroke-dasharray:2 12;stroke-linecap:round}.arch-edge.is-active .wire{stroke-opacity:.87;stroke-width:2.2}.arch-edge.is-active .traffic{opacity:1;animation:arch-travel .9s linear 2}.diagram-panel.is-playing .arch-edge.is-active .traffic{animation-iteration-count:infinite}.diagram-panel.is-paused .traffic{animation-play-state:paused}.channel-key{display:flex;gap:.3rem 1.1rem;flex-wrap:wrap;font-size:.84rem;margin:7px 0}.channel-key span:before{content:"";display:inline-block;width:18px;border-top:3px solid var(--swatch);vertical-align:middle;margin-right:5px}.arch-actions{align-items:center;margin:.65rem 0;gap:7px}.arch-actions select{width:auto;margin:0;padding:5px}.arch-actions label,.arch-actions strong{font-size:.88rem}.arch-actions strong{margin-left:auto}.arch-caption{border-left:3px solid var(--active);padding:3px 10px;color:#ffe1a5;font-size:.98rem}.inspection{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;background:#1e3240;padding:10px 12px;margin:.65rem 0;border-radius:5px}.inspection[hidden]{display:none}.inspection p{margin:.1em 0}.inventory{border-top:1px solid var(--line);padding:.55rem 0 0}.inventory h3{font-size:.92rem}.pan-help{display:none;font-size:.82rem;color:var(--muted)}@keyframes arch-travel{to{stroke-dashoffset:-28}}@media(prefers-reduced-motion:reduce){.arch-edge.is-active .traffic{animation:none!important;opacity:0}.arch-edge.is-active .wire{stroke-width:3.2}}@media(max-width:760px){.diagram-head{display:block}.diagram-head>a{display:inline-block;margin-bottom:6px}.architecture-svg{min-width:850px;max-height:none;min-height:0}.pan-help{display:flex;align-items:center;gap:8px;margin-top:6px}.pan-help button{font-size:.82rem;padding:3px 8px}.is-fitted .architecture-svg{width:100%;min-width:0}.arch-actions strong{margin-left:0}.lesson-picker select{flex-basis:100%}.diagram-panel{padding:10px}.arch-caption{font-size:.94rem}}
   </style>
 </head>
 <body>
   <a class="sr" href="#lesson">Skip to lesson</a>
-  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html" aria-current="page">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>RAC + Data Guard</h1><p>Trace what moves inside a cluster, what crosses a site link, and which service can recover from each failure.</p><p class="ver">Oracle Database 11g Release 2 · Tower v2</p></header>
-  <main><div class="layout"><section id="lesson" class="panel"><label for="workflow">Workflow</label><select id="workflow"><option value="both-1">Follow a block within a site and redo between sites</option><option value="both-2">Size standby redo logs for two primary threads</option><option value="both-3">Find a gap when thread sequence numbers overlap</option><option value="both-4">Move Redo Apply to the other standby instance</option><option value="both-5">Move the write service in a planned switchover</option><option value="both-6">Choose a response to three different outages</option><option value="both-7">Restore protection after a site failover</option><option value="startup">Startup sequence · two clusters, two roles and two primary redo threads</option><option value="graceful-shutdown">Graceful shutdown · maintain one RAC node while Data Guard protects the site</option><option value="patching">Patching · check both RAC rolling and standby-first support</option></select>
-    <p><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></p><p id="level" class="level"></p><h2 id="title"></h2><p id="setup"></p>
-    <h3 id="progress"></h3><p id="step" class="step" aria-live="polite"></p>
-    <p id="focus" class="focus"></p><div class="actions"><button id="prev" type="button">Previous</button><button id="next" class="next" type="button">Next step</button></div>
-    <h3>Correctness check</h3><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details>
-  </section><section class="panel" aria-label="Architecture"><h2>Architecture</h2><p class="note">Highlighted components take part in this step. Select any component to find its workflows.</p><section><h3>Site A cluster</h3><div class="actors"><button type="button" class="actor" data-actor="a1" aria-pressed="false">Instance A1</button><button type="button" class="actor" data-actor="a2" aria-pressed="false">Instance A2</button><button type="button" class="actor" data-actor="ia" aria-pressed="false">Private interconnect A</button><button type="button" class="actor" data-actor="ta" aria-pressed="false">Redo threads A</button><button type="button" class="actor" data-actor="fa" aria-pressed="false">Files at Site A</button></div></section><section><h3>Between sites</h3><div class="actors"><button type="button" class="actor" data-actor="wan" aria-pressed="false">Redo transport</button><button type="button" class="actor" data-actor="svc" aria-pressed="false">Application service</button><button type="button" class="actor" data-actor="br" aria-pressed="false">Broker / observer</button></div></section><section><h3>Site B cluster</h3><div class="actors"><button type="button" class="actor" data-actor="b1" aria-pressed="false">Instance B1</button><button type="button" class="actor" data-actor="b2" aria-pressed="false">Instance B2</button><button type="button" class="actor" data-actor="sb" aria-pressed="false">Standby logs B</button><button type="button" class="actor" data-actor="apply" aria-pressed="false">Apply coordinator</button><button type="button" class="actor" data-actor="tb" aria-pressed="false">Redo threads B</button><button type="button" class="actor" data-actor="fb" aria-pressed="false">Files at Site B</button></div></section><p class="status" id="inspect" aria-live="polite"></p></section></div>
-  <div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Review <a href="./rac.html#rac-7">a Cache Fusion block transfer</a> or <a href="./dataguard.html#dg-1">redo transport and apply</a>.</p><!-- authored-home-crosslinks -->
+  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html" aria-current="page">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>RAC + Data Guard</h1><p>Trace what moves inside a cluster, what crosses a site link, and which service can recover from each failure.</p><p class="ver">Oracle Database 11g Release 2 · 11.2.0.4 · Tower v3</p></header>
+  <main><section id="lesson" class="lesson-picker"><label for="workflow">Workflow</label><select id="workflow"><option value="both-1">Follow a block within a site and redo between sites</option><option value="both-2">Size standby redo logs for two primary threads</option><option value="both-3">Find a gap when thread sequence numbers overlap</option><option value="both-4">Move Redo Apply to the other standby instance</option><option value="both-5">Move the write service in a planned switchover</option><option value="both-6">Choose a response to three different outages</option><option value="both-7">Restore protection after a site failover</option><option value="startup">Startup sequence · two clusters, two roles and two primary redo threads</option><option value="graceful-shutdown">Graceful shutdown · maintain one RAC node while Data Guard protects the site</option><option value="patching">Patching · check both RAC rolling and standby-first support</option></select><span id="level" class="level"></span><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></section>
+<section class="diagram-panel panel" aria-labelledby="arch-heading"><div class="diagram-head"><div><h2 id="arch-heading">Two RAC sites · one Data Guard configuration</h2><p class="note">Site A and Site B each own a cluster and a database. Follow the private block path within a site and the separate redo streams between sites.</p></div><a href="#arch-controls">Playback controls ↓</a></div>
+<div class="svg-scroll" tabindex="0" aria-label="Architecture diagram, scroll horizontally for full detail"><svg data-architecture-diagram="" class="architecture-svg" viewBox="0 0 1060 565" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="arch-svg-title arch-svg-desc">
+<title id="arch-svg-title">Two RAC sites · one Data Guard configuration</title><desc id="arch-svg-desc">Site A and Site B each own a cluster and a database. Follow the private block path within a site and the separate redo streams between sites. Select components to inspect them. The current step is repeated below the diagram.</desc>
+<defs>
+<marker id="arrow-client" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#7eddeb" stroke-width="2.3"/></marker>
+<marker id="arrow-cluster" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#b7a3fa" stroke-width="2.3"/></marker>
+<marker id="arrow-storage" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#7ed5a6" stroke-width="2.3"/></marker>
+<marker id="arrow-redo" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#f8bc76" stroke-width="2.3"/></marker>
+<marker id="arrow-control" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#9cbbcf" stroke-width="2.3"/></marker>
+</defs>
+<g class="arch-zone bridge"><rect x="10" y="8" width="1040" height="93" rx="12"/><text x="24" y="29">Client access and broker monitoring</text></g>
+<g class="arch-zone site"><rect x="10" y="111" width="424" height="442" rx="12"/><text x="24" y="132">Site A · RAC cluster</text></g>
+<g class="arch-zone site"><rect x="626" y="111" width="424" height="442" rx="12"/><text x="640" y="132">Site B · RAC cluster</text></g>
+<g class="arch-zone secondary"><rect x="19" y="194" width="406" height="102" rx="12"/><text x="33" y="215">RAC instances · per-instance SGA and processes</text></g>
+<g class="arch-zone secondary"><rect x="635" y="194" width="406" height="102" rx="12"/><text x="649" y="215">RAC instances · per-instance SGA and processes</text></g>
+<g class="arch-zone storage"><rect x="19" y="304" width="406" height="238" rx="12"/><text x="33" y="325">Shared database storage and recovery · Site A</text></g>
+<g class="arch-zone storage"><rect x="635" y="304" width="406" height="238" rx="12"/><text x="649" y="325">Shared database storage and recovery · Site B</text></g>
+<g class="arch-edge cluster" data-edge="cacheA" data-from="a2" data-to="ica"><title>Site A: consistent block transferred to A1 across the private interconnect</title><path class="wire" d="M265 254 H258" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M265 254 H258"/></g>
+<g class="arch-edge cluster" data-edge="cacheA-receive" data-from="ica" data-to="a1"><title>Transfer arrives in A1’s buffer cache</title><path class="wire" d="M177 254 H172" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M177 254 H172"/></g>
+<g class="arch-edge cluster" data-edge="cacheB" data-from="b2" data-to="icb"><title>Site B private interconnect for RAC traffic</title><path class="wire" d="M881 254 H875" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M881 254 H875"/></g>
+<g class="arch-edge cluster" data-edge="cacheB-receive" data-from="icb" data-to="b1"><title>Site B private block path to B1</title><path class="wire" d="M793 254 H788" marker-end="url(#arrow-cluster)"/><path class="traffic" d="M793 254 H788"/></g>
+<g class="arch-edge redo" data-edge="gena1" data-from="a1" data-to="ta1"><title>Instance A1 generates redo thread 1</title><path class="wire" d="M98 280 V344" marker-end="url(#arrow-redo)"/><path class="traffic" d="M98 280 V344"/></g>
+<g class="arch-edge redo" data-edge="gena2" data-from="a2" data-to="ta2"><title>Instance A2 generates redo thread 2</title><path class="wire" d="M330 280 V344" marker-end="url(#arrow-redo)"/><path class="traffic" d="M330 280 V344"/></g>
+<g class="arch-edge redo" data-edge="genb1" data-from="b1" data-to="tb1"><title>Instance B1 generates redo thread 1</title><path class="wire" d="M714 280 V344" marker-end="url(#arrow-redo)"/><path class="traffic" d="M714 280 V344"/></g>
+<g class="arch-edge redo" data-edge="genb2" data-from="b2" data-to="tb2"><title>Instance B2 generates redo thread 2</title><path class="wire" d="M946 280 V344" marker-end="url(#arrow-redo)"/><path class="traffic" d="M946 280 V344"/></g>
+<g class="arch-edge redo" data-edge="a1wan" data-from="ta1" data-to="wan"><title>Site A sends thread 1 redo</title><path class="wire" d="M198 353 H211 V330 H437 V370 H448" marker-end="url(#arrow-redo)"/><path class="traffic" d="M198 353 H211 V330 H437 V370 H448"/></g>
+<g class="arch-edge redo" data-edge="a2wan" data-from="ta2" data-to="wan"><title>Site A sends thread 2 redo</title><path class="wire" d="M407 381 H448" marker-end="url(#arrow-redo)"/><path class="traffic" d="M407 381 H448"/></g>
+<g class="arch-edge redo" data-edge="wanB" data-from="wan" data-to="rfsb"><title>Intersite transport delivers primary redo to RFS at B</title><path class="wire" d="M613 380 H623 V436 H646" marker-end="url(#arrow-redo)"/><path class="traffic" d="M613 380 H623 V436 H646"/></g>
+<g class="arch-edge redo" data-edge="rcvB" data-from="rfsb" data-to="srlb"><title>B receiver persists incoming redo into a standby redo log</title><path class="wire" d="M794 436 H844" marker-end="url(#arrow-redo)"/><path class="traffic" d="M794 436 H844"/></g>
+<g class="arch-edge redo" data-edge="logB" data-from="srlb" data-to="applyb"><title>B recovery reads the available redo, with real-time apply in the scenario</title><path class="wire" d="M927 460 V481" marker-end="url(#arrow-redo)"/><path class="traffic" d="M927 460 V481"/></g>
+<g class="arch-edge storage" data-edge="applyFilesB" data-from="applyb" data-to="filesb"><title>B apply coordinates recovery of the standby database files</title><path class="wire" d="M844 505 H819" marker-end="url(#arrow-storage)"/><path class="traffic" d="M844 505 H819"/></g>
+<g class="arch-edge redo" data-edge="b1wan" data-from="tb1" data-to="wan"><title>Site B sends its thread 1 after promotion</title><path class="wire" d="M646 354 H619 V371 H613" marker-end="url(#arrow-redo)"/><path class="traffic" d="M646 354 H619 V371 H613"/></g>
+<g class="arch-edge redo" data-edge="b2wan" data-from="tb2" data-to="wan"><title>Site B sends its thread 2 after promotion</title><path class="wire" d="M844 355 H830 V331 H620 V385 H613" marker-end="url(#arrow-redo)"/><path class="traffic" d="M844 355 H830 V331 H620 V385 H613"/></g>
+<g class="arch-edge redo" data-edge="wanA" data-from="wan" data-to="rfsa"><title>Site A now receives redo from Site B</title><path class="wire" d="M448 385 H436 V436 H407" marker-end="url(#arrow-redo)"/><path class="traffic" d="M448 385 H436 V436 H407"/></g>
+<g class="arch-edge redo" data-edge="rcvA" data-from="rfsa" data-to="srla"><title>A receiver writes standby redo</title><path class="wire" d="M259 436 H198" marker-end="url(#arrow-redo)"/><path class="traffic" d="M259 436 H198"/></g>
+<g class="arch-edge redo" data-edge="logA" data-from="srla" data-to="applya"><title>A apply reads available redo</title><path class="wire" d="M116 460 V481" marker-end="url(#arrow-redo)"/><path class="traffic" d="M116 460 V481"/></g>
+<g class="arch-edge storage" data-edge="applyFilesA" data-from="applya" data-to="filesa"><title>Redo Apply advances recovery at A</title><path class="wire" d="M198 505 H229" marker-end="url(#arrow-storage)"/><path class="traffic" d="M198 505 H229"/></g>
+<g class="arch-edge control" data-edge="controlA" data-from="broker" data-to="rolea"><title>Broker checks database A availability and role</title><path class="wire" d="M710 90 V106 H113 V139" marker-end="url(#arrow-control)"/><path class="traffic" d="M710 90 V106 H113 V139"/></g>
+<g class="arch-edge control" data-edge="controlB" data-from="broker" data-to="roleb"><title>Broker checks database B availability and role</title><path class="wire" d="M717 90 V139" marker-end="url(#arrow-control)"/><path class="traffic" d="M717 90 V139"/></g>
+<g class="arch-edge control" data-edge="brokerB2" data-from="broker" data-to="b2"><title>Broker controls the second standby instance through its database configuration</title><path class="wire" d="M748 90 V104 H1025 V211 H1008 V233" marker-end="url(#arrow-control)"/><path class="traffic" d="M748 90 V104 H1025 V211 H1008 V233"/></g>
+<g class="arch-edge control" data-edge="observeA" data-from="observer" data-to="rolea"><title>Observer tests connectivity to the primary database</title><path class="wire" d="M487 90 V101 H128 V139" marker-end="url(#arrow-control)"/><path class="traffic" d="M487 90 V101 H128 V139"/></g>
+<g class="arch-edge control" data-edge="observeB" data-from="observer" data-to="roleb"><title>Observer tests connectivity to the failover target</title><path class="wire" d="M544 90 V102 H688 V139" marker-end="url(#arrow-control)"/><path class="traffic" d="M544 90 V102 H688 V139"/></g>
+<g class="arch-edge client" data-edge="serviceA" data-from="client" data-to="svca"><title>Client uses the primary-role service at A</title><path class="wire" d="M188 65 H229" marker-end="url(#arrow-client)"/><path class="traffic" d="M188 65 H229"/></g>
+<g class="arch-edge client" data-edge="serviceB" data-from="client" data-to="svcb"><title>Client reconnects through the primary-role service at B</title><path class="wire" d="M109 43 V35 H929 V43" marker-end="url(#arrow-client)"/><path class="traffic" d="M109 43 V35 H929 V43"/></g>
+<g class="arch-edge client" data-edge="placeA2" data-from="svca" data-to="a2"><title>Service is offered on A2 according to its placement policy</title><path class="wire" d="M319 90 V115 H419 V222 H337 V233" marker-end="url(#arrow-client)"/><path class="traffic" d="M319 90 V115 H419 V222 H337 V233"/></g>
+<g class="arch-edge client" data-edge="placeB1" data-from="svcb" data-to="b1"><title>Service is offered on the new primary at B1</title><path class="wire" d="M919 90 V105 H627 V221 H720 V233" marker-end="url(#arrow-client)"/><path class="traffic" d="M919 90 V105 H627 V221 H720 V233"/></g>
+<g class="arch-node resource" data-key="client" tabindex="0" role="button" aria-label="Application: Role-based connection" transform="translate(30 43)"><title>Clients use a service configured at both sites and connect descriptors able to reach the new primary after a role transition.</title><rect class="node-shell" width="158" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Application</text><text class="node-sub" x="13" y="36">Role-based connection</text></g>
+<g class="arch-node grid" data-key="svca" tabindex="0" role="button" aria-label="Write service A: Online · initial primary" transform="translate(229 43)"><title>This service is configured for the primary role on Site A. Clusterware manages its local placement.</title><rect class="node-shell" width="167" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Write service A</text><text class="node-sub" x="13" y="36">Online · initial primary</text></g>
+<g class="arch-node grid" data-key="observer" tabindex="0" role="button" aria-label="FSFO observer: Separate host" transform="translate(436 43)"><title>A fast-start failover observer monitors the designated primary and target standby. A primary RAC node failure alone does not establish a site failure.</title><rect class="node-shell" width="154" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">FSFO observer</text><text class="node-sub" x="13" y="36">Separate host</text></g>
+<g class="arch-node grid" data-key="broker" tabindex="0" role="button" aria-label="Data Guard broker: DMON at each database" transform="translate(630 43)"><title>DMON runs in the database instances participating in the broker configuration. Broker manages roles, apply and transport. The external FSFO observer is a separate component.</title><rect class="node-shell" width="165" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Data Guard broker</text><text class="node-sub" x="13" y="36">DMON at each database</text></g>
+<g class="arch-node grid" data-key="svcb" tabindex="0" role="button" aria-label="Write service B: Ready · role policy" transform="translate(844 43)"><title>The matching service is configured at Site B and runs when that database holds the primary role.</title><rect class="node-shell" width="167" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Write service B</text><text class="node-sub" x="13" y="36">Ready · role policy</text></g>
+<g class="arch-node resource" data-key="rolea" tabindex="0" role="button" aria-label="Database A: PRIMARY" transform="translate(30 139)"><title>This role belongs to the database across both local RAC instances. A local node failure leaves the database role intact.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Database A</text><text class="node-sub" x="13" y="36">PRIMARY</text></g>
+<g class="arch-node grid" data-key="grida" tabindex="0" role="button" aria-label="Grid Infrastructure: Clusterware · ASM" transform="translate(228 139)"><title>Clusterware manages this site’s database resources, listeners and services. Local ASM instances provide access to storage shared by the local RAC nodes.</title><rect class="node-shell" width="179" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Grid Infrastructure</text><text class="node-sub" x="13" y="36">Clusterware · ASM</text></g>
+<g class="arch-node cluster" data-key="a1" tabindex="0" role="button" aria-label="Instance A1: SGA / LMSn · thread 1" transform="translate(30 233)"><title>Node A1 has its own SGA and background processes. A physical standby can mount on multiple RAC instances; one coordinates Redo Apply in 11gR2.</title><rect class="node-shell" width="142" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Instance A1</text><text class="node-sub" x="13" y="36">SGA / LMSn · thread 1</text></g>
+<g class="arch-node cluster" data-key="a2" tabindex="0" role="button" aria-label="Instance A2: SGA / LMSn · thread 2" transform="translate(265 233)"><title>Node A2 belongs to the local database. A local listener accepts redirected connections for services offered here.</title><rect class="node-shell" width="142" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Instance A2</text><text class="node-sub" x="13" y="36">SGA / LMSn · thread 2</text></g>
+<g class="arch-node redo" data-key="ta1" tabindex="0" role="button" aria-label="Thread 1 · A1: Online redo groups" transform="translate(30 344)"><title>Redo is distinguished by database incarnation, thread and sequence. A thread’s online logs are on the local site’s shared storage.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Thread 1 · A1</text><text class="node-sub" x="13" y="36">Online redo groups</text></g>
+<g class="arch-node redo" data-key="ta2" tabindex="0" role="button" aria-label="Thread 2 · A2: Online redo groups" transform="translate(228 344)"><title>The second primary instance generates its own stream of redo. A missing sequence must be identified by thread and incarnation.</title><rect class="node-shell" width="179" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Thread 2 · A2</text><text class="node-sub" x="13" y="36">Online redo groups</text></g>
+<g class="arch-node redo" data-key="rfsa" tabindex="0" role="button" aria-label="RFS · Site A: Redo reception" transform="translate(259 413)"><title>RFS writes incoming primary redo to a standby redo log. During gap resolution, missing archived logs can also be transferred to the destination.</title><rect class="node-shell" width="148" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">RFS · Site A</text><text class="node-sub" x="13" y="36">Redo reception</text></g>
+<g class="arch-node redo" data-key="srla" tabindex="0" role="button" aria-label="Standby redo logs: Thread 1 + thread 2" transform="translate(30 413)"><title>A receiving site needs appropriately sized standby redo log groups for every source thread. These are separate from its online logs and data files.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Standby redo logs</text><text class="node-sub" x="13" y="36">Thread 1 + thread 2</text></g>
+<g class="arch-node storage" data-key="applya" tabindex="0" role="button" aria-label="MRP0 · Redo Apply: Inactive · primary" transform="translate(30 481)"><title>On a physical RAC standby in 11gR2 a single instance coordinates Redo Apply across the primary threads; parallel recovery workers may participate.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">MRP0 · Redo Apply</text><text class="node-sub" x="13" y="36">Inactive · primary</text></g>
+<g class="arch-node storage" data-key="filesa" tabindex="0" role="button" aria-label="Database files A: Local shared storage" transform="translate(229 481)"><title>These are the files of database A, shared by its local RAC instances. The remote cluster uses a different set of files.</title><rect class="node-shell" width="173" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Database files A</text><text class="node-sub" x="13" y="36">Local shared storage</text></g>
+<g class="arch-node resource" data-key="roleb" tabindex="0" role="button" aria-label="Database B: PHYSICAL STANDBY" transform="translate(646 139)"><title>This role belongs to the database across both local RAC instances. A local node failure leaves the database role intact.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Database B</text><text class="node-sub" x="13" y="36">PHYSICAL STANDBY</text></g>
+<g class="arch-node grid" data-key="gridb" tabindex="0" role="button" aria-label="Grid Infrastructure: Clusterware · ASM" transform="translate(844 139)"><title>Clusterware manages this site’s database resources, listeners and services. Local ASM instances provide access to storage shared by the local RAC nodes.</title><rect class="node-shell" width="179" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Grid Infrastructure</text><text class="node-sub" x="13" y="36">Clusterware · ASM</text></g>
+<g class="arch-node cluster" data-key="b1" tabindex="0" role="button" aria-label="Instance B1: Apply host · initial" transform="translate(646 233)"><title>Node B1 has its own SGA and background processes. A physical standby can mount on multiple RAC instances; one coordinates Redo Apply in 11gR2.</title><rect class="node-shell" width="142" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Instance B1</text><text class="node-sub" x="13" y="36">Apply host · initial</text></g>
+<g class="arch-node cluster" data-key="b2" tabindex="0" role="button" aria-label="Instance B2: Eligible apply host" transform="translate(881 233)"><title>Node B2 belongs to the local database. A local listener accepts redirected connections for services offered here.</title><rect class="node-shell" width="142" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Instance B2</text><text class="node-sub" x="13" y="36">Eligible apply host</text></g>
+<g class="arch-node redo" data-key="tb1" tabindex="0" role="button" aria-label="Thread 1 · B1: Online redo groups" transform="translate(646 344)"><title>Redo is distinguished by database incarnation, thread and sequence. A thread’s online logs are on the local site’s shared storage.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Thread 1 · B1</text><text class="node-sub" x="13" y="36">Online redo groups</text></g>
+<g class="arch-node redo" data-key="tb2" tabindex="0" role="button" aria-label="Thread 2 · B2: Online redo groups" transform="translate(844 344)"><title>The second primary instance generates its own stream of redo. A missing sequence must be identified by thread and incarnation.</title><rect class="node-shell" width="179" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Thread 2 · B2</text><text class="node-sub" x="13" y="36">Online redo groups</text></g>
+<g class="arch-node redo" data-key="rfsb" tabindex="0" role="button" aria-label="RFS · Site B: Redo reception" transform="translate(646 413)"><title>RFS writes incoming primary redo to a standby redo log. During gap resolution, missing archived logs can also be transferred to the destination.</title><rect class="node-shell" width="148" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">RFS · Site B</text><text class="node-sub" x="13" y="36">Redo reception</text></g>
+<g class="arch-node redo" data-key="srlb" tabindex="0" role="button" aria-label="Standby redo logs: Thread 1 + thread 2" transform="translate(844 413)"><title>A receiving site needs appropriately sized standby redo log groups for every source thread. These are separate from its online logs and data files.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Standby redo logs</text><text class="node-sub" x="13" y="36">Thread 1 + thread 2</text></g>
+<g class="arch-node storage" data-key="applyb" tabindex="0" role="button" aria-label="MRP0 · Redo Apply: Coordinator on B1" transform="translate(844 481)"><title>On a physical RAC standby in 11gR2 a single instance coordinates Redo Apply across the primary threads; parallel recovery workers may participate.</title><rect class="node-shell" width="168" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">MRP0 · Redo Apply</text><text class="node-sub" x="13" y="36">Coordinator on B1</text></g>
+<g class="arch-node storage" data-key="filesb" tabindex="0" role="button" aria-label="Database files B: Local shared storage" transform="translate(646 481)"><title>These are the files of database B, shared by its local RAC instances. The remote cluster uses a different set of files.</title><rect class="node-shell" width="173" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Database files B</text><text class="node-sub" x="13" y="36">Local shared storage</text></g>
+<g class="arch-node cluster" data-key="ica" tabindex="0" role="button" aria-label="Private link: Interconnect" transform="translate(177 233)"><title>Cache Fusion transfers buffer images through Site A’s private interconnect between its own instances.</title><rect class="node-shell" width="81" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Private link</text><text class="node-sub" x="13" y="36">Interconnect</text></g>
+<g class="arch-node cluster" data-key="icb" tabindex="0" role="button" aria-label="Private link: Interconnect" transform="translate(793 233)"><title>The Site B private interconnect is independent of the intersite redo network.</title><rect class="node-shell" width="82" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Private link</text><text class="node-sub" x="13" y="36">Interconnect</text></g>
+<g class="arch-node wan" data-key="wan" tabindex="0" role="button" aria-label="Intersite network: Redo transport" transform="translate(448 356)"><title>Redo transport connects independent databases. Cache Fusion uses the private interconnect inside each cluster. In this example both redo threads reach the receiving site.</title><rect class="node-shell" width="165" height="47" rx="7"/><rect class="node-key" width="3.5" height="27" x="4" y="10" rx="2"/><text class="node-name" x="13" y="19">Intersite network</text><text class="node-sub" x="13" y="36">Redo transport</text></g>
+</svg></div>
+<div class="pan-help"><button id="fit-diagram" type="button" aria-pressed="false">Fit entire diagram</button> <span>Scroll horizontally for full-size labels.</span></div>
+<div class="channel-key"><span style="--swatch:#7eddeb">Client / service</span><span style="--swatch:#b7a3fa">Cache Fusion</span><span style="--swatch:#f8bc76">Redo transport</span><span style="--swatch:#7ed5a6">Redo Apply I/O</span><span style="--swatch:#9cbbcf">Broker control</span></div>
+<div id="arch-controls" class="actions arch-actions"><button id="prev" type="button">Previous</button><button id="arch-play" data-arch-play="" type="button" aria-pressed="false">Play</button><button id="next" class="next" type="button">Next step</button><label for="arch-speed">Speed</label><select id="arch-speed" data-arch-speed=""><option value="8000">Slow</option><option value="5000" selected>Normal</option><option value="2600">Fast</option></select><strong id="progress"></strong></div>
+<p id="arch-caption" class="arch-caption"></p><aside class="inspection" id="inspection" hidden><div><b id="inspect-name"></b><p id="inspect"></p></div><button type="button" id="close-inspector" aria-label="Close component details">Close</button></aside>
+<details class="inventory"><summary>Browse component groups</summary><section><h3>Site A cluster</h3><div class="actors"><button type="button" class="actor" data-actor="a1" aria-pressed="false">Instance A1</button><button type="button" class="actor" data-actor="a2" aria-pressed="false">Instance A2</button><button type="button" class="actor" data-actor="ia" aria-pressed="false">Private interconnect A</button><button type="button" class="actor" data-actor="ta" aria-pressed="false">Redo threads A</button><button type="button" class="actor" data-actor="fa" aria-pressed="false">Files at Site A</button></div></section><section><h3>Between sites</h3><div class="actors"><button type="button" class="actor" data-actor="wan" aria-pressed="false">Redo transport</button><button type="button" class="actor" data-actor="svc" aria-pressed="false">Application service</button><button type="button" class="actor" data-actor="br" aria-pressed="false">Broker / observer</button></div></section><section><h3>Site B cluster</h3><div class="actors"><button type="button" class="actor" data-actor="b1" aria-pressed="false">Instance B1</button><button type="button" class="actor" data-actor="b2" aria-pressed="false">Instance B2</button><button type="button" class="actor" data-actor="sb" aria-pressed="false">Standby logs B</button><button type="button" class="actor" data-actor="apply" aria-pressed="false">Apply coordinator</button><button type="button" class="actor" data-actor="tb" aria-pressed="false">Redo threads B</button><button type="button" class="actor" data-actor="fb" aria-pressed="false">Files at Site B</button></div></section></details></section>
+<div class="layout"><section class="panel"><h2 id="title"></h2><p id="setup"></p><p id="step" class="step" aria-live="polite"></p><p class="focus" id="focus"></p></section>
+<section class="panel"><h2>Correctness check</h2><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section></div>
+<div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Review <a href="./rac.html#rac-7">a Cache Fusion block transfer</a> or <a href="./dataguard.html#dg-1">redo transport and apply</a>.</p><!-- authored-home-crosslinks -->
 <details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
 <script>(function(){
 const related={"both-5":[["user-login","Follow a client reconnecting to its primary-role service after a planned site transition."],["connection-failure-rca","Verify that the primary-role service runs at the new site and the client can reach that endpoint."]],"both-1":[["select-cache-hit","Trace an instance cache supplying a block inside one site before following redo to the other site."],["select-cache-miss","A primary instance obtains a block from its local RAC peer across the cluster interconnect."],["insert-commit","Trace the primary instance’s redo thread and the separate intersite transport path."],["update-commit","Follow a remote block read, an update and the corresponding thread’s redo at the standby."],["commit-durability","The write belongs to the instance’s thread. Receipt at the other site is a separate milestone."],["read-consistency","Identify a suitable block image on a peer within the primary site."],["single-block-read-diagnosis","Trace an in-cluster block transfer independently from intersite redo transport."],["redo-commit-latency","Separate the primary instance's redo path from the intersite redo transport path."],["buffer-contention","Identify which private interconnect carries a primary-site block before investigating intersite lag."]],"both-2":[["redo-log-switch","Count online groups and standby log groups for each primary instance's thread."],["archive-log-switch-pressure","Inspect online and standby log group counts by thread before attributing delayed reuse to the other site."]],"both-3":[["archive-destination-failure-rca","Use both thread and sequence to identify redo missing from the receiving site."]],"startup":[["instance-startup","Verify both clusters, database roles and the single 11g standby apply instance."]],"graceful-shutdown":[["shutdown-normal","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."],["shutdown-transactional","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."],["shutdown-immediate","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."]],"both-6":[["shutdown-abort","Compare losing a single instance with isolation or failure of the primary site."],["crash-recovery","Determine whether local instance recovery or a site-level role transition applies."],["performance-incident-rca","Localize a disruption to one instance, the transport network or the entire site before escalation."]],"both-7":[["rman-restore-recover","Choose reinstatement or re-creation of the former primary after checking flashback eligibility."],["flashback-database","Evaluate flashback enablement and retained history before reinstating the former primary."],["flashback-unavailable-rca","Choose standby re-creation if the former primary lacks sufficient flashback history."]],"patching":[["patch-quarterly-psu-spu","Sequence maintenance by site, Oracle home and instance, then check both primary redo threads and standby apply."],["patch-one-off","Check conflicts and compatible mixed states for each home, site and instance."],["patch-rollback","Verify version parity, role, service placement and redo continuity after a supported rollback."]]};
@@ -34,6 +113,808 @@ function showRelated(){const current=document.querySelector("[data-lesson][aria-
 window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
 <!-- /authored-home-crosslinks -->
 </main><footer><a href="./index.html">Return to Stand-Alone DB</a></footer>
+  <script type="application/json" id="architecture-spec">{
+  "frames": {
+    "both-1": [
+      {
+        "nodes": [
+          "a2",
+          "a1"
+        ],
+        "edges": [
+          "cacheA",
+          "cacheA-receive"
+        ],
+        "caption": "A consistent block travels between nodes of Site A; the WAN carries no block."
+      },
+      {
+        "nodes": [
+          "a1",
+          "ta1"
+        ],
+        "edges": [
+          "gena1"
+        ],
+        "caption": "A1 updates the row and generates redo in thread 1."
+      },
+      {
+        "nodes": [
+          "ta1",
+          "wan",
+          "rfsb",
+          "srlb"
+        ],
+        "edges": [
+          "a1wan",
+          "wanB",
+          "rcvB"
+        ],
+        "caption": "Thread 1 redo is transported to B and received into a standby redo log."
+      },
+      {
+        "nodes": [
+          "b1",
+          "srlb",
+          "applyb",
+          "filesb"
+        ],
+        "edges": [
+          "logB",
+          "applyFilesB"
+        ],
+        "caption": "The apply coordinator on B1 recovers B’s own data files."
+      }
+    ],
+    "both-2": [
+      {
+        "nodes": [
+          "ta1",
+          "ta2"
+        ],
+        "edges": [],
+        "caption": "Three primary online groups in each of the two threads.",
+        "states": {
+          "ta1": "3 online groups",
+          "ta2": "3 online groups"
+        }
+      },
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb"
+        ],
+        "edges": [],
+        "caption": "Size and allocate four standby groups per source thread in this example.",
+        "states": {
+          "srlb": "4 + 4 groups"
+        }
+      },
+      {
+        "nodes": [
+          "srlb",
+          "filesb",
+          "gridb"
+        ],
+        "edges": [],
+        "caption": "Both B instances must be able to access these eight standby groups.",
+        "states": {
+          "srlb": "8 shared SRL groups"
+        }
+      },
+      {
+        "nodes": [
+          "srla",
+          "filesa",
+          "grida"
+        ],
+        "edges": [],
+        "caption": "Prepare Site A for the receiving role as well.",
+        "states": {
+          "srla": "4 + 4 groups",
+          "srlb": "4 + 4 groups"
+        }
+      }
+    ],
+    "both-3": [
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "applyb"
+        ],
+        "edges": [],
+        "caption": "Thread and sequence identify different records even when the sequence numbers match."
+      },
+      {
+        "nodes": [
+          "ta2",
+          "applyb"
+        ],
+        "edges": [],
+        "caption": "Thread 2 sequence 42 blocks this recovery point while thread 1 has its own progress.",
+        "states": {
+          "applyb": "Gap · thread 2 / 42"
+        }
+      },
+      {
+        "nodes": [
+          "ta2",
+          "wan",
+          "rfsb",
+          "applyb",
+          "filesb"
+        ],
+        "edges": [
+          "a2wan",
+          "wanB",
+          "applyFilesB"
+        ],
+        "caption": "Fetch the missing archive for thread 2; recovery can then advance. Gap retrieval can write an archived file instead of a standby redo log."
+      }
+    ],
+    "both-4": [
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "b1",
+          "applyb"
+        ],
+        "edges": [
+          "a1wan",
+          "a2wan",
+          "wanB",
+          "rcvB"
+        ],
+        "caption": "Both primary streams reach B; B1 hosts the single recovery coordinator."
+      },
+      {
+        "nodes": [
+          "b1",
+          "b2",
+          "applyb"
+        ],
+        "edges": [],
+        "caption": "The standby database role is retained while its apply instance fails.",
+        "states": {
+          "b1": "Offline · instance loss",
+          "applyb": "Paused · no coordinator"
+        }
+      },
+      {
+        "nodes": [
+          "broker",
+          "b2",
+          "applyb"
+        ],
+        "edges": [
+          "brokerB2"
+        ],
+        "caption": "Following the configured timeout, broker moves apply to the eligible B2 instance.",
+        "states": {
+          "b1": "Offline",
+          "b2": "Apply host",
+          "applyb": "Coordinator on B2"
+        }
+      },
+      {
+        "nodes": [
+          "b2",
+          "srlb",
+          "applyb",
+          "filesb"
+        ],
+        "edges": [
+          "logB",
+          "applyFilesB"
+        ],
+        "caption": "B2 coordinates recovery of the same standby files.",
+        "states": {
+          "b1": "Offline",
+          "b2": "Apply host",
+          "applyb": "Coordinator on B2"
+        }
+      }
+    ],
+    "both-5": [
+      {
+        "nodes": [
+          "broker",
+          "rolea",
+          "roleb"
+        ],
+        "edges": [
+          "controlA",
+          "controlB"
+        ],
+        "caption": "Both roles and switchover readiness are checked before the planned exchange."
+      },
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "rolea",
+          "roleb"
+        ],
+        "edges": [
+          "a1wan",
+          "a2wan",
+          "wanB",
+          "rcvB"
+        ],
+        "caption": "The last primary redo flows A → B before completing the role exchange.",
+        "states": {
+          "rolea": "Switching to standby",
+          "roleb": "Switching to primary"
+        }
+      },
+      {
+        "nodes": [
+          "svcb",
+          "b1",
+          "roleb"
+        ],
+        "edges": [
+          "placeB1"
+        ],
+        "caption": "The primary-role service is now available on Site B.",
+        "states": {
+          "rolea": "PHYSICAL STANDBY",
+          "roleb": "PRIMARY",
+          "applya": "Coordinator on A1",
+          "applyb": "Inactive · primary",
+          "a1": "Apply host",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Ready · role policy",
+          "svcb": "Online · PRIMARY"
+        }
+      },
+      {
+        "nodes": [
+          "tb1",
+          "tb2",
+          "rfsa",
+          "srla",
+          "applya",
+          "filesa"
+        ],
+        "edges": [
+          "serviceB",
+          "b1wan",
+          "b2wan",
+          "wanA",
+          "rcvA",
+          "logA",
+          "applyFilesA"
+        ],
+        "caption": "The new direction is B → A. A now receives and applies redo.",
+        "states": {
+          "rolea": "PHYSICAL STANDBY",
+          "roleb": "PRIMARY",
+          "applya": "Coordinator on A1",
+          "applyb": "Inactive · primary",
+          "a1": "Apply host",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Ready · role policy",
+          "svcb": "Online · PRIMARY"
+        }
+      }
+    ],
+    "both-6": [
+      {
+        "nodes": [
+          "a1",
+          "a2",
+          "observer",
+          "rolea"
+        ],
+        "edges": [
+          "observeA"
+        ],
+        "caption": "A2 remains reachable in the primary database after A1 fails.",
+        "states": {
+          "a1": "Offline · instance loss",
+          "svca": "Online · A2"
+        }
+      },
+      {
+        "nodes": [
+          "wan",
+          "ta1",
+          "ta2",
+          "observer"
+        ],
+        "edges": [
+          "observeA"
+        ],
+        "caption": "Fresh scenario: redo transport is interrupted while Site A is still reachable.",
+        "states": {
+          "wan": "Unavailable · transport"
+        }
+      },
+      {
+        "nodes": [
+          "a1",
+          "a2",
+          "observer",
+          "roleb"
+        ],
+        "edges": [],
+        "caption": "Fresh scenario: both observer and target lose contact with every primary instance.",
+        "states": {
+          "a1": "Isolated",
+          "a2": "Isolated",
+          "wan": "Isolated · primary"
+        }
+      },
+      {
+        "nodes": [
+          "observer",
+          "roleb",
+          "b1"
+        ],
+        "edges": [
+          "observeB"
+        ],
+        "caption": "Check threshold and target eligibility before a decision; this frame does not presume promotion.",
+        "states": {
+          "a1": "Isolated",
+          "a2": "Isolated",
+          "wan": "Isolated · primary"
+        }
+      }
+    ],
+    "both-7": [
+      {
+        "nodes": [
+          "svcb",
+          "b1",
+          "roleb",
+          "rolea"
+        ],
+        "edges": [
+          "serviceB",
+          "placeB1"
+        ],
+        "caption": "B is the active primary after failover. Keep application writes at B.",
+        "states": {
+          "rolea": "FORMER PRIMARY",
+          "roleb": "PRIMARY",
+          "applya": "Paused · former primary",
+          "applyb": "Inactive · primary",
+          "a1": "Offline · former primary",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Stopped · former primary",
+          "svcb": "Online · PRIMARY"
+        }
+      },
+      {
+        "nodes": [
+          "filesa",
+          "rolea"
+        ],
+        "edges": [],
+        "caption": "A has returned. Inspect flashback prerequisites and retained history.",
+        "states": {
+          "rolea": "FORMER PRIMARY",
+          "roleb": "PRIMARY",
+          "applya": "Paused · former primary",
+          "applyb": "Inactive · primary",
+          "a1": "Returned · assess",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Stopped · former primary",
+          "svcb": "Online · PRIMARY"
+        }
+      },
+      {
+        "nodes": [
+          "broker",
+          "rolea",
+          "filesa"
+        ],
+        "edges": [
+          "controlA"
+        ],
+        "caption": "Eligible flashback reinstatement and re-creation are alternative paths to a physical standby.",
+        "states": {
+          "rolea": "Reinstating / rebuilding",
+          "roleb": "PRIMARY",
+          "applya": "Paused · former primary",
+          "applyb": "Inactive · primary",
+          "a1": "Restore protection",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Stopped · former primary",
+          "svcb": "Online · PRIMARY"
+        }
+      },
+      {
+        "nodes": [
+          "tb1",
+          "tb2",
+          "rfsa",
+          "srla",
+          "applya",
+          "filesa"
+        ],
+        "edges": [
+          "b1wan",
+          "b2wan",
+          "wanA",
+          "rcvA",
+          "logA",
+          "applyFilesA"
+        ],
+        "caption": "Verification: A is a physical standby and recovery advances with new redo from B.",
+        "states": {
+          "rolea": "PHYSICAL STANDBY",
+          "roleb": "PRIMARY",
+          "applya": "Coordinator on A1",
+          "applyb": "Inactive · primary",
+          "a1": "Apply host",
+          "a2": "Eligible apply host",
+          "b1": "SGA / LMSn · thread 1",
+          "b2": "SGA / LMSn · thread 2",
+          "svca": "Ready · role policy",
+          "svcb": "Online · PRIMARY"
+        }
+      }
+    ],
+    "startup": [
+      {
+        "nodes": [
+          "grida",
+          "gridb",
+          "filesa",
+          "filesb",
+          "rolea",
+          "roleb"
+        ],
+        "edges": [],
+        "caption": "Check independent cluster resources, file visibility and established database roles."
+      },
+      {
+        "nodes": [
+          "b1",
+          "b2",
+          "applyb",
+          "roleb"
+        ],
+        "edges": [],
+        "caption": "B1 and B2 mount the same physical standby database; only B1 coordinates apply.",
+        "states": {
+          "b1": "Mounted · apply host",
+          "b2": "Mounted · eligible"
+        }
+      },
+      {
+        "nodes": [
+          "a1",
+          "a2",
+          "ta1",
+          "ta2",
+          "svca"
+        ],
+        "edges": [
+          "serviceA"
+        ],
+        "caption": "Confirm the primary service and both enabled redo threads.",
+        "states": {
+          "a1": "OPEN · thread 1",
+          "a2": "OPEN · thread 2"
+        }
+      },
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "applyb",
+          "filesb"
+        ],
+        "edges": [
+          "a1wan",
+          "a2wan",
+          "wanB",
+          "rcvB",
+          "logB",
+          "applyFilesB"
+        ],
+        "caption": "Verify thread-specific receipt and forward progress under B1’s apply coordinator."
+      }
+    ],
+    "graceful-shutdown": [
+      {
+        "nodes": [
+          "svca",
+          "a1",
+          "a2"
+        ],
+        "edges": [
+          "serviceA",
+          "placeA2"
+        ],
+        "caption": "Prepare sessions and the service on surviving A2.",
+        "states": {
+          "svca": "Online · A2"
+        }
+      },
+      {
+        "nodes": [
+          "a1",
+          "a2",
+          "ta2"
+        ],
+        "edges": [
+          "gena2"
+        ],
+        "caption": "A1 stops cleanly while A2 remains a primary instance producing thread 2 redo.",
+        "states": {
+          "a1": "Stopped · clean close",
+          "svca": "Online · A2"
+        }
+      },
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "applyb"
+        ],
+        "edges": [
+          "a2wan",
+          "wanB",
+          "rcvB",
+          "logB"
+        ],
+        "caption": "Check the final A1 log boundary and continuing A2 redo at the standby.",
+        "states": {
+          "a1": "Stopped",
+          "ta1": "Closed thread",
+          "svca": "Online · A2"
+        }
+      },
+      {
+        "nodes": [
+          "broker",
+          "svca",
+          "rolea",
+          "roleb"
+        ],
+        "edges": [],
+        "caption": "Whole-site alternative: assess service-outage versus switchover readiness before proceeding."
+      }
+    ],
+    "patching": [
+      {
+        "nodes": [
+          "grida",
+          "gridb",
+          "a1",
+          "a2",
+          "b1",
+          "b2"
+        ],
+        "edges": [],
+        "caption": "RAC rolling and Data Guard standby-first certification are independent checks."
+      },
+      {
+        "nodes": [
+          "b1",
+          "b2",
+          "applyb",
+          "gridb"
+        ],
+        "edges": [],
+        "caption": "Under a certified plan, coordinate standby node maintenance and verify Redo Apply on its intended host."
+      },
+      {
+        "nodes": [
+          "a1",
+          "a2",
+          "svca",
+          "grida"
+        ],
+        "edges": [
+          "placeA2"
+        ],
+        "caption": "During an approved rolling primary phase, check alternate service placement and each patched home.",
+        "states": {
+          "svca": "Serving on A2"
+        }
+      },
+      {
+        "nodes": [
+          "ta1",
+          "ta2",
+          "srlb",
+          "applyb",
+          "filesb"
+        ],
+        "edges": [
+          "a1wan",
+          "a2wan",
+          "wanB",
+          "rcvB",
+          "logB",
+          "applyFilesB"
+        ],
+        "caption": "Verify both redo threads, open roles, application service and restored protection."
+      }
+    ]
+  },
+  "parts": {
+    "client": {
+      "name": "Application",
+      "sub": "Role-based connection",
+      "detail": "Clients use a service configured at both sites and connect descriptors able to reach the new primary after a role transition."
+    },
+    "svca": {
+      "name": "Write service A",
+      "sub": "Online · initial primary",
+      "detail": "This service is configured for the primary role on Site A. Clusterware manages its local placement."
+    },
+    "observer": {
+      "name": "FSFO observer",
+      "sub": "Separate host",
+      "detail": "A fast-start failover observer monitors the designated primary and target standby. A primary RAC node failure alone does not establish a site failure."
+    },
+    "broker": {
+      "name": "Data Guard broker",
+      "sub": "DMON at each database",
+      "detail": "DMON runs in the database instances participating in the broker configuration. Broker manages roles, apply and transport. The external FSFO observer is a separate component."
+    },
+    "svcb": {
+      "name": "Write service B",
+      "sub": "Ready · role policy",
+      "detail": "The matching service is configured at Site B and runs when that database holds the primary role."
+    },
+    "rolea": {
+      "name": "Database A",
+      "sub": "PRIMARY",
+      "detail": "This role belongs to the database across both local RAC instances. A local node failure leaves the database role intact."
+    },
+    "grida": {
+      "name": "Grid Infrastructure",
+      "sub": "Clusterware · ASM",
+      "detail": "Clusterware manages this site’s database resources, listeners and services. Local ASM instances provide access to storage shared by the local RAC nodes."
+    },
+    "a1": {
+      "name": "Instance A1",
+      "sub": "SGA / LMSn · thread 1",
+      "detail": "Node A1 has its own SGA and background processes. A physical standby can mount on multiple RAC instances; one coordinates Redo Apply in 11gR2."
+    },
+    "a2": {
+      "name": "Instance A2",
+      "sub": "SGA / LMSn · thread 2",
+      "detail": "Node A2 belongs to the local database. A local listener accepts redirected connections for services offered here."
+    },
+    "ta1": {
+      "name": "Thread 1 · A1",
+      "sub": "Online redo groups",
+      "detail": "Redo is distinguished by database incarnation, thread and sequence. A thread’s online logs are on the local site’s shared storage."
+    },
+    "ta2": {
+      "name": "Thread 2 · A2",
+      "sub": "Online redo groups",
+      "detail": "The second primary instance generates its own stream of redo. A missing sequence must be identified by thread and incarnation."
+    },
+    "rfsa": {
+      "name": "RFS · Site A",
+      "sub": "Redo reception",
+      "detail": "RFS writes incoming primary redo to a standby redo log. During gap resolution, missing archived logs can also be transferred to the destination."
+    },
+    "srla": {
+      "name": "Standby redo logs",
+      "sub": "Thread 1 + thread 2",
+      "detail": "A receiving site needs appropriately sized standby redo log groups for every source thread. These are separate from its online logs and data files."
+    },
+    "applya": {
+      "name": "MRP0 · Redo Apply",
+      "sub": "Inactive · primary",
+      "detail": "On a physical RAC standby in 11gR2 a single instance coordinates Redo Apply across the primary threads; parallel recovery workers may participate."
+    },
+    "filesa": {
+      "name": "Database files A",
+      "sub": "Local shared storage",
+      "detail": "These are the files of database A, shared by its local RAC instances. The remote cluster uses a different set of files."
+    },
+    "roleb": {
+      "name": "Database B",
+      "sub": "PHYSICAL STANDBY",
+      "detail": "This role belongs to the database across both local RAC instances. A local node failure leaves the database role intact."
+    },
+    "gridb": {
+      "name": "Grid Infrastructure",
+      "sub": "Clusterware · ASM",
+      "detail": "Clusterware manages this site’s database resources, listeners and services. Local ASM instances provide access to storage shared by the local RAC nodes."
+    },
+    "b1": {
+      "name": "Instance B1",
+      "sub": "Apply host · initial",
+      "detail": "Node B1 has its own SGA and background processes. A physical standby can mount on multiple RAC instances; one coordinates Redo Apply in 11gR2."
+    },
+    "b2": {
+      "name": "Instance B2",
+      "sub": "Eligible apply host",
+      "detail": "Node B2 belongs to the local database. A local listener accepts redirected connections for services offered here."
+    },
+    "tb1": {
+      "name": "Thread 1 · B1",
+      "sub": "Online redo groups",
+      "detail": "Redo is distinguished by database incarnation, thread and sequence. A thread’s online logs are on the local site’s shared storage."
+    },
+    "tb2": {
+      "name": "Thread 2 · B2",
+      "sub": "Online redo groups",
+      "detail": "The second primary instance generates its own stream of redo. A missing sequence must be identified by thread and incarnation."
+    },
+    "rfsb": {
+      "name": "RFS · Site B",
+      "sub": "Redo reception",
+      "detail": "RFS writes incoming primary redo to a standby redo log. During gap resolution, missing archived logs can also be transferred to the destination."
+    },
+    "srlb": {
+      "name": "Standby redo logs",
+      "sub": "Thread 1 + thread 2",
+      "detail": "A receiving site needs appropriately sized standby redo log groups for every source thread. These are separate from its online logs and data files."
+    },
+    "applyb": {
+      "name": "MRP0 · Redo Apply",
+      "sub": "Coordinator on B1",
+      "detail": "On a physical RAC standby in 11gR2 a single instance coordinates Redo Apply across the primary threads; parallel recovery workers may participate."
+    },
+    "filesb": {
+      "name": "Database files B",
+      "sub": "Local shared storage",
+      "detail": "These are the files of database B, shared by its local RAC instances. The remote cluster uses a different set of files."
+    },
+    "ica": {
+      "name": "Private link",
+      "sub": "Interconnect",
+      "detail": "Cache Fusion transfers buffer images through Site A’s private interconnect between its own instances."
+    },
+    "icb": {
+      "name": "Private link",
+      "sub": "Interconnect",
+      "detail": "The Site B private interconnect is independent of the intersite redo network."
+    },
+    "wan": {
+      "name": "Intersite network",
+      "sub": "Redo transport",
+      "detail": "Redo transport connects independent databases. Cache Fusion uses the private interconnect inside each cluster. In this example both redo threads reach the receiving site."
+    }
+  },
+  "alias": {
+    "a1": "a1",
+    "a2": "a2",
+    "ia": "ica",
+    "ta": "ta1",
+    "fa": "filesa",
+    "wan": "wan",
+    "svc": "svca",
+    "br": "broker",
+    "b1": "b1",
+    "b2": "b2",
+    "sb": "srlb",
+    "apply": "applyb",
+    "tb": "tb1",
+    "fb": "filesb"
+  }
+}</script>
   <script type="application/json" id="data">[
   {
     "id": "both-1",
@@ -534,22 +1415,97 @@ window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener(
       el('answer').querySelector('p').textContent = flow.answer;
       el('prev').disabled = pos === 0;
       el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      renderArchitecture(flow.id, pos);
       for (const b of document.querySelectorAll('.actor')) b.setAttribute('aria-pressed', String(flow.actors[pos].includes(b.dataset.actor)));
       el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
     }
     function readRoute() {
       const requested = location.hash.slice(1);
       select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
-      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+      stopAnimation(); pos=0; inspected=null; parts.forEach(node=>node.classList.remove('is-inspected')); el('answer').open=false;el('inspection').hidden=true;paint();
     }
     select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
     window.addEventListener('hashchange', readRoute);
-    el('next').addEventListener('click', () => {pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
-    el('prev').addEventListener('click', () => {if(pos>0) pos--; el('answer').open=false;paint();});
-    for (const b of document.querySelectorAll('.actor')) b.addEventListener('click', () => {
-      const related=flows.filter(flow=>flow.actors.some(step=>step.includes(b.dataset.actor)));
-      el('inspect').textContent=b.textContent+' appears in '+related.map(flow=>flow.title).join(' · ')+'.';
+    el('next').addEventListener('click', () => {stopAnimation();pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {stopAnimation();if(pos>0) pos--; el('answer').open=false;paint();});
+
+    // Every frame chooses its own active connections. Inspection never changes a workflow step.
+    const blueprint=JSON.parse(el('architecture-spec').textContent);
+    const diagram=el('arch-heading').closest('.diagram-panel');
+    const parts=[...diagram.querySelectorAll('.arch-node')];
+    const paths=[...diagram.querySelectorAll('.arch-edge')];
+    let advanceTimer=null, inspected=null;
+    el('fit-diagram').addEventListener('click',()=>{
+      const fitted=diagram.classList.toggle('is-fitted');el('fit-diagram').setAttribute('aria-pressed',String(fitted));el('fit-diagram').textContent=fitted?'Full-size labels':'Fit entire diagram';
     });
+    function renderArchitecture(flowId,index) {
+      const frame=blueprint.frames[flowId][index];
+      const states=frame.states || {};
+      const active=new Set(frame.nodes);
+      for (const edge of paths) {
+        const enabled=frame.edges.includes(edge.dataset.edge);
+        edge.classList.toggle('is-active',enabled);
+        if (enabled) {active.add(edge.dataset.from);active.add(edge.dataset.to);}
+      }
+      for (const part of parts) {
+        const id=part.dataset.key, model=blueprint.parts[id];
+        const state=states[id] || model.sub;
+        part.classList.toggle('is-active',active.has(id));
+        part.classList.toggle('is-offline',/^(offline|stopped|isolated|paused|unavailable|gap)/i.test(state));
+        part.querySelector('.node-sub').textContent=state;
+        part.setAttribute('aria-label',model.name+', '+state);
+      }
+      el('arch-caption').textContent=frame.caption;
+      if (inspected && !el('inspection').hidden) inspectPart(inspected);
+    }
+    function inspectPart(id) {
+      const model=blueprint.parts[id];if(!model)return;
+      inspected=id;
+      const selected=parts.find(part=>part.dataset.key===id);
+      for(const part of parts) part.classList.toggle('is-inspected',part===selected);
+      el('inspect-name').textContent=model.name+' · '+selected.querySelector('.node-sub').textContent;
+      el('inspect').textContent=model.detail;
+      el('inspection').hidden=false;
+    }
+    for (const part of parts) {
+      part.addEventListener('click',()=>inspectPart(part.dataset.key));
+      part.addEventListener('keydown',event=>{
+        if(event.key===' ' || event.key==='Enter'){event.preventDefault();inspectPart(part.dataset.key);}
+      });
+    }
+    for (const button of document.querySelectorAll('.actor')) {
+      button.addEventListener('click',()=>inspectPart(blueprint.alias[button.dataset.actor]));
+    }
+    el('close-inspector').addEventListener('click',()=>{
+      el('inspection').hidden=true;
+      const part=parts.find(node=>node.dataset.key===inspected);
+      if(part){part.classList.remove('is-inspected');part.focus({preventScroll:true});}
+      inspected=null;
+    });
+    function stopAnimation(){
+      clearTimeout(advanceTimer); advanceTimer=null;
+      diagram.classList.remove('is-playing');
+      el('arch-play').textContent='Play';el('arch-play').setAttribute('aria-pressed','false');
+    }
+    function scheduleStep(){
+      clearTimeout(advanceTimer);
+      advanceTimer=setTimeout(()=>{
+        if(pos>=flows[select.selectedIndex].steps.length-1){stopAnimation();return;}
+        pos++;el('answer').open=false;paint();
+        if(pos===flows[select.selectedIndex].steps.length-1)stopAnimation();else scheduleStep();
+      },Number(el('arch-speed').value));
+    }
+    el('arch-play').addEventListener('click',()=>{
+      if(advanceTimer!==null){stopAnimation();diagram.classList.add('is-paused');return;}
+      diagram.classList.remove('is-paused');
+      if(pos===flows[select.selectedIndex].steps.length-1){pos=0;el('answer').open=false;paint();}
+      diagram.classList.add('is-playing');el('arch-play').textContent='Pause';el('arch-play').setAttribute('aria-pressed','true');scheduleStep();
+    });
+    el('arch-speed').addEventListener('change',()=>{if(advanceTimer!==null)scheduleStep();});
+    for(const control of [select,el('next'),el('prev')]) control.addEventListener('click',()=>diagram.classList.remove('is-paused'));
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)stopAnimation();});
+    window.addEventListener('pagehide',stopAnimation);
+
     readRoute();
   </script>
 </body></html>

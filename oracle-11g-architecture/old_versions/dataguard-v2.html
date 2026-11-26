@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
+  <title>Data Guard · Oracle 11g R2 Architecture</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
+    a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
+    @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+  </style>
+</head>
+<body>
+  <a class="sr" href="#lesson">Skip to lesson</a>
+  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html">RAC</a> <a href="./dataguard.html" aria-current="page">Data Guard</a> <a href="./rac-dataguard.html">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>Data Guard</h1><p>Follow one database change from local commit to remote receipt, apply, and a possible change of roles.</p><p class="ver">Oracle Database 11g Release 2 · Tower v2</p></header>
+  <main><div class="layout"><section id="lesson" class="panel"><label for="workflow">Workflow</label><select id="workflow"><option value="dg-1">Follow one commit to a physical standby</option><option value="dg-2">Compare asynchronous and synchronous commit</option><option value="dg-3">Compare the three protection modes</option><option value="dg-4">Read the current standby redo log as it fills</option><option value="dg-5">Diagnose a redo gap after a network interruption</option><option value="dg-6">Switch roles during planned maintenance</option><option value="dg-7">Fail over after loss of the primary</option><option value="dg-8">Decide whether the fast-start failover observer should act</option><option value="startup">Startup sequence · restore transport and physical standby apply</option><option value="graceful-shutdown">Graceful shutdown · take a protected pair offline</option><option value="patching">Patching · evaluate standby-first eligibility</option></select>
+    <p><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></p><p id="level" class="level"></p><h2 id="title"></h2><p id="setup"></p>
+    <h3 id="progress"></h3><p id="step" class="step" aria-live="polite"></p>
+    <p id="focus" class="focus"></p><div class="actions"><button id="prev" type="button">Previous</button><button id="next" class="next" type="button">Next step</button></div>
+    <h3>Correctness check</h3><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details>
+  </section><section class="panel" aria-label="Architecture"><h2>Architecture</h2><p class="note">Highlighted components take part in this step. Select any component to find its workflows.</p><section><h3>Site A</h3><div class="actors"><button type="button" class="actor" data-actor="a" aria-pressed="false">Database A</button><button type="button" class="actor" data-actor="al" aria-pressed="false">Online redo A</button><button type="button" class="actor" data-actor="as" aria-pressed="false">Standby logs A</button><button type="button" class="actor" data-actor="af" aria-pressed="false">Data files A</button></div></section><section><h3>Transport and clients</h3><div class="actors"><button type="button" class="actor" data-actor="app" aria-pressed="false">Application</button><button type="button" class="actor" data-actor="wan" aria-pressed="false">Redo transport</button><button type="button" class="actor" data-actor="br" aria-pressed="false">Broker / observer</button><button type="button" class="actor" data-actor="svc" aria-pressed="false">Primary-role service</button></div></section><section><h3>Site B</h3><div class="actors"><button type="button" class="actor" data-actor="b" aria-pressed="false">Database B</button><button type="button" class="actor" data-actor="bl" aria-pressed="false">Online redo B</button><button type="button" class="actor" data-actor="rfs" aria-pressed="false">RFS at B</button><button type="button" class="actor" data-actor="srl" aria-pressed="false">Standby logs B</button><button type="button" class="actor" data-actor="mrp" aria-pressed="false">Managed recovery B</button><button type="button" class="actor" data-actor="bf" aria-pressed="false">Data files B</button></div></section><p class="status" id="inspect" aria-live="polite"></p></section></div>
+  <div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Continue with <a href="./rac-dataguard.html#both-2">standby redo logs for two primary threads</a>.</p><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"dg-1":[["insert-commit","Trace a locally committed row through transport, standby reception and physical apply."],["update-commit","Follow an updated row’s redo from the primary to the physical standby."]],"dg-2":[["commit-durability","Compare completion of an ASYNC commit with the remote durable acknowledgment in healthy SYNC/AFFIRM."],["redo-commit-latency","Test how remote durable acknowledgment in SYNC/AFFIRM contributes to commit time."]],"dg-4":[["redo-log-switch","Compare waiting for archival at the standby with reading its current standby redo log during real-time apply."]],"dg-5":[["archive-destination-failure-rca","Follow a missing archived sequence through transport restoration and gap resolution."],["performance-incident-rca","Use receive and apply positions to localize a specific redo continuity incident."]],"startup":[["instance-startup","Startup decisions depend on the primary or standby role and the required apply state."]],"graceful-shutdown":[["shutdown-normal","Account for the database role, outstanding transport and standby apply before a planned stop."],["shutdown-transactional","A final primary transaction must finish before closing. Track its redo receipt and apply separately at the standby."],["shutdown-immediate","Account for the database role, outstanding transport and standby apply before a planned stop."]],"dg-7":[["crash-recovery","A primary outage can raise a separate site failover decision. Inspect received redo and target readiness."],["rman-restore-recover","After failover, review reinstating the former primary or rebuilding its standby. RMAN restore details remain on the home page."],["flashback-database","Flashback Database can permit the old primary to be reinstated after a role transition."],["flashback-unavailable-rca","When the old primary cannot be reinstated, assess rebuilding it as a standby."]],"patching":[["patch-quarterly-psu-spu","Check patch-specific standby-first eligibility and role-specific work, then verify transport and apply."],["patch-one-off","Confirm primary and standby eligibility for this specific interim patch."],["patch-rollback","Restore supported versions on the affected sites and verify shipping and apply in the correct direction."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main><footer><a href="./index.html">Return to Stand-Alone DB</a></footer>
+  <script type="application/json" id="data">[
+  {
+    "id": "dg-1",
+    "title": "Follow one commit to a physical standby",
+    "level": "Basic",
+    "setup": "Site A is the primary. Site B has a mounted physical standby with standby redo logs and real-time apply enabled. Transport is asynchronous.",
+    "steps": [
+      "Update a row at Site A and commit. The log writer persists the transaction’s redo in the primary online redo log.",
+      "Watch redo travel to Site B. The client can receive commit confirmation before that redo reaches Site B.",
+      "Follow the remote file server process (RFS) as it writes the incoming redo into a standby redo log.",
+      "Follow managed recovery (MRP0) as it coordinates applying the changes described by the redo to the standby datafiles."
+    ],
+    "actors": [
+      [
+        "app",
+        "a",
+        "al"
+      ],
+      [
+        "al",
+        "wan"
+      ],
+      [
+        "rfs",
+        "srl"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "The application saw a successful commit. What can you conclude about Site B?",
+    "answer": "With asynchronous transport, that confirmation establishes local redo durability. Remote receipt and standby apply can occur later.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ]
+    ],
+    "home": "insert-commit"
+  },
+  {
+    "id": "dg-2",
+    "title": "Compare asynchronous and synchronous commit",
+    "level": "Intermediate",
+    "setup": "Run the same transaction twice. The first run uses ASYNC. The second has a healthy, synchronized SYNC/AFFIRM standby in maximum availability mode.",
+    "steps": [
+      "Increase the simulated network delay and commit a row with ASYNC. Observe the client reply while the remote write is still pending.",
+      "Replay the commit with SYNC/AFFIRM. Wait for both the primary redo flush and the standby’s acknowledgment of its redo-log write.",
+      "Pause standby apply while transport stays healthy. Compare the client reply with the separate apply indicator."
+    ],
+    "actors": [
+      [
+        "app",
+        "al",
+        "wan"
+      ],
+      [
+        "al",
+        "srl",
+        "app"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Which standby event is on the commit path in the healthy SYNC/AFFIRM run?",
+    "answer": "The standby acknowledges durable receipt of the redo in its standby redo log. Applying that redo to standby datafiles is a separate event.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "commit-durability"
+  },
+  {
+    "id": "dg-3",
+    "title": "Compare the three protection modes",
+    "level": "Intermediate",
+    "setup": "A single synchronized standby is healthy. Repeat the loss of its transport link separately under each protection mode.",
+    "steps": [
+      "Under maximum performance with ASYNC, acknowledge local commits and track unsent redo.",
+      "Under maximum availability with SYNC/AFFIRM, trace the remote acknowledgment while healthy. After failure detection, follow continued primary operation and the interval of reduced protection.",
+      "Under maximum protection, observe the primary shut down when it cannot write to any qualifying synchronized standby."
+    ],
+    "actors": [
+      [
+        "app",
+        "al"
+      ],
+      [
+        "al",
+        "wan",
+        "srl"
+      ],
+      [
+        "a",
+        "wan"
+      ]
+    ],
+    "question": "Which mode keeps the primary running on loss of its only synchronized destination, then restores protection when it catches up?",
+    "answer": "Maximum availability. Maximum performance commits locally in this example. Maximum protection prioritizes the durability guarantee when the last synchronized destination is lost.",
+    "refs": [
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "commit-durability"
+  },
+  {
+    "id": "dg-4",
+    "title": "Read the current standby redo log as it fills",
+    "level": "Intermediate",
+    "setup": "The 11g physical standby is mounted in ARCHIVELOG mode and has standby redo logs. Compare SQL-managed archived-log apply and real-time apply.",
+    "steps": [
+      "Receive redo into the current standby redo log and observe archived-log apply waiting until that log is archived.",
+      "Replay with 11g real-time apply enabled. MRP0 can process the incoming redo as RFS fills the current standby redo log.",
+      "Compare the mounted standby with a separately illustrated read-only standby running apply. The latter supplies real-time query through the Active Data Guard option."
+    ],
+    "actors": [
+      [
+        "rfs",
+        "srl"
+      ],
+      [
+        "srl",
+        "mrp"
+      ],
+      [
+        "b",
+        "mrp"
+      ]
+    ],
+    "question": "Must users be able to query the standby for real-time apply to work?",
+    "answer": "A mounted physical standby can apply incoming redo. Read-only access while application of redo continues is the separately licensed Active Data Guard real-time query capability.",
+    "refs": [
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ],
+      [
+        "Data Guard configuration",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/config_dg.htm"
+      ]
+    ],
+    "home": "redo-log-switch"
+  },
+  {
+    "id": "dg-5",
+    "title": "Diagnose a redo gap after a network interruption",
+    "level": "Advanced",
+    "setup": "This example has one redo thread. The standby has applied sequence 41. Sequence 43 is present in the archive, but sequence 42 is missing.",
+    "steps": [
+      "Compare the received and applied sequence numbers and inspect the blocking range in V$ARCHIVE_GAP.",
+      "Restore connectivity in the simulation and follow automatic gap resolution as the missing sequence arrives.",
+      "Watch recovery process sequence 42 and then 43. Check for further blocking gaps and recheck lag against fresh timestamps."
+    ],
+    "actors": [
+      [
+        "rfs",
+        "mrp"
+      ],
+      [
+        "wan",
+        "rfs"
+      ],
+      [
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Why does receiving sequence 43 fail to advance recovery through sequence 43?",
+    "answer": "Physical recovery requires a continuous redo stream. The missing changes in sequence 42 must be available before recovery can proceed through 43.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Apply services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_apply.htm"
+      ]
+    ],
+    "home": "archive-destination-failure-rca"
+  },
+  {
+    "id": "dg-6",
+    "title": "Switch roles during planned maintenance",
+    "level": "Advanced",
+    "setup": "Both sites are healthy. The application uses a service configured for the primary role, and the physical standby is ready for a planned role exchange.",
+    "steps": [
+      "Check database roles and switchover readiness, and prepare the application for its planned reconnect.",
+      "Follow the role exchange while the final primary redo reaches the standby. Watch Site A become the physical standby and Site B become primary.",
+      "Reconnect the application to the primary-role service and issue a sample transaction on Site B.",
+      "Follow the new redo from B to A and verify that apply resumes at the former primary."
+    ],
+    "actors": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "al",
+        "wan",
+        "b"
+      ],
+      [
+        "app",
+        "svc",
+        "b"
+      ],
+      [
+        "bl",
+        "wan",
+        "as",
+        "af"
+      ]
+    ],
+    "question": "What demonstrates that the switchover has restored protection in the new direction?",
+    "answer": "Site B accepts the application transaction, and Site A receives and applies its redo as the new physical standby. A successful switchover exchanges roles without data loss.",
+    "refs": [
+      [
+        "Database role transitions",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/role_management.htm"
+      ],
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "dg-7",
+    "title": "Fail over after loss of the primary",
+    "level": "Advanced",
+    "setup": "The primary becomes unavailable while transport is asynchronous. The standby has received some redo that it has yet to apply.",
+    "steps": [
+      "Inspect the target’s last received and applied positions. Identify any primary redo that is still accessible for recovery.",
+      "Follow a complete failover in the simulation. Apply the available redo before the standby takes the primary role.",
+      "Reconnect the application and test a new transaction. Check whether the original test transaction survived using the recovered data.",
+      "Review the former primary’s recovery options. Reinstate it when Flashback Database prerequisites and sufficient history are available, or rebuild it as a standby."
+    ],
+    "actors": [
+      [
+        "a",
+        "wan",
+        "srl"
+      ],
+      [
+        "mrp",
+        "b"
+      ],
+      [
+        "app",
+        "b",
+        "bf"
+      ],
+      [
+        "br",
+        "a"
+      ]
+    ],
+    "question": "Which interval is at risk if the primary’s last redo cannot be recovered?",
+    "answer": "Changes whose redo never reached the standby and cannot be obtained elsewhere can be lost. Redo already received can still be applied during a complete failover.",
+    "refs": [
+      [
+        "Database role transitions",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/role_management.htm"
+      ],
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "dg-8",
+    "title": "Decide whether the fast-start failover observer should act",
+    "level": "Ultra-advanced",
+    "setup": "Broker fast-start failover is enabled with a separate observer, a synchronized eligible standby in maximum availability mode, and default observer behavior. The scenario tests connectivity failures.",
+    "steps": [
+      "Isolate the observer from the primary while the standby retains contact with the primary. Track the standby’s view of the primary.",
+      "Replay with the primary isolated from both observer and standby. Keep the observer connected to the target and advance the configured failure threshold.",
+      "Inspect the target’s readiness and synchronization state. Trace promotion only on the eligible branch of the scenario.",
+      "Restore the old primary and inspect whether broker can reinstate it as a standby. Confirm transport and apply in the new direction."
+    ],
+    "actors": [
+      [
+        "br",
+        "a",
+        "b"
+      ],
+      [
+        "br",
+        "b"
+      ],
+      [
+        "br",
+        "b"
+      ],
+      [
+        "br",
+        "wan",
+        "a"
+      ]
+    ],
+    "question": "Should one observer losing contact with a healthy primary initiate failover in this scenario?",
+    "answer": "No. With the default behavior and this connectivity-failure scenario, the standby’s continuing contact with the primary prevents promotion. Losing contact from both locations and satisfying the configured eligibility checks changes the decision.",
+    "refs": [
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ],
+      [
+        "Data protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "startup",
+    "title": "Startup sequence · restore transport and physical standby apply",
+    "level": "Basic",
+    "setup": "After planned maintenance both databases were cleanly shut down. The database roles are known. Site B is a physical standby with standby redo logs. This example uses mounted Redo Apply.",
+    "steps": [
+      "Verify database identity, existing roles, protection mode and broker ownership. If the policy needs a synchronized destination for primary availability, arrange receiver readiness before resuming writes.",
+      "Bring the physical standby to MOUNT and enable its intended apply state. A broker-managed site uses its broker policy. Confirm the receiving service is reachable.",
+      "Start the known primary through OPEN READ WRITE. Re-establish transport and check destination health. Opening the standby as primary would be a separate role transition.",
+      "Follow a new primary change to the standby logs. Confirm receipt and apply progress with fresh timestamps and the expected database roles."
+    ],
+    "actors": [
+      [
+        "a",
+        "b"
+      ],
+      [
+        "b",
+        "srl",
+        "mrp"
+      ],
+      [
+        "a",
+        "al",
+        "wan"
+      ],
+      [
+        "rfs",
+        "srl",
+        "mrp",
+        "bf"
+      ]
+    ],
+    "question": "Which evidence closes this startup?",
+    "options": [
+      "The primary listener responds",
+      "Both databases are read/write",
+      "The primary accepts writes and a new redo change is received and applied by the physical standby"
+    ],
+    "correct": 2,
+    "answer": "Database open state, redo destination health and fresh standby progress test the role-specific paths end to end.",
+    "refs": [
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ],
+      [
+        "Data Guard protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "graceful-shutdown",
+    "title": "Graceful shutdown · take a protected pair offline",
+    "level": "Intermediate",
+    "setup": "A planned full-site maintenance window has been approved for both members. Preserve the role assignment and record the last received and applied positions.",
+    "steps": [
+      "Quiesce application writes using the agreed service procedure. Check protection requirements and any fast-start failover policy before the coordinated outage.",
+      "Record final application redo and confirm receipt and apply through the agreed boundary while transport is available. Retain needed archives for any outstanding tail.",
+      "Shut the primary down consistently under the plan. Keeping a required synchronized destination available during this phase avoids an unintended protection-mode interaction.",
+      "Stop managed recovery through the mechanism that owns it, then consistently shut the standby. Verify each instance stopped and roles were not promoted. On restart verify fresh transport and apply."
+    ],
+    "actors": [
+      [
+        "app",
+        "svc",
+        "a"
+      ],
+      [
+        "al",
+        "wan",
+        "srl"
+      ],
+      [
+        "a",
+        "al"
+      ],
+      [
+        "mrp",
+        "b"
+      ]
+    ],
+    "question": "What is the evidence for the agreed pre-outage recovery point?",
+    "options": [
+      "A log sequence from the primary alone",
+      "Received and applied positions on the intended standby correlated with the recorded primary boundary",
+      "A stopped listener"
+    ],
+    "correct": 1,
+    "answer": "The evidence must cover the primary boundary and the standby’s actual progress. Preserve the tail needed for restart.",
+    "refs": [
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ],
+      [
+        "Data Guard protection modes",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/protection.htm"
+      ]
+    ],
+    "home": "shutdown-immediate"
+  },
+  {
+    "id": "patching",
+    "title": "Patching · evaluate standby-first eligibility",
+    "level": "Advanced",
+    "setup": "A single-instance primary protects a physical standby. The proposed 11.2 database-home patch may be a PSU or a one-off.",
+    "steps": [
+      "Inventory both homes, check release, platform, conflicts, recoverability and the exact patch README. Look specifically for Data Guard standby-first certification. A database patch-set upgrade uses a different procedure.",
+      "For a certified example, follow the documented standby maintenance steps and patch its binary home. Bring it back to its supported standby state. Observe the mixed-home interval allowed by the README.",
+      "Verify transport, redo apply and expected standby inventory. Assess rollback readiness or pause if verification fails before touching the primary.",
+      "Complete the documented primary phase and SQL work at the prescribed database and role. For an uncertified patch, use its documented coordinated procedure. Confirm binary levels, role, service and fresh apply on the pair."
+    ],
+    "actors": [
+      [
+        "a",
+        "b",
+        "br"
+      ],
+      [
+        "b",
+        "mrp"
+      ],
+      [
+        "wan",
+        "rfs",
+        "mrp"
+      ],
+      [
+        "a",
+        "al",
+        "wan"
+      ]
+    ],
+    "question": "Which property authorizes the temporary mismatch of primary and standby binary homes?",
+    "options": [
+      "The standby has little apply lag",
+      "Standby-first certification for this exact patch",
+      "Both machines use the same operating system"
+    ],
+    "correct": 1,
+    "answer": "Eligibility comes from the exact patch documentation. Successful transport proves connectivity but does not establish certification.",
+    "refs": [
+      [
+        "Reducing downtime for planned maintenance",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/schedule_outage.htm"
+      ],
+      [
+        "Managing physical standby databases",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/manage_ps.htm"
+      ]
+    ],
+    "home": "patch-quarterly-psu-spu"
+  }
+]</script>
+  <script>
+    const flows = JSON.parse(document.getElementById('data').textContent);
+    const select = document.getElementById('workflow');
+    const names = new Map([...document.querySelectorAll('.actor')].map(b => [b.dataset.actor, b.textContent]));
+    const el = id => document.getElementById(id);
+    let pos = 0;
+    function paint() {
+      const flow = flows[select.selectedIndex];
+      el('level').textContent = flow.level;
+      el('title').textContent = flow.title;
+      el('setup').textContent = flow.setup;
+      el('progress').textContent = 'Step ' + (pos + 1) + ' of ' + flow.steps.length;
+      el('step').textContent = flow.steps[pos];
+      el('focus').textContent = 'In focus · ' + flow.actors[pos].map(a => names.get(a)).join(' · ');
+      el('question').textContent = flow.question;
+      el('foundation').href = './index.html#lesson=' + flow.home;
+      el('foundation').textContent = 'Stand-Alone DB lesson · ' + flow.home.split('-').join(' ');
+      el('verdict').textContent = '';
+      el('decision').replaceChildren(...(flow.options || []).map((label, i) => {
+        const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+        button.addEventListener('click', () => { el('verdict').textContent = (i === flow.correct ? 'Correct. ' : 'Try again. ') + flow.answer; });
+        return button;
+      }));
+      el('answer').querySelector('p').textContent = flow.answer;
+      el('prev').disabled = pos === 0;
+      el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      for (const b of document.querySelectorAll('.actor')) b.setAttribute('aria-pressed', String(flow.actors[pos].includes(b.dataset.actor)));
+      el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
+    }
+    function readRoute() {
+      const requested = location.hash.slice(1);
+      select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
+      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+    }
+    select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
+    window.addEventListener('hashchange', readRoute);
+    el('next').addEventListener('click', () => {pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {if(pos>0) pos--; el('answer').open=false;paint();});
+    for (const b of document.querySelectorAll('.actor')) b.addEventListener('click', () => {
+      const related=flows.filter(flow=>flow.actors.some(step=>step.includes(b.dataset.actor)));
+      el('inspect').textContent=b.textContent+' appears in '+related.map(flow=>flow.title).join(' · ')+'.';
+    });
+    readRoute();
+  </script>
+</body></html>

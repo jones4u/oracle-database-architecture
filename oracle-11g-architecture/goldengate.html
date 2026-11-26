@@ -3,11 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
+<meta name="copyright" content="Designer : Cyril Jones S | Version : v3 | Updated : 26-Nov-2026">
 <title>Oracle GoldenGate · Oracle 11g Architecture</title>
 <style>
 :root{color-scheme:dark;--bg:#10141b;--panel:#191f28;--line:#374452;--text:#edf3fa;--muted:#b2bfcd;--accent:#ffd166}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 "Segoe UI",Arial,sans-serif}a{color:var(--accent)}button,a,summary{touch-action:manipulation}button,summary{cursor:pointer}button{font:inherit}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:3px}header,main,footer{max-width:1180px;margin:auto;padding:0 clamp(16px,3vw,38px)}header{padding-top:22px}nav{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;padding-bottom:14px;border-bottom:1px solid var(--line)}nav a{display:inline-block;text-decoration:none;border-radius:6px;padding:5px 9px;color:var(--muted);font-size:.92rem}nav a:first-child{color:var(--text);font-weight:650}nav a[aria-current]{background:var(--accent);color:#10151b;font-weight:650}nav a:hover,.menu a:hover{background:#263442;color:#fff}h1,h2,h3,p{margin:0}h1{font-size:clamp(1.9rem,4vw,3rem);line-height:1.12;margin:25px 0 8px;letter-spacing:-.027em}h2{font-size:1.22rem}h3{font-size:1.12rem}.sub{font-size:1.08rem}.scope,.muted,footer{color:var(--muted)}.scope{font-size:.92rem;margin-top:3px}.layout{display:grid;grid-template-columns:minmax(210px,275px) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:start;margin:25px auto}.menu a{display:block;color:var(--text);text-decoration:none;line-height:1.35;padding:11px 12px;border:1px solid var(--line);border-radius:7px;margin-top:8px}.menu small{display:block;color:var(--muted);margin-bottom:3px}.menu a[aria-current]{border-color:var(--accent);background:#222c34}.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(14px,2.2vw,24px)}.setup{margin:6px 0 14px;color:var(--muted)}.map{list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0 15px}.map li{padding:8px 9px;background:#10151b;border:1px solid var(--line);border-radius:6px;line-height:1.32}.map strong,.map small{display:block}.map small{margin-top:3px;color:var(--muted)}.map .active{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}.map .active strong,.state{color:var(--accent)}.state{font-size:.87rem;font-weight:650}.frame{border-top:1px solid var(--line);padding-top:13px;min-height:109px}.frame p{margin-top:4px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tools button{padding:6px 13px;color:var(--text);background:#28323e;border:1px solid var(--line);border-radius:6px}button.primary{background:var(--accent);color:#111820;font-weight:650}.tools button:disabled{opacity:.48;cursor:default}.check{border-top:1px solid var(--line);margin:17px 0 0;padding-top:13px}.check p{margin:4px 0}.check summary{color:var(--accent);font-weight:600}.refs{margin:17px 0 0}.refs ul{margin:5px 0 0;padding-left:20px}.refs a{font-size:.92rem}footer{padding-bottom:24px;font-size:.88rem}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:6px;background:#162532;padding:7px;z-index:9}[hidden]{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.menu h2{grid-column:1/-1}.menu a{margin:0;font-size:.93rem}.map{grid-template-columns:repeat(2,minmax(0,1fr))}.frame{min-height:0}}@media(max-width:390px){.map{grid-template-columns:1fr 1fr}.menu a{padding:8px}.tools button{padding:6px 11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.layout{grid-template-columns:minmax(178px,224px) minmax(0,1fr);gap:clamp(12px,2vw,23px)}
+.arch-stage{margin:14px 0 12px}.arch-head,.arch-legend,.arch-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px}.arch-head{justify-content:space-between}.arch-head h3{font-size:1.04rem}.arch-legend{font-size:.81rem;color:#beccd5;margin:6px 0 8px}.arch-legend span{display:inline-flex;align-items:center;gap:5px}
+.arch-legend i{width:21px;height:0;border-top:2px solid #8af3e4}.arch-legend .control-key{border-color:#ffcf81;border-top-style:dashed}.arch-legend .blocked-key{border-color:#f39b89;border-top-style:dotted}
+.arch-scroll{background:#0c131b;border:1px solid #39525e;border-radius:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-color:#57717c #14222e}
+.architecture-svg{display:block;width:100%;min-width:650px;height:auto;font-family:"Segoe UI",Arial,sans-serif}
+.arch-scroll.fit .architecture-svg{min-width:0}.arch-scroll:focus-visible,.arch-node:focus-visible{outline:2px solid #ffcf81;outline-offset:-2px}
+.region{fill:#111e28;stroke:#39505d}.region-name{fill:#ebf1f3;font-size:15px;font-weight:700}.region-desc{fill:#a7bdc7;font-size:11px}
+.arch-edge{fill:none;stroke:#53727a;stroke-width:1.5;stroke-linejoin:round;opacity:.77}.arch-edge[data-kind=command],.arch-edge[data-kind=state]{stroke-dasharray:4 3}
+.arch-edge.is-active{stroke:#8af3e4;stroke-width:3;opacity:1}.arch-edge.is-active[data-kind=command],.arch-edge.is-active[data-kind=state]{stroke:#ffcf81}
+.arch-edge.is-blocked{stroke:#f39b89;stroke-width:3;stroke-dasharray:2 5;opacity:1}.arch-stop-mark{fill:#ffac9d;stroke:#0c131b;stroke-width:5;paint-order:stroke;font-weight:800;font-size:20px}
+.arch-node{cursor:pointer}.node-face{fill:#1b2c36;stroke:#6a8590;stroke-width:1.3}.arch-node:hover .node-face,.arch-node:focus .node-face{stroke:white;stroke-width:2.6}.arch-node.is-active .node-face{stroke:#ffcf81;stroke-width:2.4;fill:#383022}.arch-node[data-inspected] .node-face{stroke:#b7e5ff;stroke-width:3}
+.storage-rim{fill:none;stroke:#6a8590;stroke-width:.85}.node-title{fill:#f5f6f1;font-size:14px;font-weight:700}.node-state{fill:#bedaed;font-size:11.2px}.arch-node.is-active .node-state{fill:#ffe1a9}
+.arch-focus{margin:8px 0;color:#a5e3dc;font-size:.91rem}.arch-inspector{margin:7px 0;padding:8px 10px;border-left:3px solid #6a8895;background:#14202a;font-size:.9rem;color:#cbd9df}.arch-inspector strong{color:#f2f4f1}
+.arch-toolbar{margin:9px 0}.tools select,.arch-head button{font:inherit;font-size:.91rem;color:var(--text);background:#28323e;border:1px solid #556573;border-radius:6px;padding:6px 8px}.arch-toolbar label{font-size:.88rem;color:#cbd9df;display:inline-flex;align-items:center;gap:5px}.arch-toolbar{border-bottom:1px solid #374452;padding-bottom:10px}.layout>.box,.layout>.menu{min-width:0}.layout>#homeFoundations{grid-column:1/-1}
+@media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}.arch-head{align-items:start}.arch-scroll{touch-action:pan-x pan-y}.arch-toolbar{gap:6px}.arch-toolbar button{padding:6px 9px}}
+@media(min-width:1150px){.fit-toggle{display:none}}
+@media print{.arch-scroll .architecture-svg{min-width:0}.arch-scroll{overflow:visible}.arch-toolbar,.fit-toggle{display:none}}
 </style>
 </head>
 <body>
@@ -16,21 +34,85 @@
 <a href="./dataguard.html">Data Guard</a>
 <a href="./rac-dataguard.html">RAC + Data Guard</a>
 <a href="./goldengate.html" aria-current="page">GoldenGate</a>
-<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · One-way replication · Trainer v2</p></header>
+<a href="./oem.html">Enterprise Manager</a></nav><h1>Oracle GoldenGate</h1><p class="sub">Follow a row change through classic capture and delivery between two Oracle databases.</p><p class="scope">GoldenGate 11g Release 2 (11.2.1) · Classic Extract and classic Replicat · Oracle Database 11g R2 (11.2.0.4) source and target · Trainer v3</p></header>
 <main class="layout"><aside class="menu" aria-label="Workflows"><h2>Workflows</h2><a href="#trace-a-commit" data-lesson="trace-a-commit"><small>Basic</small>Follow a committed row</a>
 <a href="#network-interruption" data-lesson="network-interruption"><small>Intermediate</small>Resume after a network interruption</a>
 <a href="#replicat-recovery" data-lesson="replicat-recovery"><small>Advanced</small>Recover a stopped Replicat</a>
 <a href="#isolate-lag" data-lesson="isolate-lag"><small>Ultra-advanced</small>Find where lag accumulated</a>
 <a href="#gg-startup" data-lesson="gg-startup"><small>Basic</small>Start a classic GoldenGate replication path</a>
 <a href="#gg-graceful-shutdown" data-lesson="gg-graceful-shutdown"><small>Intermediate</small>Drain and gracefully stop GoldenGate</a>
-<a href="#gg-patching" data-lesson="gg-patching"><small>Advanced</small>Patch GoldenGate and validate delivery</a></aside><section id="demo" class="box" aria-label="Manual demo" tabindex="-1"><h2 id="flow-title"></h2><p class="setup" id="setup"></p><h3>Architecture</h3><p class="muted">Source redo → Extract → local trail → pump → Collector → remote trail → Replicat → target rows.</p><ul class="map" id="architecture" aria-label="Components highlighted in the current step"><li data-node="manager"><strong>Managers</strong><small>Manage classic groups on each installation</small></li><li data-node="source"><strong>Source 11g database</strong><small>Redo records for changes to mapped tables</small></li>
-<li data-node="extract"><strong>Primary Extract</strong><small>Captures changes and tracks transaction boundaries</small></li>
-<li data-node="trail"><strong>Local trail</strong><small>Durable capture output on the source host</small></li>
-<li data-node="pump"><strong>Data pump</strong><small>Reads the local trail and sends records</small></li>
-<li data-node="collector"><strong>Target Collector</strong><small>Receives records and writes the remote trail</small></li>
-<li data-node="remote"><strong>Remote trail</strong><small>Ordered input for target delivery</small></li>
-<li data-node="replicat"><strong>Replicat</strong><small>Maps and applies trail transactions</small></li>
-<li data-node="target"><strong>Target database</strong><small>Commits applied changes and checkpoints</small></li></ul><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools"><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
+<a href="#gg-patching" data-lesson="gg-patching"><small>Advanced</small>Patch GoldenGate and validate delivery</a></aside><section id="demo" class="box" aria-label="Manual demo" tabindex="-1"><h2 id="flow-title"></h2><p class="setup" id="setup"></p><section class="arch-stage" aria-labelledby="arch-heading"><div class="arch-head"><h3 id="arch-heading">Classic capture and delivery</h3><button class="fit-toggle" id="fit" type="button" aria-pressed="false">Fit diagram</button></div><div class="arch-legend" aria-label="Diagram key"><span><i></i>Data path</span><span><i class="control-key"></i>Control or checkpoint</span><span><i class="blocked-key"></i>Interrupted path ×</span></div><div class="arch-scroll" id="arch-scroll" tabindex="0" aria-label="Scrollable architecture diagram"><svg xmlns="http://www.w3.org/2000/svg" class="architecture-svg" id="architecture" data-architecture-diagram="" viewBox="0 0 830 497" role="group" aria-labelledby="arch-title arch-description">
+<title id="arch-title">Classic capture and delivery</title><desc id="arch-description">One-way GoldenGate replication between separate Oracle databases. Arrows trace logical changes from source redo to the target; Manager and checkpoint paths show process control and restart state. Select a component for its role. Arrowheads indicate direction.</desc>
+<defs>
+<marker id="arrow-idle" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#62828b"/></marker>
+<marker id="arrow-on" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#8af3e4"/></marker>
+<marker id="arrow-control" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#ffcf81"/></marker>
+<marker id="arrow-blocked" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#f39b89"/></marker>
+</defs>
+<rect class="region" x="8" y="8" width="382" height="480" rx="9"/>
+<text class="region-name" x="20" y="30">Source host</text>
+<text class="region-desc" x="20" y="46">Oracle 11g R2 and GoldenGate 11.2.1</text>
+<rect class="region" x="440" y="8" width="382" height="480" rx="9"/>
+<text class="region-name" x="452" y="30">Target host</text>
+<text class="region-desc" x="452" y="46">Oracle 11g R2 and GoldenGate 11.2.1</text>
+<path id="link-redo-write" class="arch-edge" data-edge="redo-write" data-from="source" data-to="redo" data-kind="data" d="M185 100 H215" marker-end="url(#arrow-idle)"><title>redo write</title></path>
+<path id="link-capture" class="arch-edge" data-edge="capture" data-from="redo" data-to="extract" data-kind="data" d="M290 128 V172" marker-end="url(#arrow-idle)"><title>capture</title></path>
+<path id="link-write-local" class="arch-edge" data-edge="write-local" data-from="extract" data-to="trail" data-kind="data" d="M290 228 V275" marker-end="url(#arrow-idle)"><title>write local</title></path>
+<path id="link-read-local" class="arch-edge" data-edge="read-local" data-from="trail" data-to="pump" data-kind="data" d="M290 331 V380" marker-end="url(#arrow-idle)"><title>read local</title></path>
+<path id="link-send" class="arch-edge" data-edge="send" data-from="pump" data-to="collector" data-kind="data" d="M365 408 H467" marker-end="url(#arrow-idle)"><title>send</title></path>
+<path id="link-receive" class="arch-edge" data-edge="receive" data-from="collector" data-to="remote" data-kind="data" d="M542 380 V331" marker-end="url(#arrow-idle)"><title>receive</title></path>
+<path id="link-read-remote" class="arch-edge" data-edge="read-remote" data-from="remote" data-to="replicat" data-kind="data" d="M542 275 V228" marker-end="url(#arrow-idle)"><title>read remote</title></path>
+<path id="link-apply" class="arch-edge" data-edge="apply" data-from="replicat" data-to="target" data-kind="data" d="M542 172 V128" marker-end="url(#arrow-idle)"><title>apply</title></path>
+<path id="link-txn-cp" class="arch-edge" data-edge="txn-cp" data-from="target" data-to="cktab" data-kind="state" d="M617 100 H647" marker-end="url(#arrow-idle)"><title>txn cp</title></path>
+<path id="link-rep-cp" class="arch-edge" data-edge="rep-cp" data-from="replicat" data-to="repck" data-kind="state" d="M617 200 H647" marker-end="url(#arrow-idle)"><title>rep cp</title></path>
+<path id="link-ext-cp" class="arch-edge" data-edge="ext-cp" data-from="extract" data-to="capck" data-kind="state" d="M215 213 H199 V303 H185" marker-end="url(#arrow-idle)"><title>ext cp</title></path>
+<path id="link-pump-cp" class="arch-edge" data-edge="pump-cp" data-from="pump" data-to="capck" data-kind="state" d="M215 408 H110 V331" marker-end="url(#arrow-idle)"><title>pump cp</title></path>
+<path id="link-src-mgr" class="arch-edge" data-edge="src-mgr" data-from="manager" data-to="extract" data-kind="command" d="M185 200 H215" marker-end="url(#arrow-idle)"><title>src mgr</title></path>
+<path id="link-start-coll" class="arch-edge" data-edge="start-coll" data-from="mgrT" data-to="collector" data-kind="command" d="M647 408 H617" marker-end="url(#arrow-idle)"><title>start coll</title></path>
+<g id="packets" aria-hidden="true"></g>
+<g class="arch-node" data-node="source" role="button" tabindex="0" transform="translate(110 100)" aria-label="Source database: mapped transaction"><title>Application sessions execute DML against mapped source tables. Supplemental logging supplies additional column information required for capture. The source client receives its own database commit acknowledgment.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Source database</text><text class="node-state" text-anchor="middle" y="20">mapped transaction</text></g>
+<g class="arch-node" data-node="redo" role="button" tabindex="0" transform="translate(290 100)" aria-label="Oracle redo: online / archived"><title>Oracle records transaction changes and their boundaries as redo. Classic Extract reads the needed online or archived redo for this capture configuration.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Oracle redo</text><text class="node-state" text-anchor="middle" y="20">online / archived</text></g>
+<g class="arch-node" data-node="manager" role="button" tabindex="0" transform="translate(110 200)" aria-label="Source Manager: group supervision"><title>One Manager runs per GoldenGate installation in this example. GGSCI sends administrative requests. Manager can start or restart configured groups and manage trail retention.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Source Manager</text><text class="node-state" text-anchor="middle" y="14">group supervision</text></g>
+<g class="arch-node" data-node="extract" role="button" tabindex="0" transform="translate(290 200)" aria-label="Classic Extract: redo capture"><title>Primary Extract reads source redo, maintains transaction context, and writes eligible committed changes to its local GoldenGate trail.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Classic Extract</text><text class="node-state" text-anchor="middle" y="14">redo capture</text></g>
+<g class="arch-node" data-node="capck" role="button" tabindex="0" transform="translate(110 303)" aria-label="Checkpoints: capture / pump"><title>Extract and pump keep checkpoint files for their read and write positions. The retained redo and trail files must cover the required restart positions.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Checkpoints</text><text class="node-state" text-anchor="middle" y="20">capture / pump</text></g>
+<g class="arch-node" data-node="trail" role="button" tabindex="0" transform="translate(290 303)" aria-label="Local trail: trail files"><title>Local trail files decouple capture from transport. The pump reads the file sequence and relative byte positions produced by the primary Extract.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Local trail</text><text class="node-state" text-anchor="middle" y="20">trail files</text></g>
+<g class="arch-node" data-node="pump" role="button" tabindex="0" transform="translate(290 408)" aria-label="Data pump: secondary Extract"><title>This secondary Extract reads the local trail and sends records over TCP/IP to the target Collector. The source trail can accumulate during a network outage.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Data pump</text><text class="node-state" text-anchor="middle" y="14">secondary Extract</text></g>
+<g class="arch-node" data-node="target" role="button" tabindex="0" transform="translate(542 100)" aria-label="Target database: mapped transaction"><title>Classic Replicat executes mapped operations on the target database. A committed row becomes visible to a subsequent target query. Source and target commit at different times.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Target database</text><text class="node-state" text-anchor="middle" y="20">mapped transaction</text></g>
+<g class="arch-node" data-node="cktab" role="button" tabindex="0" transform="translate(722 100)" aria-label="Checkpoint table: target database"><title>This example uses a target checkpoint table. Replicat can record its checkpoint as part of the target transaction so the database commit also preserves the delivery boundary.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Checkpoint table</text><text class="node-state" text-anchor="middle" y="20">target database</text></g>
+<g class="arch-node" data-node="replicat" role="button" tabindex="0" transform="translate(542 200)" aria-label="Classic Replicat: SQL delivery"><title>Classic Replicat reads ordered transactions from the remote trail, maps records to the target schema, and applies them in a target database session.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Classic Replicat</text><text class="node-state" text-anchor="middle" y="14">SQL delivery</text></g>
+<g class="arch-node" data-node="repck" role="button" tabindex="0" transform="translate(722 200)" aria-label="Checkpoint file: Replicat group"><title>Replicat uses a local checkpoint file. In this walkthrough the configured target checkpoint table provides transactional coordination for recovery.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Checkpoint file</text><text class="node-state" text-anchor="middle" y="20">Replicat group</text></g>
+<g class="arch-node" data-node="remote" role="button" tabindex="0" transform="translate(542 303)" aria-label="Remote trail: trail files"><title>The target Collector writes incoming trail records here. Replicat can continue to drain retained trail data while the source is temporarily unreachable.</title>
+<path class="node-face" d="M-75 -19 C-75 -32 75 -32 75 -19 L75 17 C75 32 -75 32 -75 17 Z"/><path class="storage-rim" d="M-74 -19 C-70 -8 70 -8 74 -19"/>
+<text class="node-title" text-anchor="middle" y="4">Remote trail</text><text class="node-state" text-anchor="middle" y="20">trail files</text></g>
+<g class="arch-node" data-node="collector" role="button" tabindex="0" transform="translate(542 408)" aria-label="Collector: network receiver"><title>The target Manager starts a dynamic Collector for the incoming pump connection in this topology. Collector receives the data stream and writes the target trail.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Collector</text><text class="node-state" text-anchor="middle" y="14">network receiver</text></g>
+<g class="arch-node" data-node="mgrT" role="button" tabindex="0" transform="translate(722 408)" aria-label="Target Manager: Collector startup"><title>Target Manager listens for connection requests and starts the dynamic Collector. Once established, the pump sends records to Collector.</title>
+<rect class="node-face" x="-75" y="-28" width="150" height="56" rx="7"/>
+<text class="node-title" text-anchor="middle" y="-2">Target Manager</text><text class="node-state" text-anchor="middle" y="14">Collector startup</text></g>
+</svg></div><p class="arch-focus" id="arch-focus"></p><p class="arch-inspector" aria-live="polite"><strong id="component-title"></strong><span id="component-detail"></span></p></section><div class="frame" aria-live="polite" aria-atomic="true"><span id="progress" class="state"></span><h3 id="step-title"></h3><p id="explain"></p></div><div class="tools arch-toolbar"><button id="play" data-arch-play type="button" aria-pressed="false">Play</button><label>Speed <select id="speed" data-arch-speed><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><button id="previous" type="button">Previous</button><button id="next" type="button" class="primary">Next step</button><button id="reset" type="button">Restart</button></div><section id="checkpoint" class="check" hidden><h3>Checkpoint</h3><p id="question"></p><details id="answer"><summary>Suggested answer</summary><p></p></details></section><div class="refs"><h3>Oracle references</h3><ul id="refs"></ul></div><noscript><p>Enable JavaScript in your browser to run the interactive walkthroughs.</p></noscript></section><!-- authored-home-crosslinks -->
 <details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
 <script>(function(){
 const related={"network-interruption":[["connection-failure-rca","Distinguish a broken pump-to-target trail connection from an application login failure."]],"trace-a-commit":[["insert-commit","Follow a committed source row through capture, trail and target apply."],["update-commit","Trace committed DML into the trail and then into a target transaction."],["commit-durability","Distinguish source commit success from later completion of target apply."]],"gg-startup":[["instance-startup","After the database is ready, start capture, pump and apply from their known positions."]],"gg-graceful-shutdown":[["shutdown-normal","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-transactional","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."],["shutdown-immediate","Coordinate database maintenance with the Extract, pump and Replicat checkpoints."]],"replicat-recovery":[["shutdown-abort","Use a stopped Replicat's checkpoint to understand process restart, distinct from database instance recovery."],["crash-recovery","Separate the target database's crash recovery from restart of the trail consumer."]],"isolate-lag":[["redo-commit-latency","Separate source commit latency from time subsequently spent in capture, pump or apply."],["performance-incident-rca","Compare positions over time to find the pipeline stage accumulating delay."]],"gg-patching":[["patch-quarterly-psu-spu","Check capture and apply compatibility and record process positions before database or GoldenGate maintenance."],["patch-one-off","Check capture and apply compatibility for the exact interim database or GoldenGate patch."],["patch-rollback","Check process compatibility and resume only from verified checkpoints after maintenance."]]};
@@ -45,6 +127,785 @@ window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener(
 <!-- /authored-home-crosslinks -->
 </main>
 <footer><p>Related Stand-Alone DB lessons: <a href="./index.html#lesson=instance-startup">Single-instance startup</a> · <a href="./index.html#lesson=shutdown-immediate">Graceful database shutdown</a> · <a href="./index.html#lesson=patch-quarterly-psu-spu">Database patching and verification</a> · <a href="./index.html#lesson=insert-commit">Source transaction commit</a></p><a href="./index.html">Return to Stand-Alone DB</a></footer>
+<script type="application/json" id="architecture-model">{
+  "nodes": [
+    {
+      "id": "source",
+      "x": 110,
+      "y": 100,
+      "label": "Source database",
+      "sub": "mapped transaction",
+      "detail": "Application sessions execute DML against mapped source tables. Supplemental logging supplies additional column information required for capture. The source client receives its own database commit acknowledgment.",
+      "kind": "db"
+    },
+    {
+      "id": "redo",
+      "x": 290,
+      "y": 100,
+      "label": "Oracle redo",
+      "sub": "online / archived",
+      "detail": "Oracle records transaction changes and their boundaries as redo. Classic Extract reads the needed online or archived redo for this capture configuration.",
+      "kind": "disk"
+    },
+    {
+      "id": "manager",
+      "x": 110,
+      "y": 200,
+      "label": "Source Manager",
+      "sub": "group supervision",
+      "detail": "One Manager runs per GoldenGate installation in this example. GGSCI sends administrative requests. Manager can start or restart configured groups and manage trail retention.",
+      "kind": "process"
+    },
+    {
+      "id": "extract",
+      "x": 290,
+      "y": 200,
+      "label": "Classic Extract",
+      "sub": "redo capture",
+      "detail": "Primary Extract reads source redo, maintains transaction context, and writes eligible committed changes to its local GoldenGate trail.",
+      "kind": "process"
+    },
+    {
+      "id": "capck",
+      "x": 110,
+      "y": 303,
+      "label": "Checkpoints",
+      "sub": "capture / pump",
+      "detail": "Extract and pump keep checkpoint files for their read and write positions. The retained redo and trail files must cover the required restart positions.",
+      "kind": "disk"
+    },
+    {
+      "id": "trail",
+      "x": 290,
+      "y": 303,
+      "label": "Local trail",
+      "sub": "trail files",
+      "detail": "Local trail files decouple capture from transport. The pump reads the file sequence and relative byte positions produced by the primary Extract.",
+      "kind": "disk"
+    },
+    {
+      "id": "pump",
+      "x": 290,
+      "y": 408,
+      "label": "Data pump",
+      "sub": "secondary Extract",
+      "detail": "This secondary Extract reads the local trail and sends records over TCP/IP to the target Collector. The source trail can accumulate during a network outage.",
+      "kind": "process"
+    },
+    {
+      "id": "target",
+      "x": 542,
+      "y": 100,
+      "label": "Target database",
+      "sub": "mapped transaction",
+      "detail": "Classic Replicat executes mapped operations on the target database. A committed row becomes visible to a subsequent target query. Source and target commit at different times.",
+      "kind": "db"
+    },
+    {
+      "id": "cktab",
+      "x": 722,
+      "y": 100,
+      "label": "Checkpoint table",
+      "sub": "target database",
+      "detail": "This example uses a target checkpoint table. Replicat can record its checkpoint as part of the target transaction so the database commit also preserves the delivery boundary.",
+      "kind": "disk"
+    },
+    {
+      "id": "replicat",
+      "x": 542,
+      "y": 200,
+      "label": "Classic Replicat",
+      "sub": "SQL delivery",
+      "detail": "Classic Replicat reads ordered transactions from the remote trail, maps records to the target schema, and applies them in a target database session.",
+      "kind": "process"
+    },
+    {
+      "id": "repck",
+      "x": 722,
+      "y": 200,
+      "label": "Checkpoint file",
+      "sub": "Replicat group",
+      "detail": "Replicat uses a local checkpoint file. In this walkthrough the configured target checkpoint table provides transactional coordination for recovery.",
+      "kind": "disk"
+    },
+    {
+      "id": "remote",
+      "x": 542,
+      "y": 303,
+      "label": "Remote trail",
+      "sub": "trail files",
+      "detail": "The target Collector writes incoming trail records here. Replicat can continue to drain retained trail data while the source is temporarily unreachable.",
+      "kind": "disk"
+    },
+    {
+      "id": "collector",
+      "x": 542,
+      "y": 408,
+      "label": "Collector",
+      "sub": "network receiver",
+      "detail": "The target Manager starts a dynamic Collector for the incoming pump connection in this topology. Collector receives the data stream and writes the target trail.",
+      "kind": "process"
+    },
+    {
+      "id": "mgrT",
+      "x": 722,
+      "y": 408,
+      "label": "Target Manager",
+      "sub": "Collector startup",
+      "detail": "Target Manager listens for connection requests and starts the dynamic Collector. Once established, the pump sends records to Collector.",
+      "kind": "process"
+    }
+  ],
+  "frames": {
+    "trace-a-commit": [
+      {
+        "nodes": [
+          "source",
+          "redo"
+        ],
+        "edges": [
+          "redo-write"
+        ],
+        "label": "Source commit writes redo.",
+        "states": {
+          "source": "Committed"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "redo",
+          "extract"
+        ],
+        "edges": [
+          "capture"
+        ],
+        "label": "Classic Extract reads the transaction and its commit.",
+        "states": {
+          "extract": "Commit seen"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "extract",
+          "trail"
+        ],
+        "edges": [
+          "write-local"
+        ],
+        "label": "Extract writes the eligible change to the local trail.",
+        "states": {
+          "trail": "Written"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "trail",
+          "pump",
+          "collector"
+        ],
+        "edges": [
+          "read-local",
+          "send"
+        ],
+        "label": "The pump reads the trail and sends records across TCP/IP.",
+        "states": {
+          "pump": "Sending"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "collector",
+          "remote"
+        ],
+        "edges": [
+          "receive"
+        ],
+        "label": "Collector appends the received records to the target trail.",
+        "states": {
+          "remote": "Written"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "read-remote",
+          "apply"
+        ],
+        "label": "Replicat reads the trail and issues the mapped update.",
+        "states": {
+          "replicat": "Applying"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "target",
+          "cktab"
+        ],
+        "edges": [
+          "txn-cp"
+        ],
+        "label": "The target transaction commits, including its configured checkpoint.",
+        "states": {
+          "target": "Committed",
+          "cktab": "Durable"
+        },
+        "blocked": []
+      }
+    ],
+    "network-interruption": [
+      {
+        "nodes": [
+          "extract",
+          "trail",
+          "pump",
+          "collector"
+        ],
+        "edges": [
+          "write-local"
+        ],
+        "label": "Capture writes locally while the network path is unavailable.",
+        "states": {
+          "trail": "Accumulating",
+          "pump": "Disconnected"
+        },
+        "blocked": [
+          "send"
+        ]
+      },
+      {
+        "nodes": [
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "read-remote",
+          "apply"
+        ],
+        "label": "Replicat drains previously received transactions.",
+        "states": {
+          "remote": "Draining"
+        },
+        "blocked": [
+          "send"
+        ]
+      },
+      {
+        "nodes": [
+          "capck",
+          "trail",
+          "pump",
+          "collector",
+          "mgrT"
+        ],
+        "edges": [
+          "read-local",
+          "start-coll",
+          "send"
+        ],
+        "label": "The pump reconnects and resumes from its saved trail position.",
+        "states": {
+          "pump": "Connected"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "collector",
+          "remote"
+        ],
+        "edges": [
+          "receive"
+        ],
+        "label": "Collector writes arriving records into the remote trail.",
+        "states": {
+          "remote": "Advancing"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "read-remote",
+          "apply"
+        ],
+        "label": "Replicat commits the delayed order at the target.",
+        "states": {
+          "target": "Reconciled"
+        },
+        "blocked": []
+      }
+    ],
+    "replicat-recovery": [
+      {
+        "nodes": [
+          "collector",
+          "remote",
+          "replicat",
+          "repck"
+        ],
+        "edges": [
+          "receive"
+        ],
+        "label": "Remote trail input accumulates behind the stopped delivery group.",
+        "states": {
+          "remote": "Growing",
+          "replicat": "Stopped"
+        },
+        "blocked": [
+          "apply"
+        ]
+      },
+      {
+        "nodes": [
+          "replicat",
+          "repck",
+          "target"
+        ],
+        "edges": [],
+        "label": "Inspect the group report, saved position and missing target row.",
+        "states": {
+          "replicat": "Investigating"
+        },
+        "blocked": [
+          "apply"
+        ]
+      },
+      {
+        "nodes": [
+          "target",
+          "replicat"
+        ],
+        "edges": [],
+        "label": "Repair the target baseline through the approved database procedure.",
+        "states": {
+          "target": "Repaired",
+          "replicat": "Stopped"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "repck",
+          "remote",
+          "replicat",
+          "target",
+          "cktab"
+        ],
+        "edges": [
+          "read-remote",
+          "apply",
+          "txn-cp"
+        ],
+        "label": "Restart from the checkpoint and commit the previously failing operation.",
+        "states": {
+          "replicat": "Resumed"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "source",
+          "target"
+        ],
+        "edges": [],
+        "label": "Compare affected source and target rows and verify a later target commit.",
+        "states": {
+          "target": "Verified"
+        },
+        "blocked": []
+      }
+    ],
+    "isolate-lag": [
+      {
+        "nodes": [
+          "redo",
+          "extract",
+          "trail"
+        ],
+        "edges": [
+          "capture",
+          "write-local"
+        ],
+        "label": "Capture reads newer redo and advances the local trail.",
+        "states": {
+          "extract": "Advancing"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "trail",
+          "pump",
+          "collector",
+          "remote"
+        ],
+        "edges": [
+          "read-local",
+          "send",
+          "receive"
+        ],
+        "label": "Check movement through the transport stages independently.",
+        "states": {
+          "remote": "Advancing"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "replicat",
+          "target",
+          "repck"
+        ],
+        "edges": [],
+        "label": "A target row lock holds up apply while the checkpoint remains stationary.",
+        "states": {
+          "replicat": "Waiting",
+          "target": "Row lock"
+        },
+        "blocked": [
+          "apply"
+        ]
+      },
+      {
+        "nodes": [
+          "replicat",
+          "target",
+          "cktab"
+        ],
+        "edges": [
+          "apply",
+          "txn-cp"
+        ],
+        "label": "After the blocker releases, delivery commits and its checkpoint advances.",
+        "states": {
+          "target": "Committed"
+        },
+        "blocked": []
+      }
+    ],
+    "gg-startup": [
+      {
+        "nodes": [
+          "source",
+          "redo",
+          "target",
+          "remote",
+          "capck",
+          "repck"
+        ],
+        "edges": [],
+        "label": "Check both databases and retained inputs at the saved positions.",
+        "states": {
+          "source": "Open",
+          "target": "Open"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "manager",
+          "mgrT"
+        ],
+        "edges": [],
+        "label": "Start the two Managers and verify them independently.",
+        "states": {
+          "manager": "Running",
+          "mgrT": "Running"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "manager",
+          "redo",
+          "extract",
+          "trail"
+        ],
+        "edges": [
+          "capture",
+          "write-local"
+        ],
+        "label": "Restore primary capture and confirm fresh local-trail output.",
+        "states": {
+          "extract": "Running"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "trail",
+          "pump",
+          "mgrT",
+          "collector",
+          "remote"
+        ],
+        "edges": [
+          "read-local",
+          "start-coll",
+          "send",
+          "receive"
+        ],
+        "label": "The pump connects to the target; Collector receives the next records.",
+        "states": {
+          "pump": "Running"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "remote",
+          "replicat",
+          "repck"
+        ],
+        "edges": [
+          "read-remote"
+        ],
+        "label": "Replicat resumes reading the retained trail at its verified position.",
+        "states": {
+          "replicat": "Running"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "source",
+          "redo",
+          "extract",
+          "trail",
+          "pump",
+          "collector",
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "redo-write",
+          "capture",
+          "write-local",
+          "read-local",
+          "send",
+          "receive",
+          "read-remote",
+          "apply"
+        ],
+        "label": "Follow the test marker across capture, transport and delivery.",
+        "states": {
+          "target": "Verified"
+        },
+        "blocked": []
+      }
+    ],
+    "gg-graceful-shutdown": [
+      {
+        "nodes": [
+          "source",
+          "redo"
+        ],
+        "edges": [
+          "redo-write"
+        ],
+        "label": "Commit the final mapped marker after new mapped work is paused.",
+        "states": {
+          "source": "Last marker"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "redo",
+          "extract",
+          "trail",
+          "capck"
+        ],
+        "edges": [
+          "capture",
+          "write-local",
+          "ext-cp"
+        ],
+        "label": "Capture the final source work and save the capture checkpoint.",
+        "states": {
+          "extract": "Draining"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "trail",
+          "pump",
+          "collector",
+          "remote",
+          "capck"
+        ],
+        "edges": [
+          "read-local",
+          "send",
+          "receive",
+          "pump-cp"
+        ],
+        "label": "Drain the stable local trail and save the pump position.",
+        "states": {
+          "pump": "Draining"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "remote",
+          "replicat",
+          "target",
+          "cktab"
+        ],
+        "edges": [
+          "read-remote",
+          "apply",
+          "txn-cp"
+        ],
+        "label": "Drain the stable remote trail and verify the final target marker.",
+        "states": {
+          "replicat": "Draining"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "manager",
+          "mgrT",
+          "capck",
+          "repck",
+          "cktab"
+        ],
+        "edges": [],
+        "label": "Stop the in-scope Managers after their groups stop; preserve restart state.",
+        "states": {
+          "manager": "Stopped",
+          "mgrT": "Stopped"
+        },
+        "blocked": []
+      }
+    ],
+    "gg-patching": [
+      {
+        "nodes": [
+          "manager",
+          "mgrT",
+          "extract",
+          "replicat"
+        ],
+        "edges": [],
+        "label": "Compare GoldenGate homes, group modes, builds and trail compatibility.",
+        "states": {
+          "manager": "Inventory",
+          "mgrT": "Inventory"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "source",
+          "redo",
+          "extract",
+          "trail",
+          "pump",
+          "collector",
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "redo-write",
+          "capture",
+          "write-local",
+          "read-local",
+          "send",
+          "receive",
+          "read-remote",
+          "apply"
+        ],
+        "label": "Drain the tagged final source transaction through to the target.",
+        "states": {
+          "target": "Last marker"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "manager",
+          "mgrT",
+          "capck",
+          "repck"
+        ],
+        "edges": [],
+        "label": "Stop the affected groups; protect both installations, checkpoints and retained trails.",
+        "states": {
+          "manager": "Maintenance",
+          "mgrT": "Maintenance"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "manager",
+          "mgrT",
+          "extract",
+          "pump",
+          "replicat",
+          "capck",
+          "repck"
+        ],
+        "edges": [],
+        "label": "Verify the running builds, reports and restart positions on both hosts.",
+        "states": {
+          "extract": "Restarted",
+          "replicat": "Restarted"
+        },
+        "blocked": []
+      },
+      {
+        "nodes": [
+          "source",
+          "redo",
+          "extract",
+          "trail",
+          "pump",
+          "collector",
+          "remote",
+          "replicat",
+          "target"
+        ],
+        "edges": [
+          "redo-write",
+          "capture",
+          "write-local",
+          "read-local",
+          "send",
+          "receive",
+          "read-remote",
+          "apply"
+        ],
+        "label": "Validate the GoldenGate patch by following a new committed marker.",
+        "states": {
+          "target": "Verified"
+        },
+        "blocked": []
+      }
+    ]
+  }
+}</script>
 <script type="application/json" id="lesson-data">{
   "flows": [
     [
@@ -205,6 +1066,7 @@ window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener(
       "Which observation distinguishes slow apply from a transport outage?",
       "Fresh transactions are arriving in the remote trail while Replicat is stalled on its target operation. Compare positions over time within each stream and correlate with the target session.",
       [
+        0,
         2,
         3
       ]
@@ -365,7 +1227,123 @@ const links=Array.from(document.querySelectorAll('[data-lesson]'));
 const components=Array.from(document.querySelectorAll('[data-node]'));
 let current=flows[0];
 let frame=0;
+
+const topology = JSON.parse(get('architecture-model').textContent);
+const nodeInfo = new Map(topology.nodes.map(n => [n.id, n]));
+const timers = { playback: 0 };
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const svgNamespace = 'http://www.w3.org/2000/svg';
+let playing = false;
+function inspectComponent(id, pinned) {
+  const info = nodeInfo.get(id);
+  get('component-title').textContent = info.label + ' · ';
+  get('component-detail').textContent = info.detail;
+  for(const component of components) {
+    component.toggleAttribute('data-inspected', pinned && component.dataset.node === id);
+  }
+}
+function clearPackets() {
+  get('packets').replaceChildren();
+}
+function showRoute(path, moving, order) {
+  const kind = path.dataset.kind;
+  const motionColor = kind === 'data' ? '#8af3e4' : '#ffcf81';
+  path.classList.add('is-active');
+  path.setAttribute('marker-end', 'url(#arrow-' + (kind === 'data' ? 'on' : 'control') + ')');
+  if (!moving || reducedMotion.matches) return;
+  const dot = document.createElementNS(svgNamespace, 'circle');
+  dot.setAttribute('r', '4');
+  dot.setAttribute('fill', motionColor);
+  dot.setAttribute('visibility', 'hidden');
+  const motion = document.createElementNS(svgNamespace, 'animateMotion');
+  motion.setAttribute('path', path.getAttribute('d'));
+  motion.setAttribute('begin', 'indefinite');
+  motion.setAttribute('dur', String(1.35 / Number(get('speed').value)) + 's');
+  motion.setAttribute('repeatCount', '2');
+  motion.addEventListener('beginEvent', () => dot.setAttribute('visibility', 'visible'));
+  motion.addEventListener('endEvent', () => dot.setAttribute('visibility', 'hidden'));
+  dot.append(motion);
+  get('packets').append(dot);
+  if (typeof motion.beginElementAt === 'function') motion.beginElementAt(order * 0.09 / Number(get('speed').value));
+}
+function paintTopology(lesson, index) {
+  const model = topology.frames[lesson][index];
+  const lit = new Set(model.nodes);
+  const primary = current[4][index][0];
+  lit.add(primary);
+  clearPackets();
+  for (const node of components) {
+    const id = node.dataset.node;
+    node.classList.toggle('is-active', lit.has(id));
+    node.querySelector('.node-state').textContent = model.states[id] || nodeInfo.get(id).sub;
+  }
+  for (const path of document.querySelectorAll('.arch-edge')) {
+    path.classList.remove('is-active','is-blocked');
+    path.setAttribute('marker-end','url(#arrow-idle)');
+  }
+  for (const [i,id] of model.edges.entries()) showRoute(get('link-' + id), true, i);
+  for (const id of model.blocked) {
+    const path = get('link-' + id);
+    path.classList.add('is-blocked');
+    path.setAttribute('marker-end', 'url(#arrow-blocked)');
+    const p = path.getPointAtLength(path.getTotalLength() / 2);
+    const mark = document.createElementNS(svgNamespace, 'text');
+    mark.setAttribute('class','arch-stop-mark');mark.setAttribute('text-anchor','middle');
+    mark.setAttribute('x',String(p.x));mark.setAttribute('y',String(p.y+6));mark.textContent='×';
+    get('packets').append(mark);
+  }
+  get('arch-focus').textContent = model.label;
+  inspectComponent(primary, false);
+  const box = get('arch-scroll'), node = components.find(n => n.dataset.node === primary);
+  if (box.scrollWidth > box.clientWidth + 2 && node) {
+    const rect = node.getBoundingClientRect(), view = box.getBoundingClientRect();
+    if (rect.left < view.left || rect.right > view.right) box.scrollLeft += rect.left - view.left - (view.width-rect.width)/2;
+  }
+}
+function updatePlayButton() {
+  const button = get('play');
+  button.textContent = playing ? 'Pause' : 'Play';
+  button.setAttribute('aria-pressed',String(playing));
+}
+function stopPlayback() {
+  clearTimeout(timers.playback); timers.playback = 0;
+  playing = false; updatePlayButton();
+}
+function scheduleNext() {
+  clearTimeout(timers.playback);
+  if (!playing) return;
+  timers.playback = setTimeout(() => {
+    if (frame < current[4].length - 1) frame++;
+    displayStep();
+    if (frame === current[4].length - 1) stopPlayback();
+    else scheduleNext();
+  }, 3000 / Number(get('speed').value));
+}
+for (const component of components) {
+  component.addEventListener('click', () => inspectComponent(component.dataset.node,true));
+  component.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      inspectComponent(component.dataset.node,true);
+    }
+  });
+}
+get('play').addEventListener('click', () => {
+  if (playing) { stopPlayback(); get('architecture').pauseAnimations?.(); return; }
+  if (frame === current[4].length - 1) frame = 0;
+  playing=true; updatePlayButton(); displayStep(); scheduleNext();
+});
+get('speed').addEventListener('change', () => { if (playing) {displayStep(); scheduleNext();} });
+get('fit').addEventListener('click', () => {
+  const fit = get('arch-scroll').classList.toggle('fit');
+  get('fit').setAttribute('aria-pressed',String(fit));get('fit').textContent=fit?'Enlarge diagram':'Fit diagram';
+});
+reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) clearPackets(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) {stopPlayback();get('architecture').pauseAnimations?.();} });
+
 function displayStep(){
+  get("architecture").unpauseAnimations?.();
+  paintTopology(current[0],frame);
   const [node,title,explanation]=current[4][frame];
   for(const component of components){
     const active=component.dataset.node===node;
@@ -384,6 +1362,7 @@ function displayStep(){
   if(!end) get('answer').open=false;
 }
 function selectLesson(){
+  stopPlayback();
   const id=location.hash.slice(1);
   current=flows.find(f=>f[0]===id)||flows[0];
   frame=0;
@@ -407,9 +1386,9 @@ function selectLesson(){
 }
 for(const link of links) link.addEventListener('click',()=>{if(link.hash===location.hash) selectLesson();});
 window.addEventListener('hashchange',()=>{if(location.hash!=='#demo') selectLesson();});
-get('previous').addEventListener('click',()=>{if(frame>0){frame--;displayStep();}});
-get('next').addEventListener('click',()=>{if(frame<current[4].length-1){frame++;displayStep();}});
-get('reset').addEventListener('click',()=>{frame=0;displayStep();});
+get('previous').addEventListener('click',()=>{stopPlayback();if(frame>0){frame--;displayStep();}});
+get('next').addEventListener('click',()=>{stopPlayback();if(frame<current[4].length-1){frame++;displayStep();}});
+get('reset').addEventListener('click',()=>{stopPlayback();frame=0;displayStep();});
 selectLesson();
 </script>
 </body>

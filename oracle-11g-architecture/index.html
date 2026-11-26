@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Offline Oracle Database 11g architecture and SQL execution trainer">
+  <meta name="description" content="Offline Oracle Database 11g Release 2 (11.2.0.4) architecture and SQL execution trainer">
   <meta name="author" content="Cyril Jones S">
-  <meta name="copyright" content="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026">
   <title>Oracle Database 11g Interactive Architecture</title>
   <style>
     :root {
@@ -2301,10 +2301,10 @@
     <header id="architecture-home" class="trainer-header glass">
       <div>
         <h1>Oracle Database 11g Interactive Architecture</h1>
-        <p class="subtitle">Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
+        <p class="subtitle">11g Release 2 (11.2.0.4) | Instance | Memory | Processes | Storage | SQL Execution | Commit | DDL | Recovery</p>
       </div>
       <div class="header-side">
-        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026"></p>
+        <p id="developerCredit" class="source-note credit-lock" data-credit="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026" aria-label="Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026"></p>
         <button id="architectureScrollCue" class="scroll-cue" type="button" aria-label="Scroll down to the dynamic architecture diagram">
           <span>Dynamic architecture diagram</span>
           <span class="cue-arrow" aria-hidden="true">&#8595;</span>
@@ -2747,7 +2747,7 @@
   </div>
 
   <div id="creditTamperBanner" class="tamper-banner" role="alert" hidden>
-    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026.
+    Developer credit check failed. This offline trainer is labeled: Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026.
   </div>
 
   <dialog id="referencesModal" class="modal" aria-labelledby="referencesTitle">
@@ -2758,6 +2758,11 @@
       </div>
       <p>These links are listed for instructor reference. The trainer does not load them at runtime and remains fully offline after saving this file.</p>
       <ul>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admcon.htm">RAC instances, shared storage, Cache Fusion and the interconnect</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm">Data Guard redo transport and standby redo logs</a></li>
+        <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm">Data Guard with Oracle RAC instances at both sites</a></li>
+        <li><a href="https://docs.oracle.com/cd/E35209_01/doc.1121/e29397.pdf">Oracle GoldenGate 11.2.1 classic capture, trails and delivery</a></li>
+        <li><a href="https://docs.oracle.com/cd/E24628_01/doc.121/e25353/overview.htm">Enterprise Manager Cloud Control 12.1 components for monitoring database targets</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/sqllangu.htm">Oracle 11g Concepts: SQL processing</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e40540/memory.htm">Oracle 11g Concepts: memory architecture</a></li>
         <li><a href="https://docs.oracle.com/cd/E11882_01/server.112/e25494/start.htm">Oracle 11gR2 Administrator’s Guide to starting up and shutting down</a></li>
@@ -2822,7 +2827,7 @@
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const SVG_NS = "http://www.w3.org/2000/svg";
-      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v80 | Updated : 26-Nov-2026";
+      const DEVELOPER_CREDIT = "Designer : Cyril Jones S | Version : v81 | Updated : 26-Nov-2026";
       let flowCueSerial = 0;
       let flowPathSerial = 0;
       let layoutFrame = 0;

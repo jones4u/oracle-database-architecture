@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="copyright" content="Designer : Cyril Jones S | Version : v2 | Updated : 25-Nov-2026">
+  <title>RAC + Data Guard · Oracle 11g R2 Architecture</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0f151d;--surface:#17222e;--line:#384856;--ink:#edf3f5;--muted:#b1c2cb;--link:#95dcdf;--active:#ffcf78}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Arial,sans-serif}main,header,footer{max-width:1180px;margin:auto;padding:0 24px}header{padding-top:20px}
+    a{color:var(--link)}a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:.25rem .85rem;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}nav a{font-size:.91em}nav a[aria-current]{font-weight:bold;color:var(--ink);text-decoration:none}h1{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin:24px 0 4px}header p{margin:5px 0;color:var(--muted)}.ver{font-size:.84rem}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}h2{font-size:1.22rem;margin:0 0 .6em}h3{font-size:.98rem;color:var(--muted);margin:15px 0 5px}button,select{color:var(--ink);font:inherit;background:#101d27;border:1px solid #667c88;border-radius:5px;padding:7px 10px}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}select{width:100%;margin:8px 0}label{font-weight:650}.level,.status,.note{color:var(--muted);font-size:.9rem}p{margin:.55rem 0}.actors,.actions{display:flex;flex-wrap:wrap;gap:7px}.actor{font-size:.91rem}.actor[aria-pressed=true]{color:#1c2430;background:var(--active);border-color:var(--active);font-weight:650}.focus{color:var(--active);font-size:.9rem}.step{min-height:3em;font-size:1.13rem}.actions{margin:1rem 0}.next{background:#155b61;border-color:#70b6bf}details{border-top:1px solid var(--line);padding:.65rem 0;margin-top:.7rem}summary{color:var(--link)}.refs{margin-top:.9rem}.refs a{display:inline-block;margin:0 12px 5px 0}.related{font-size:.95rem;border-top:1px solid var(--line);padding-top:12px}footer{margin-bottom:22px}.sr{position:absolute;left:-10000px}.sr:focus{left:20px;top:10px;background:var(--bg);z-index:1}
+    @media(max-width:760px){main,header,footer{padding-left:14px;padding-right:14px}.layout{grid-template-columns:1fr}.panel{padding:13px}.actor{padding:5px 7px}.step{min-height:0}}
+  </style>
+</head>
+<body>
+  <a class="sr" href="#lesson">Skip to lesson</a>
+  <header><nav aria-label="Tower navigation"><a href="./index.html">Stand-Alone DB</a> <a href="./rac.html">RAC</a> <a href="./dataguard.html">Data Guard</a> <a href="./rac-dataguard.html" aria-current="page">RAC + Data Guard</a> <a href="./goldengate.html">GoldenGate</a> <a href="./oem.html">Enterprise Manager</a></nav><h1>RAC + Data Guard</h1><p>Trace what moves inside a cluster, what crosses a site link, and which service can recover from each failure.</p><p class="ver">Oracle Database 11g Release 2 · Tower v2</p></header>
+  <main><div class="layout"><section id="lesson" class="panel"><label for="workflow">Workflow</label><select id="workflow"><option value="both-1">Follow a block within a site and redo between sites</option><option value="both-2">Size standby redo logs for two primary threads</option><option value="both-3">Find a gap when thread sequence numbers overlap</option><option value="both-4">Move Redo Apply to the other standby instance</option><option value="both-5">Move the write service in a planned switchover</option><option value="both-6">Choose a response to three different outages</option><option value="both-7">Restore protection after a site failover</option><option value="startup">Startup sequence · two clusters, two roles and two primary redo threads</option><option value="graceful-shutdown">Graceful shutdown · maintain one RAC node while Data Guard protects the site</option><option value="patching">Patching · check both RAC rolling and standby-first support</option></select>
+    <p><a id="foundation" href="./index.html">Stand-Alone DB foundation</a></p><p id="level" class="level"></p><h2 id="title"></h2><p id="setup"></p>
+    <h3 id="progress"></h3><p id="step" class="step" aria-live="polite"></p>
+    <p id="focus" class="focus"></p><div class="actions"><button id="prev" type="button">Previous</button><button id="next" class="next" type="button">Next step</button></div>
+    <h3>Correctness check</h3><p id="question"></p><div id="decision" class="actions"></div><p id="verdict" role="status"></p><details id="answer"><summary>Suggested answer</summary><p></p></details>
+  </section><section class="panel" aria-label="Architecture"><h2>Architecture</h2><p class="note">Highlighted components take part in this step. Select any component to find its workflows.</p><section><h3>Site A cluster</h3><div class="actors"><button type="button" class="actor" data-actor="a1" aria-pressed="false">Instance A1</button><button type="button" class="actor" data-actor="a2" aria-pressed="false">Instance A2</button><button type="button" class="actor" data-actor="ia" aria-pressed="false">Private interconnect A</button><button type="button" class="actor" data-actor="ta" aria-pressed="false">Redo threads A</button><button type="button" class="actor" data-actor="fa" aria-pressed="false">Files at Site A</button></div></section><section><h3>Between sites</h3><div class="actors"><button type="button" class="actor" data-actor="wan" aria-pressed="false">Redo transport</button><button type="button" class="actor" data-actor="svc" aria-pressed="false">Application service</button><button type="button" class="actor" data-actor="br" aria-pressed="false">Broker / observer</button></div></section><section><h3>Site B cluster</h3><div class="actors"><button type="button" class="actor" data-actor="b1" aria-pressed="false">Instance B1</button><button type="button" class="actor" data-actor="b2" aria-pressed="false">Instance B2</button><button type="button" class="actor" data-actor="sb" aria-pressed="false">Standby logs B</button><button type="button" class="actor" data-actor="apply" aria-pressed="false">Apply coordinator</button><button type="button" class="actor" data-actor="tb" aria-pressed="false">Redo threads B</button><button type="button" class="actor" data-actor="fb" aria-pressed="false">Files at Site B</button></div></section><p class="status" id="inspect" aria-live="polite"></p></section></div>
+  <div class="refs"><h2>Oracle references for this workflow</h2><p id="sources"></p></div><p class="related">Review <a href="./rac.html#rac-7">a Cache Fusion block transfer</a> or <a href="./dataguard.html#dg-1">redo transport and apply</a>.</p><!-- authored-home-crosslinks -->
+<details id="homeFoundations" style="margin:1rem 0"><summary>Related Stand-Alone DB workflows</summary><ul></ul></details>
+<script>(function(){
+const related={"both-5":[["user-login","Follow a client reconnecting to its primary-role service after a planned site transition."],["connection-failure-rca","Verify that the primary-role service runs at the new site and the client can reach that endpoint."]],"both-1":[["select-cache-hit","Trace an instance cache supplying a block inside one site before following redo to the other site."],["select-cache-miss","A primary instance obtains a block from its local RAC peer across the cluster interconnect."],["insert-commit","Trace the primary instance’s redo thread and the separate intersite transport path."],["update-commit","Follow a remote block read, an update and the corresponding thread’s redo at the standby."],["commit-durability","The write belongs to the instance’s thread. Receipt at the other site is a separate milestone."],["read-consistency","Identify a suitable block image on a peer within the primary site."],["single-block-read-diagnosis","Trace an in-cluster block transfer independently from intersite redo transport."],["redo-commit-latency","Separate the primary instance's redo path from the intersite redo transport path."],["buffer-contention","Identify which private interconnect carries a primary-site block before investigating intersite lag."]],"both-2":[["redo-log-switch","Count online groups and standby log groups for each primary instance's thread."],["archive-log-switch-pressure","Inspect online and standby log group counts by thread before attributing delayed reuse to the other site."]],"both-3":[["archive-destination-failure-rca","Use both thread and sequence to identify redo missing from the receiving site."]],"startup":[["instance-startup","Verify both clusters, database roles and the single 11g standby apply instance."]],"graceful-shutdown":[["shutdown-normal","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."],["shutdown-transactional","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."],["shutdown-immediate","Identify the role, service, instances and redo threads affected at the chosen site before stopping resources."]],"both-6":[["shutdown-abort","Compare losing a single instance with isolation or failure of the primary site."],["crash-recovery","Determine whether local instance recovery or a site-level role transition applies."],["performance-incident-rca","Localize a disruption to one instance, the transport network or the entire site before escalation."]],"both-7":[["rman-restore-recover","Choose reinstatement or re-creation of the former primary after checking flashback eligibility."],["flashback-database","Evaluate flashback enablement and retained history before reinstating the former primary."],["flashback-unavailable-rca","Choose standby re-creation if the former primary lacks sufficient flashback history."]],"patching":[["patch-quarterly-psu-spu","Sequence maintenance by site, Oracle home and instance, then check both primary redo threads and standby apply."],["patch-one-off","Check conflicts and compatible mixed states for each home, site and instance."],["patch-rollback","Verify version parity, role, service placement and redo continuity after a supported rollback."]]};
+function showRelated(){const current=document.querySelector("[data-lesson][aria-current=true]");
+ const selector=document.getElementById("workflow"), hash=location.hash.slice(1);
+ const valid=selector ? Array.from(selector.options).some(o=>o.value===hash) : Array.from(document.querySelectorAll("[data-lesson]")).some(a=>a.dataset.lesson===hash);
+ const route=valid ? hash : (selector && selector.value) || (current && current.dataset.lesson);
+ const block=document.getElementById("homeFoundations");const items=related[route] || [];
+ block.hidden=!items.length;block.querySelector("ul").replaceChildren(...items.map(([id,reason])=>{
+ const li=document.createElement("li"),a=document.createElement("a");a.href="./index.html#lesson="+id;a.textContent=id.split("-").join(" ");li.append(a,document.createTextNode(" — "+reason));return li;}));}
+window.addEventListener("DOMContentLoaded",showRelated);window.addEventListener("hashchange",()=>queueMicrotask(showRelated));})();</script>
+<!-- /authored-home-crosslinks -->
+</main><footer><a href="./index.html">Return to Stand-Alone DB</a></footer>
+  <script type="application/json" id="data">[
+  {
+    "id": "both-1",
+    "title": "Follow a block within a site and redo between sites",
+    "level": "Basic",
+    "setup": "Site A runs a two-instance RAC primary. Site B runs a two-instance physical standby. A suitable copy of the requested block is cached on A2.",
+    "steps": [
+      "Read the block from a session on A1 and trace its transfer from A2 across Site A’s private interconnect.",
+      "Update the row on A1 and follow the redo for that change in A1’s redo thread.",
+      "Follow redo transport across the site link to a standby redo log at Site B.",
+      "Watch the standby apply the change to its own database files."
+    ],
+    "actors": [
+      [
+        "a2",
+        "ia",
+        "a1"
+      ],
+      [
+        "a1",
+        "ta"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb"
+      ],
+      [
+        "apply",
+        "fb"
+      ]
+    ],
+    "question": "Which network carries the cached block, and what crosses the site link?",
+    "answer": "Cache Fusion transfers the block between the instances at Site A. Data Guard transports redo to Site B, where Redo Apply updates the standby’s copy of the database.",
+    "refs": [
+      [
+        "Introduction to Oracle RAC",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e17264/intro_tdprc.htm"
+      ],
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ]
+    ],
+    "home": "select-cache-miss"
+  },
+  {
+    "id": "both-2",
+    "title": "Size standby redo logs for two primary threads",
+    "level": "Intermediate",
+    "setup": "Primary instances A1 and A2 each have three online redo log groups of the same size. Both sites must be ready to become the standby.",
+    "steps": [
+      "Count the three online groups on thread 1 and repeat for thread 2.",
+      "Give each thread four standby redo log groups, each the size of the online groups in this example.",
+      "Place the eight standby groups on storage shared by the instances at Site B.",
+      "Repeat the layout on Site A so that it can receive both threads after a role change."
+    ],
+    "actors": [
+      [
+        "ta"
+      ],
+      [
+        "ta",
+        "sb"
+      ],
+      [
+        "sb",
+        "fb"
+      ],
+      [
+        "ta",
+        "fa"
+      ]
+    ],
+    "question": "If a fourth online group is added only to thread 2, how many standby groups does Site B need?",
+    "answer": "The 11gR2 minimum in this example becomes nine groups: four for thread 1 and five for thread 2. Count each thread separately.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Data Guard configuration",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/config_dg.htm"
+      ]
+    ],
+    "home": "redo-log-switch"
+  },
+  {
+    "id": "both-3",
+    "title": "Find a gap when thread sequence numbers overlap",
+    "level": "Advanced",
+    "setup": "A two-instance primary ships redo for two threads. In this simulation thread 1 sequence 42 arrived. Thread 2 sequence 42 is missing, while its sequence 43 is already archived.",
+    "steps": [
+      "Group the simulated standby records by thread and sequence within the same database incarnation.",
+      "Find the blocking range and identify thread 2 sequence 42. Inspect the separate progress visible for thread 1.",
+      "Follow retrieval of the missing archive and watch recovery advance once the required redo is available."
+    ],
+    "actors": [
+      [
+        "ta",
+        "sb"
+      ],
+      [
+        "sb",
+        "apply"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb",
+        "apply"
+      ]
+    ],
+    "question": "Why is the already received sequence 42 insufficient?",
+    "answer": "A log is identified by its thread and sequence within an incarnation. Thread 1 sequence 42 cannot supply thread 2’s missing changes.",
+    "refs": [
+      [
+        "Redo transport services",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/log_transport.htm"
+      ],
+      [
+        "Data Guard with Oracle RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ]
+    ],
+    "home": "archive-destination-failure-rca"
+  },
+  {
+    "id": "both-4",
+    "title": "Move Redo Apply to the other standby instance",
+    "level": "Intermediate",
+    "setup": "Site B has two running instances with shared storage. The broker manages Redo Apply on B1 and B2 is eligible to take over.",
+    "steps": [
+      "Follow redo from both primary threads into Site B and identify B1 as the apply instance.",
+      "Simulate losing B1 and observe the pause in apply progress.",
+      "After the configured apply-instance timeout, watch the broker start Redo Apply on B2.",
+      "Check that progress resumes and Site B still reports the physical standby role."
+    ],
+    "actors": [
+      [
+        "ta",
+        "wan",
+        "sb",
+        "b1"
+      ],
+      [
+        "b1",
+        "apply"
+      ],
+      [
+        "br",
+        "b2",
+        "apply"
+      ],
+      [
+        "apply",
+        "fb"
+      ]
+    ],
+    "question": "Which responsibility moved from B1 to B2?",
+    "answer": "Coordination of Redo Apply moved to B2. One instance coordinates apply for the 11gR2 RAC standby, and Site A keeps the primary role.",
+    "refs": [
+      [
+        "Broker database management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/dbresource.htm"
+      ],
+      [
+        "Data Guard with Oracle RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "both-5",
+    "title": "Move the write service in a planned switchover",
+    "level": "Advanced",
+    "setup": "A primary-role service is configured on both clusters. Clients know how to reach both sites, and the standby is ready for a planned role transition.",
+    "steps": [
+      "Check that the broker reports the primary and the target standby ready for switchover.",
+      "Follow the planned transition as Site A becomes a physical standby and Site B becomes primary.",
+      "Observe Clusterware bring the primary-role service online at Site B.",
+      "Reconnect through the service and verify that redo now flows from Site B to Site A."
+    ],
+    "actors": [
+      [
+        "br",
+        "a1",
+        "b1"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb"
+      ],
+      [
+        "svc",
+        "b1"
+      ],
+      [
+        "tb",
+        "wan",
+        "fa"
+      ]
+    ],
+    "question": "What must be configured in advance for learners to reconnect to the same service name at Site B?",
+    "answer": "The primary-role service must be defined at both sites, and clients must be able to discover or reach the new primary through their connection configuration.",
+    "refs": [
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ],
+      [
+        "Data Guard with Oracle RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ]
+    ],
+    "home": "user-login"
+  },
+  {
+    "id": "both-6",
+    "title": "Choose a response to three different outages",
+    "level": "Ultra-advanced",
+    "setup": "Start each case from a healthy two-site configuration. Fast-start failover is enabled with an observer and an eligible target standby.",
+    "steps": [
+      "Lose A1 while A2 is reachable and watch the observer reconnect to the surviving primary instance.",
+      "Restore the baseline, then interrupt redo transport while the observer can still contact Site A. Inspect transport lag and database roles.",
+      "Restore the baseline again, then isolate all primary instances from both the observer and target standby.",
+      "Check the configured threshold, target readiness and protection-mode requirements before deciding whether the observer can initiate failover."
+    ],
+    "actors": [
+      [
+        "a1",
+        "a2",
+        "br"
+      ],
+      [
+        "ta",
+        "wan"
+      ],
+      [
+        "br",
+        "a1",
+        "a2"
+      ],
+      [
+        "br",
+        "b1"
+      ]
+    ],
+    "question": "Which of these cases can lead to fast-start failover in this scenario?",
+    "answer": "The third can qualify when the observer and target lose the primary and the required conditions hold. A surviving reachable primary instance or a transport-only interruption leaves Site A primary.",
+    "refs": [
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ],
+      [
+        "Broker database management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/dbresource.htm"
+      ]
+    ],
+    "home": "crash-recovery"
+  },
+  {
+    "id": "both-7",
+    "title": "Restore protection after a site failover",
+    "level": "Ultra-advanced",
+    "setup": "Site B is primary after a failover. Site A has returned, and the application write service is running at Site B.",
+    "steps": [
+      "Identify Site B as the current primary and keep application writes on that site.",
+      "Check whether Flashback Database was enabled on Site A before failure and whether sufficient flashback logs remain.",
+      "When the broker declares Site A eligible and connectivity is available, follow its reinstatement as a physical standby. Otherwise follow the re-creation path from Site B.",
+      "Trace new redo from Site B to Site A and check that standby recovery advances."
+    ],
+    "actors": [
+      [
+        "svc",
+        "b1"
+      ],
+      [
+        "fa"
+      ],
+      [
+        "br",
+        "fa"
+      ],
+      [
+        "tb",
+        "wan",
+        "fa"
+      ]
+    ],
+    "question": "When is having Site A back online insufficient for broker reinstatement?",
+    "answer": "Reinstatement also needs prior Flashback Database enablement, enough retained flashback logs, connectivity and an eligible database. Re-create the standby when reinstatement is unavailable.",
+    "refs": [
+      [
+        "Broker role management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/sofo.htm"
+      ],
+      [
+        "Broker database management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/dbresource.htm"
+      ]
+    ],
+    "home": "flashback-database"
+  },
+  {
+    "id": "startup",
+    "title": "Startup sequence · two clusters, two roles and two primary redo threads",
+    "level": "Basic",
+    "setup": "A1 and A2 host the known primary. B1 and B2 host one physical standby. Each site has independent Grid Infrastructure and shared storage. B1 is the intended apply instance.",
+    "steps": [
+      "Verify local cluster dependencies and storage independently at each site. Confirm database identities and roles, local listener endpoints and the intersite destination.",
+      "Bring up the physical standby instances to their configured state. Enable the intended Redo Apply state with one instance coordinating recovery in 11gR2.",
+      "Open the primary instances subject to the protection policy. Check service placement, a fresh client session and that both primary redo threads are enabled.",
+      "Trace a change on each primary instance across the site link. Verify receipt for each thread and fresh apply progress at the standby before declaring the topology ready."
+    ],
+    "actors": [
+      [
+        "ia",
+        "fa",
+        "sb",
+        "fb"
+      ],
+      [
+        "b1",
+        "b2",
+        "apply"
+      ],
+      [
+        "a1",
+        "a2",
+        "ta",
+        "svc"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb",
+        "apply"
+      ]
+    ],
+    "question": "What distinguishes a complete verification from checking only A1?",
+    "options": [
+      "Seeing a SCAN address",
+      "Two standby apply coordinators",
+      "Both primary threads reach Site B, its single apply coordinator advances, and the service works"
+    ],
+    "correct": 2,
+    "answer": "A single successful thread can conceal a missing destination or service on the second primary instance.",
+    "refs": [
+      [
+        "Data Guard and RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ],
+      [
+        "Broker database resource management",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e40771/dbresource.htm"
+      ]
+    ],
+    "home": "instance-startup"
+  },
+  {
+    "id": "graceful-shutdown",
+    "title": "Graceful shutdown · maintain one RAC node while Data Guard protects the site",
+    "level": "Intermediate",
+    "setup": "Site A is primary, Site B is a healthy RAC physical standby. The change window affects A1. An alternate branch covers a planned stop of the entire primary site.",
+    "steps": [
+      "Identify the maintenance boundary. Move the write service to eligible A2 and drain or reconnect application sessions according to policy.",
+      "Consistently shut A1. Check A2 still serves the same database role and a new client transaction succeeds on its redo thread.",
+      "Verify the last available A1 redo and continuing A2 redo at Site B. Check the apply coordinator and both database roles. A stopped primary thread need not keep generating redo.",
+      "For a whole primary-site outage, choose between an approved service outage and a planned switchover. If continuous write service is required, verify switchover readiness and the new primary service before shutting the former site."
+    ],
+    "actors": [
+      [
+        "svc",
+        "a1",
+        "a2"
+      ],
+      [
+        "a1",
+        "a2",
+        "ta"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb",
+        "apply"
+      ],
+      [
+        "br",
+        "svc",
+        "ta"
+      ]
+    ],
+    "question": "Does shutting one primary RAC instance require promoting the standby?",
+    "options": [
+      "No, while the surviving primary instance serves the database",
+      "Yes, whenever one thread becomes idle",
+      "Yes, to restart the local listener"
+    ],
+    "correct": 0,
+    "answer": "The scope of the failure determines the response. Local service continuity and thread-specific transport can be checked without changing database roles.",
+    "refs": [
+      [
+        "Managing RAC instances and services",
+        "https://docs.oracle.com/cd/E11882_01/rac.112/e41960/admin.htm"
+      ],
+      [
+        "Data Guard and RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ]
+    ],
+    "home": "shutdown-immediate"
+  },
+  {
+    "id": "patching",
+    "title": "Patching · check both RAC rolling and standby-first support",
+    "level": "Advanced",
+    "setup": "Two independent two-node clusters use local database homes. A physical standby receives both primary threads. One standby instance coordinates apply.",
+    "steps": [
+      "Inventory all four database homes, Grid versions if relevant, database roles, patches, conflicts and rollback points. Evaluate RAC rolling eligibility and Data Guard standby-first certification independently for the exact patch.",
+      "When both approvals and the README permit, patch standby nodes in its specified order. Plan apply placement and verify it resumes after a coordinator restart. Keep the mixed-version interval within the documented limits.",
+      "Follow the primary phase in the README, relocating eligible services and verifying each node before the next. If either capability is unsupported, use the approved outage or upgrade procedure for the affected scope.",
+      "Perform prescribed SQL work in the correct database role and phase. Confirm inventory on every home, application service, both redo threads, standby role, apply progress and renewed protection."
+    ],
+    "actors": [
+      [
+        "a1",
+        "a2",
+        "b1",
+        "b2"
+      ],
+      [
+        "b1",
+        "b2",
+        "apply"
+      ],
+      [
+        "svc",
+        "a1",
+        "a2"
+      ],
+      [
+        "ta",
+        "wan",
+        "sb",
+        "apply"
+      ]
+    ],
+    "question": "The README certifies RAC rolling. What else is required before a standby-first rollout?",
+    "options": [
+      "A matching SCAN name at both sites",
+      "Separate standby-first certification and a supported sequence for this exact configuration",
+      "An extra standby instance alone"
+    ],
+    "correct": 1,
+    "answer": "RAC rolling governs temporary differences within a cluster. Data Guard certification governs the allowed differences between primary and physical standby homes.",
+    "refs": [
+      [
+        "Reducing downtime for planned maintenance",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e10803/schedule_outage.htm"
+      ],
+      [
+        "Data Guard and RAC",
+        "https://docs.oracle.com/cd/E11882_01/server.112/e41134/rac_support.htm"
+      ]
+    ],
+    "home": "patch-quarterly-psu-spu"
+  }
+]</script>
+  <script>
+    const flows = JSON.parse(document.getElementById('data').textContent);
+    const select = document.getElementById('workflow');
+    const names = new Map([...document.querySelectorAll('.actor')].map(b => [b.dataset.actor, b.textContent]));
+    const el = id => document.getElementById(id);
+    let pos = 0;
+    function paint() {
+      const flow = flows[select.selectedIndex];
+      el('level').textContent = flow.level;
+      el('title').textContent = flow.title;
+      el('setup').textContent = flow.setup;
+      el('progress').textContent = 'Step ' + (pos + 1) + ' of ' + flow.steps.length;
+      el('step').textContent = flow.steps[pos];
+      el('focus').textContent = 'In focus · ' + flow.actors[pos].map(a => names.get(a)).join(' · ');
+      el('question').textContent = flow.question;
+      el('foundation').href = './index.html#lesson=' + flow.home;
+      el('foundation').textContent = 'Stand-Alone DB lesson · ' + flow.home.split('-').join(' ');
+      el('verdict').textContent = '';
+      el('decision').replaceChildren(...(flow.options || []).map((label, i) => {
+        const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+        button.addEventListener('click', () => { el('verdict').textContent = (i === flow.correct ? 'Correct. ' : 'Try again. ') + flow.answer; });
+        return button;
+      }));
+      el('answer').querySelector('p').textContent = flow.answer;
+      el('prev').disabled = pos === 0;
+      el('next').textContent = pos === flow.steps.length - 1 ? 'Replay' : 'Next step';
+      for (const b of document.querySelectorAll('.actor')) b.setAttribute('aria-pressed', String(flow.actors[pos].includes(b.dataset.actor)));
+      el('sources').replaceChildren(...flow.refs.map(([name, url]) => { const a = document.createElement('a'); a.href=url; a.textContent=name; return a; }));
+    }
+    function readRoute() {
+      const requested = location.hash.slice(1);
+      select.selectedIndex = Math.max(0, flows.findIndex(flow => flow.id === requested));
+      pos=0; el('answer').open=false;el('inspect').textContent='';paint();
+    }
+    select.addEventListener('change', () => { location.hash = select.value; readRoute(); });
+    window.addEventListener('hashchange', readRoute);
+    el('next').addEventListener('click', () => {pos=(pos+1)%flows[select.selectedIndex].steps.length; el('answer').open=false;paint();});
+    el('prev').addEventListener('click', () => {if(pos>0) pos--; el('answer').open=false;paint();});
+    for (const b of document.querySelectorAll('.actor')) b.addEventListener('click', () => {
+      const related=flows.filter(flow=>flow.actors.some(step=>step.includes(b.dataset.actor)));
+      el('inspect').textContent=b.textContent+' appears in '+related.map(flow=>flow.title).join(' · ')+'.';
+    });
+    readRoute();
+  </script>
+</body></html>
